@@ -292,9 +292,9 @@ export class TimerPaneView extends ItemView {
 	private openPicker(): void {
   const { gateway, controller } = this.services;
   if (this.picker || controller.isBusy() || !gateway.startAvailability().available) return;
-  const modal = new TaskPickerModal(this.app, gateway, controller, () => {
+  const modal = new TaskPickerModal(this.app, { mode: "start", gateway, controller, onClose: () => {
    if (this.picker === modal) this.picker = null;
-  });
+  } });
   this.picker = modal;
   modal.open();
  }

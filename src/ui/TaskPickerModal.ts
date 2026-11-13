@@ -7,7 +7,17 @@ import type { TaskNotesGateway } from "../tasknotes/TaskNotesBridge";
 import type { TaskInfo } from "../tasknotes/runtime-api.types";
 
 /** Each opening reads once; keystrokes rank the local snapshot through public SuggestModal. */
+export interface TaskPickerOptions {
+ mode: "start";
+ gateway: TaskNotesGateway;
+ controller: Pick<TimerController, "start" | "isBusy">;
+ onClose: () => void;
+}
+
 export class TaskPickerModal extends SuggestModal<TaskInfo> {
+ private readonly gateway: TaskNotesGateway;
+ private readonly controller: TaskPickerOptions["controller"];
+ private readonly didClose: () => void;
  private tasks: TaskInfo[] = [];
  private completed = new Set<string>();
  /** D-17: the normalized path the active Pomodoro is timing, read at open; informational only. */
@@ -19,10 +29,11 @@ export class TaskPickerModal extends SuggestModal<TaskInfo> {
  private components = new Set<Component>();
  private offState: (() => void) | null = null;
 
- constructor(app: App, private readonly gateway: TaskNotesGateway,
-  private readonly controller: Pick<TimerController, "start" | "isBusy">,
-  private readonly didClose: () => void) {
+ constructor(app: App, options: TaskPickerOptions) {
   super(app);
+  this.gateway = options.gateway;
+  this.controller = options.controller;
+  this.didClose = options.onClose;
   this.setPlaceholder("Choose a task to start");
   this.emptyStateText = "Loading tasks…";
  }

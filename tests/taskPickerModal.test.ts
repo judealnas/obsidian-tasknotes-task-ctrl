@@ -46,7 +46,7 @@ describe("task picker lifecycle", () => {
   gateway.listTasks = () => Promise.resolve([task]);
   const start = vi.fn(() => Promise.resolve("started" as const));
   const closed = vi.fn();
-  const modal = new TaskPickerModal({} as App, gateway, { start, isBusy: () => false }, closed);
+  const modal = new TaskPickerModal({} as App, { mode: "start", gateway, controller: { start, isBusy: () => false }, onClose: closed });
   return { modal, gateway, start, closed };
  }
  test("unloads row renderers and discards slow results on query change and close", async () => {
@@ -84,7 +84,7 @@ test.each([false, true])("picker read failure closes and releases guards when No
  const gateway = createFakeGateway(); gateway.listTasks = () => Promise.reject(new Error("Read failed"));
  const closed = vi.fn(); host.notices = 0; host.throwNotice = throws;
  const errorLog = vi.spyOn(console, "error").mockImplementation(() => undefined);
- const modal = new TaskPickerModal({} as App, gateway, { start: () => Promise.resolve("started"), isBusy: () => false }, closed);
+ const modal = new TaskPickerModal({} as App, { mode: "start", gateway, controller: { start: () => Promise.resolve("started"), isBusy: () => false }, onClose: closed });
  modal.onOpen(); await flush();
  expect(closed).toHaveBeenCalledTimes(1); expect(host.notices).toBe(1);
  expect(modal.getSuggestions("")).toEqual([]);
@@ -102,7 +102,7 @@ describe("Pomodoro row tag (D-17)", () => {
   gateway.pomodoroOwnership = read;
   const closed = vi.fn();
   const start = vi.fn(() => Promise.resolve("started" as const));
-  const modal = new TaskPickerModal({} as App, gateway, { start, isBusy: () => false }, closed);
+  const modal = new TaskPickerModal({} as App, { mode: "start", gateway, controller: { start, isBusy: () => false }, onClose: closed });
   return { modal, gateway, read, closed, start };
  }
  function tags(modal: TaskPickerModal, row: typeof task | typeof other): Element[] {

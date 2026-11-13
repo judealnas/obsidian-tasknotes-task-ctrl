@@ -7,7 +7,7 @@ vi.mock("../src/ui/TaskPickerModal", () => ({ TaskPickerModal: class {
 	private gateway: ReturnType<typeof createFakeGateway>;
 	private didClose: () => void;
 	constructor(_app: unknown, options: { mode?: string; gateway: ReturnType<typeof createFakeGateway>; onClose: () => void } | ReturnType<typeof createFakeGateway>, _controller?: unknown, onClose?: () => void) {
-		this.options = options;
+		this.options = "gateway" in options ? options : {};
 		this.gateway = "gateway" in options ? options.gateway : options;
 		this.didClose = "gateway" in options ? options.onClose : onClose!;
 		pickerHost.instances.push(this);
