@@ -118,6 +118,8 @@ export class ItemView extends Component {
 	contentEl = this.containerEl.createDiv();
 	app = { workspace };
 	constructor(public leaf: WorkspaceLeaf) { super(); }
+	getState(): Record<string, unknown> { return {}; }
+	setState(_state: unknown, _result: unknown): Promise<void> { return Promise.resolve(); }
 }
 export class SuggestModal {}
 export const Keymap = { isModEvent: (event: HostEvent) => event.button === 1 ? "tab" : event.ctrlKey || event.metaKey };

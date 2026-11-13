@@ -5,7 +5,7 @@ import { TimerPaneView, type TimerPaneServices } from "../src/ui/TimerPaneView";
 import type { OpenTimer, TimerSnapshot } from "../src/model/timeMath";
 import { CardOrderStore } from "../src/state/CardOrderStore";
 import { createFakeGateway } from "./fakes/fakeGateway";
-import { Element, event, flush, resetViewHost, viewHost, transfer, hostDocument } from "./fakes/viewHost";
+import { Element, event, flush, resetViewHost, viewHost, transfer, hostDocument, workspace } from "./fakes/viewHost";
 
 export function timer(patch: Partial<OpenTimer> = {}): OpenTimer {
 	return { taskPath: "A.md", title: "Task A", startTime: "2026-11-13T12:00:00Z", startMs: 0, state: "running", sessionStartedAt: "2026-11-13T12:00:00Z", sessionKey: "a", sortMs: 0, accumulatedMs: 0, segmentStartMs: Date.parse("2026-11-13T12:00:00Z"), totalKnown: true, entries: [], displayKey: "", ...patch };
@@ -27,6 +27,60 @@ export function setup(initial: OpenTimer[] = [timer()], cardOrder = new CardOrde
 }
 beforeEach(() => { vi.useFakeTimers(); vi.setSystemTime(new Date("2026-11-13T12:01:00Z")); resetViewHost(); });
 afterEach(() => { vi.clearAllTimers(); vi.useRealTimers(); vi.unstubAllGlobals(); });
+
+test("serializes explicit selection and requests layout saving after state changes", async () => {
+	const s = setup(); await s.view.onOpen();
+	const observed: unknown[] = [];
+	workspace.requestSaveLayout.mockImplementation(() => { observed.push(s.view.getState().tab); });
+	event(s.root.querySelectorAll(".tntp-tabs__tab")[0]!, "click");
+	expect(s.view.getState().tab).toBe("staged");
+	expect(observed.join(",")).toBe("staged");
+	await s.view.onClose();
+});
+
+test("restores both lifecycle orders with malformed state falling back to timers", async () => {
+	const cases: Array<[unknown, string]> = [[{ tab: "staged" }, "staged"], [{ tab: "timers" }, "timers"], [undefined, "timers"], [null, "timers"], [{}, "timers"], ["staged", "timers"], [["staged"], "timers"], [{ tab: 1 }, "timers"], [{ tab: "other" }, "timers"]];
+	for (const before of [true, false]) for (const [state, expected] of cases) {
+		const s = setup();
+		if (!before) await s.view.onOpen();
+		await s.view.setState(state, {});
+		if (before) await s.view.onOpen();
+		expect(s.view.getState().tab).toBe(expected);
+		expect(s.root.querySelectorAll(".tntp-tabs__tab")[expected === "staged" ? 0 : 1]!.getAttribute("aria-selected")).toBe("true");
+		await s.view.onClose();
+	}
+	expect(workspace.requestSaveLayout).not.toHaveBeenCalled();
+});
+
+test("links unique leaf tabs and supports automatic wrapped keyboard activation", async () => {
+	const one = setup(); const two = setup();
+	await one.view.setState({ tab: "staged" }, {});
+	await one.view.onOpen(); await two.view.onOpen();
+	const tabs = one.root.querySelectorAll(".tntp-tabs__tab");
+	const panels = one.root.querySelectorAll(".tntp-panel");
+	expect(one.root.querySelector(".tntp-tabs")!.getAttribute("role")).toBe("tablist");
+	for (let i = 0; i < 2; i++) {
+		expect(tabs[i]!.getAttribute("role")).toBe("tab");
+		expect(panels[i]!.getAttribute("role")).toBe("tabpanel");
+		expect(tabs[i]!.getAttribute("aria-controls")).toBe(panels[i]!.getAttribute("id"));
+		expect(panels[i]!.getAttribute("aria-labelledby")).toBe(tabs[i]!.getAttribute("id"));
+		expect(tabs[i]!.getAttribute("id")).not.toBe(two.root.querySelectorAll(".tntp-tabs__tab")[i]!.getAttribute("id"));
+	}
+	expect(panels[0]!.getAttribute("tabindex")).toBe("0");
+	for (const [key, index] of [["ArrowLeft", 1], ["ArrowRight", 0], ["End", 1], ["Home", 0]] as const) {
+		event(tabs[index === 0 ? 1 : 0]!, "keydown", { key });
+		expect(hostDocument.activeElement).toBe(tabs[index]);
+		expect(tabs[index]!.getAttribute("tabindex")).toBe("0");
+		expect(tabs[index === 0 ? 1 : 0]!.getAttribute("tabindex")).toBe("-1");
+	}
+	event(tabs[0]!, "keydown", { key: "Tab" });
+	expect(hostDocument.activeElement).toBe(panels[0]);
+	one.set([timer({ title: "Changed" })]); one.cardOrder.set(["a"]); await flush();
+	expect(hostDocument.activeElement).toBe(panels[0]);
+	expect(one.view.getState().tab).toBe("staged");
+	expect(two.view.getState().tab).toBe("timers");
+	await one.view.onClose(); await two.view.onClose();
+});
 
 test("switches stable panels with independent actions and empty states", async () => {
 	const s = setup(); await s.view.onOpen(); await flush();
