@@ -5,7 +5,7 @@ import { TimerPaneView, type TimerPaneServices } from "../src/ui/TimerPaneView";
 import type { OpenTimer, TimerSnapshot } from "../src/model/timeMath";
 import { CardOrderStore } from "../src/state/CardOrderStore";
 import { createFakeGateway } from "./fakes/fakeGateway";
-import { Element, event, flush, resetViewHost, viewHost, transfer, hostDocument, workspace } from "./fakes/viewHost";
+import { Element, event, flush, resetViewHost, viewHost, transfer, hostDocument, hostWindow, HostEvent, workspace } from "./fakes/viewHost";
 
 export function timer(patch: Partial<OpenTimer> = {}): OpenTimer {
 	return { taskPath: "A.md", title: "Task A", startTime: "2026-11-13T12:00:00Z", startMs: 0, state: "running", sessionStartedAt: "2026-11-13T12:00:00Z", sessionKey: "a", sortMs: 0, accumulatedMs: 0, segmentStartMs: Date.parse("2026-11-13T12:00:00Z"), totalKnown: true, entries: [], displayKey: "", ...patch };
@@ -27,6 +27,54 @@ export function setup(initial: OpenTimer[] = [timer()], cardOrder = new CardOrde
 }
 beforeEach(() => { vi.useFakeTimers(); vi.setSystemTime(new Date("2026-11-13T12:01:00Z")); resetViewHost(); });
 afterEach(() => { vi.clearAllTimers(); vi.useRealTimers(); vi.unstubAllGlobals(); });
+
+test("both tabs share connection messages and disable cached header actions until the snapshot is ready", async () => {
+	for (const tab of ["staged", "timers"] as const) {
+		const s = setup(); await s.view.setState({ tab }, { history: false }); await s.view.onOpen(); await flush();
+		const panel = s.root.querySelector(`.tntp-panel--${tab}`)!;
+		for (const state of [{ kind: "missing" }, { kind: "incompatible", version: "4.9.0" }, { kind: "loading" }] as const) {
+			s.gateway.setState(state); await flush();
+			expect(s.view.getState().tab).toBe(tab);
+			for (const selector of [".tntp-start", ".tntp-pause-all", ".tntp-resume-all", ".tntp-stop-all"]) expect(s.root.querySelector(selector)!.disabled).toBe(true);
+			expect(panel.querySelector(".tntp-message__body")!.textContent).toContain(state.kind === "loading" ? "Connecting" : "This pane needs");
+			if (state.kind === "incompatible") expect(panel.querySelector(".tntp-message__meta")!.textContent).toBe("Installed version: 4.9.0");
+			const probes = s.gateway.probeCalls; event(panel.querySelector(".tntp-message__retry")!, "click"); expect(s.gateway.probeCalls).toBe(probes + 1);
+		}
+		s.set(null); s.gateway.setState({ kind: "ready" }); await flush();
+		expect(panel.querySelector(".tntp-message__body")!.textContent).toBe("Connecting to TaskNotes…");
+		expect(panel.classes.has("tntp-panel--loading")).toBe(true);
+		s.set([timer({ state: "paused", segmentStartMs: null })]); await flush();
+		expect(s.view.getState().tab).toBe(tab);
+		expect(s.root.querySelectorAll(".tntp-card")).toHaveLength(1);
+		await s.view.onClose(); s.view.unload();
+	}
+});
+
+test("Staged retains shell wake focus visibility and reveal refresh without writes and closes late completion", async () => {
+	const s = setup(); await s.view.setState({ tab: "staged" }, { history: false });
+	let finish!: (ready: boolean) => void;
+	s.controller.completionAvailable.mockImplementation(() => new Promise(resolve => { finish = resolve; }));
+	await s.view.onOpen();
+	vi.advanceTimersByTime(1000); const refreshes = s.store.requestRefresh.mock.calls.length;
+	vi.setSystemTime(new Date("2026-11-13T13:00:00Z")); vi.advanceTimersByTime(1000);
+	expect(s.store.requestRefresh.mock.calls.length).toBeGreaterThan(refreshes);
+	for (const [target, type] of [[hostWindow, "focus"], [hostDocument, "visibilitychange"]] as const) {
+		const before = s.store.requestRefresh.mock.calls.length; target.dispatchEvent(new HostEvent(type)); expect(s.store.requestRefresh.mock.calls.length).toBeGreaterThan(before);
+	}
+	s.root.shown = false; vi.advanceTimersByTime(1000); s.root.shown = true;
+	const before = s.store.requestRefresh.mock.calls.length; vi.advanceTimersByTime(1000); expect(s.store.requestRefresh.mock.calls.length).toBeGreaterThan(before);
+	s.set([timer({ title: "Started elsewhere" })]); finish(true); await flush();
+	expect(s.view.getState().tab).toBe("staged");
+	event(s.root.querySelectorAll(".tntp-tabs__tab")[1]!, "click"); expect(s.root.textContent).toContain("Started elsewhere");
+	for (const fn of [s.controller.stop, s.controller.start, s.controller.pause, s.controller.resume, s.controller.complete, s.controller.stopAll, s.controller.pauseAll, s.controller.resumeAll]) expect(fn).not.toHaveBeenCalled();
+	expect(s.gateway.startCalls).toHaveLength(0); expect(s.gateway.stopCalls).toHaveLength(0); expect(s.gateway.updateCalls).toHaveLength(0);
+	await s.view.onClose(); s.view.unload();
+	const afterClose = s.store.requestRefresh.mock.calls.length;
+	hostWindow.dispatchEvent(new HostEvent("focus")); hostDocument.dispatchEvent(new HostEvent("visibilitychange")); vi.advanceTimersByTime(10000);
+	s.gateway.setState({ kind: "missing" }); finish(true); await flush();
+	expect(s.store.requestRefresh).toHaveBeenCalledTimes(afterClose);
+	expect(vi.getTimerCount()).toBe(0);
+});
 
 test("serializes explicit selection and requests layout saving after state changes", async () => {
 	const s = setup(); await s.view.onOpen();

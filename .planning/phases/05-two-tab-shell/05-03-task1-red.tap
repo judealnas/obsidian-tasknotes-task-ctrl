@@ -1,0 +1,25 @@
+TAP version 13
+1..1
+not ok 1 - tests/timerPaneView.test.ts # time=48.64ms {
+    1..12
+    not ok 1 - both tabs share connection messages and disable cached header actions until the snapshot is ready # time=15.64ms
+        ---
+        error:
+            name: "AssertionError"
+            message: "expected false to be true // Object.is equality"
+        at: "C:/Users/ja384/Home/obsidian-tasknotes-timer-pane/.claude/worktrees/phase-05-discuss/tests/timerPaneView.test.ts:38:150"
+        actual: "false"
+        expected: "true"
+        ...
+    ok 2 - Staged retains shell wake focus visibility and reveal refresh without writes and closes late completion # time=4.18ms
+    ok 3 - serializes explicit selection and requests layout saving after state changes # time=1.09ms
+    ok 4 - restores both lifecycle orders with malformed state falling back to timers # time=11.78ms
+    ok 5 - links unique leaf tabs and supports automatic wrapped keyboard activation # time=1.93ms
+    ok 6 - switches stable panels with independent actions and empty states # time=1.48ms
+    ok 7 - mounted view dispatches current targets and keeps session DOM through pause/resume # time=2.07ms
+    ok 8 - removing a card immediately unloads pending title render exactly once # time=0.98ms
+    ok 9 - disposed list handles cannot change the shared saved order # time=1.54ms
+    ok 10 - two mounted views share persisted order but retain their own DOM and drag authority # time=2.55ms
+    ok 11 - ready loading/idle states and duplicate session reconciliation never dispatch writes # time=1.50ms
+    ok 12 - header guards retain Pause all, Resume all and Stop all dispatch # time=2.57ms
+}
