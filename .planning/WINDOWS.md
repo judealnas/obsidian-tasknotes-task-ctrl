@@ -1,10 +1,10 @@
 ---
 schema_version: 1
-open_count: 4
+open_count: 5
 waived_count: 7
 fixed_count: 4
-total_count: 15
-last_updated: 2026-10-16T07:46:24.414Z
+total_count: 16
+last_updated: 2026-11-13T19:57:46.417Z
 ---
 
 # Broken Windows Ledger
@@ -30,6 +30,7 @@ last_updated: 2026-10-16T07:46:24.414Z
 | 13 | 3 | unrun-verify | src/ui/TimerPaneView.ts |  | 03-03 human-checks deferred to end of phase: paused-card Stop and Complete leave no stray TaskNotes entry; Stop all empties the pane; Pause all and Resume all across three tasks; header disabled tooltips and four-button wrap in a narrow sidebar | open |  | 2026-10-16T07:38:05.409Z |  |
 | 14 | 3 | unrun-verify | src/state/TimerStore.ts |  | 03-04 human-checks deferred to end of phase: live Pomodoro session hides only its own entry, Pause all and Stop all leave it running, muted can't-check line with disabled Pause all/Stop all when ownership is unreadable | open |  | 2026-10-16T07:46:23.725Z |  |
 | 15 | 3 | unrun-verify | src/ui/TaskPickerModal.ts |  | 03-04 human-check deferred to end of phase: picker shows muted Pomodoro tag on the live Pomodoro's task, choosing it shows the Notice and writes nothing; tag gone after pausing the Pomodoro | open |  | 2026-10-16T07:46:24.414Z |  |
+| 16 | 05 | stub | src/ui/TimerPaneView.ts |  | Intentional Phase 05 static Staged list and disabled Stage action; Phase 06 wires staging behavior. | open |  | 2026-11-13T19:57:46.417Z |  |
 
 ````json
 [
@@ -227,6 +228,19 @@ last_updated: 2026-10-16T07:46:24.414Z
     "recorded_at": "2026-10-16T07:46:24.414Z",
     "resolved_at": null,
     "milestone": null
+  },
+  {
+    "id": 16,
+    "kind": "stub",
+    "phase": "05",
+    "file": "src/ui/TimerPaneView.ts",
+    "line": null,
+    "description": "Intentional Phase 05 static Staged list and disabled Stage action; Phase 06 wires staging behavior.",
+    "status": "open",
+    "reason": "",
+    "recorded_at": "2026-11-13T19:57:46.417Z",
+    "resolved_at": null,
+    "milestone": "v0.3"
   }
 ]
 ````
