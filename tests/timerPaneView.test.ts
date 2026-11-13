@@ -28,6 +28,31 @@ export function setup(initial: OpenTimer[] = [timer()], cardOrder = new CardOrde
 beforeEach(() => { vi.useFakeTimers(); vi.setSystemTime(new Date("2026-11-13T12:01:00Z")); resetViewHost(); });
 afterEach(() => { vi.clearAllTimers(); vi.useRealTimers(); vi.unstubAllGlobals(); });
 
+test("switches stable panels with independent actions and empty states", async () => {
+	const s = setup(); await s.view.onOpen(); await flush();
+	const tabs = s.root.querySelectorAll(".tntp-tabs__tab");
+	expect(tabs.map(tab => tab.textContent).join(",")).toBe("Staged,Timers");
+	const panels = s.root.querySelectorAll(".tntp-panel");
+	const card = s.root.querySelector(".tntp-card");
+	expect(panels[0]!.getAttribute("hidden")).toBe("");
+	event(tabs[0]!, "click");
+	expect(panels[1]!.getAttribute("hidden")).toBe("");
+	expect(panels[0]!.getAttribute("hidden")).toBeNull();
+	expect(panels[0]!.querySelector(".tntp-stage")!.disabled).toBe(true);
+	expect(panels[0]!.querySelector(".tntp-message__heading")!.textContent).toBe("Nothing staged for today");
+	expect(panels[0]!.querySelector(".tntp-message__body")!.textContent).toBe("Choose Stage above to pick today's tasks.");
+	for (const value of [[], null, [timer()]]) {
+		s.set(value); await flush();
+		expect(panels[0]!.querySelector(".tntp-message__heading")!.textContent).toBe("Nothing staged for today");
+	}
+	const current = s.root.querySelector(".tntp-card");
+	event(tabs[1]!, "click"); event(tabs[0]!, "click"); event(tabs[1]!, "click");
+	expect(s.root.querySelector(".tntp-card")).toBe(current);
+	expect(card).not.toBeNull();
+	expect(panels[1]!.querySelector(".tntp-header")!.children.map(el => el.textContent).join(",")).toBe("Start task,Pause all,Resume all,Stop all");
+	await s.view.onClose();
+});
+
 test("mounted view dispatches current targets and keeps session DOM through pause/resume", async () => {
 	const s = setup(); await s.view.onOpen(); await flush();
 	const card = s.root.querySelector(".tntp-card")!;
