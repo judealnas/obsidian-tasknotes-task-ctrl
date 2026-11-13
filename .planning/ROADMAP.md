@@ -86,7 +86,18 @@ Plans:
   3. After restarting Obsidian, the pane reopens on the tab that was last active.
   4. Bridge-state messages (TaskNotes missing, disabled, too old, reconnecting) still show correctly. Reconnecting after a TaskNotes reload and after sleep/wake still works from either tab.
 
-**Plans**: TBD
+**Plans**: 3 plans
+
+Plans:
+**Wave 1**
+- [ ] 05-01-PLAN.md — Extract TaskCard and CardList with mounted-view regression tests
+
+**Wave 2** *(blocked on Wave 1 completion)*
+- [ ] 05-02-PLAN.md — Accessible two-tab shell and per-leaf tab persistence
+
+**Wave 3** *(blocked on Wave 2 completion)*
+- [ ] 05-03-PLAN.md — Both-tab reconnect coverage, start-mode picker options and regression/UAT checks
+
 **UI hint**: yes
 **Notes**:
 - This phase is a pure refactor: no staging behavior. It extracts `TaskCard` and `CardList<K>` and gives each tab its own card map and CSS state modifiers.
@@ -167,7 +178,7 @@ Phases execute in numeric order: 4 → 5 → 6 → 7 (Phases 4 and 5 are indepen
 | 2. Start, Switch & Complete | v0.2 | 3/3 | Complete | 2026-10-16 |
 | 3. Pause & Resume | v0.2 | 4/4 | Complete | 2026-10-16 |
 | 4. Staging Foundations | v0.3 | 5/5 | Complete    | 2026-11-13 |
-| 5. Two-Tab Shell | v0.3 | 0/? | Not started | - |
+| 5. Two-Tab Shell | v0.3 | 0/3 | Planned | - |
 | 6. Staged Tab Core | v0.3 | 0/? | Not started | - |
 | 7. Complete, Roll Over & Release 0.3.0 | v0.3 | 0/? | Not started | - |
 
