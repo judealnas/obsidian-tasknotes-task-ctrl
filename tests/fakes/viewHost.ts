@@ -3,6 +3,11 @@ import { vi } from "vitest";
 import type { WorkspaceLeaf } from "obsidian";
 
 type Listener = { fn: (event: HostEvent) => void; capture: boolean };
+// Resolve timers at call time so Vitest's clock controls the simulated host.
+const schedule = {
+	setInterval: (fn: () => void, ms: number) => { const timers = { setInterval }; return timers.setInterval(fn, ms); },
+	clearInterval: (id: number) => { const timers = { clearInterval }; timers.clearInterval(id); },
+};
 export class HostEvent {
 	defaultPrevented = false;
 	stopped = false;
@@ -61,8 +66,8 @@ export class Element extends EventTarget {
 	get firstElementChild(): Element | null { return this.children[0] ?? null; }
 	get classList() { return { contains: (cls: string) => this.classes.has(cls) }; }
 	createEl(tag: string, options?: ConstructorParameters<typeof Element>[1]): Element { const child = new Element(tag, options); this.appendChild(child); return child; }
-	createDiv(options?: ConstructorParameters<typeof Element>[1]): Element { return this.createEl("div", options); }
-	createSpan(options?: ConstructorParameters<typeof Element>[1]): Element { return this.createEl("span", options); }
+	createDiv(options?: ConstructorParameters<typeof Element>[1]): Element { const child = new Element("div", options); this.appendChild(child); return child; }
+	createSpan(options?: ConstructorParameters<typeof Element>[1]): Element { const child = new Element("span", options); this.appendChild(child); return child; }
 	setText(text: string): void { this.textContent = text; }
 	empty(): void { for (const child of this.children) child.parentElement = null; this.children = []; this.text = ""; }
 	appendChild(child: Element): Element { child.detach(); this.children.push(child); child.parentElement = this; return child; }
@@ -86,7 +91,8 @@ export class Element extends EventTarget {
 	override dispatchEvent(event: HostEvent): boolean {
 		event.target ??= this;
 		const path: Element[] = [];
-		for (let el: Element | null = this; el; el = el.parentElement) path.push(el);
+		path.push(this);
+		for (let el = this.parentElement; el; el = el.parentElement) path.push(el);
 		for (const el of [...path].reverse()) el.fire(event, true);
 		for (const el of path) el.fire(event, false);
 		return !event.defaultPrevented;
@@ -103,7 +109,7 @@ export class Component {
 	addChild<T extends Component>(child: T): T { this.children.add(child); child.load(); return child; }
 	removeChild<T extends Component>(child: T): T { if (this.children.delete(child)) child.unload(); return child; }
 	register(cleanup: () => void): void { this.cleanups.push(cleanup); }
-	registerInterval(id: number): void { this.register(() => clearInterval(id)); }
+	registerInterval(id: number): void { this.register(() => schedule.clearInterval(id)); }
 	registerDomEvent(target: EventTarget, type: string, fn: Listener["fn"]): void { target.addEventListener(type, fn); this.register(() => target.removeEventListener(type, fn)); }
 }
 export const workspace = { openLinkText: vi.fn(() => Promise.resolve()), requestSaveLayout: vi.fn() };
@@ -131,7 +137,7 @@ export function resetViewHost(): void {
 	viewHost.components = []; viewHost.renders = []; workspace.openLinkText.mockClear(); workspace.requestSaveLayout.mockClear();
 	hostDocument.activeElement = null; hostDocument.visibilityState = "visible"; hostDocument.listeners.clear(); hostWindow.listeners.clear();
 	vi.stubGlobal("createDiv", (options?: ConstructorParameters<typeof Element>[1]) => new Element("div", options));
-	vi.stubGlobal("window", Object.assign(hostWindow, { setInterval: globalThis.setInterval }));
+	vi.stubGlobal("window", Object.assign(hostWindow, { setInterval: schedule.setInterval }));
 }
 export function dom(el: Element): HTMLElement { return el as unknown as HTMLElement; }
 export function event(el: Element, type: string, options?: Partial<HostEvent>): HostEvent { const evt = new HostEvent(type, options); el.dispatchEvent(evt); return evt; }

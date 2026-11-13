@@ -11,7 +11,7 @@ export function timer(patch: Partial<OpenTimer> = {}): OpenTimer {
 	return { taskPath: "A.md", title: "Task A", startTime: "2026-11-13T12:00:00Z", startMs: 0, state: "running", sessionStartedAt: "2026-11-13T12:00:00Z", sessionKey: "a", sortMs: 0, accumulatedMs: 0, segmentStartMs: Date.parse("2026-11-13T12:00:00Z"), totalKnown: true, entries: [], displayKey: "", ...patch };
 }
 export function setup(initial: OpenTimer[] = [timer()], cardOrder = new CardOrderStore({ log: vi.fn() })) {
-	const gateway = createFakeGateway(); gateway.setState({ kind: "ready", version: "4.18.2" });
+	const gateway = createFakeGateway(); gateway.setState({ kind: "ready" });
 	let snapshot: TimerSnapshot | null = { primary: initial[0] ?? null, others: initial.slice(1) };
 	const listeners = new Set<() => void>();
 	const busyListeners = new Set<() => void>();
