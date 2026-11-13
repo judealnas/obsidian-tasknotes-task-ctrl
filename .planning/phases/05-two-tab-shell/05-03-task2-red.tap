@@ -1,0 +1,27 @@
+TAP version 13
+1..1
+not ok 1 - tests/timerPaneView.test.ts # time=51.91ms {
+    1..14
+    not ok 1 - Start opens start-only options once and releases its guard after close and bridge loss # time=15.19ms
+        ---
+        error:
+            name: "AssertionError"
+            message: "expected undefined to be 'start' // Object.is equality"
+        at: "C:/Users/ja384/Home/obsidian-tasknotes-timer-pane/.claude/worktrees/phase-05-discuss/tests/timerPaneView.test.ts:52:48"
+        actual: "undefined"
+        expected: "\"start\""
+        ...
+    ok 2 - both tabs share connection messages and disable cached header actions until the snapshot is ready # time=6.28ms
+    ok 3 - Staged retains shell wake focus visibility and reveal refresh without writes and closes late completion # time=2.73ms
+    ok 4 - serializes explicit selection and requests layout saving after state changes # time=0.95ms
+    ok 5 - restores both lifecycle orders with malformed state falling back to timers # time=11.19ms
+    ok 6 - links unique leaf tabs and supports automatic wrapped keyboard activation # time=1.94ms
+    ok 7 - switches stable panels with independent actions and empty states # time=1.43ms
+    ok 8 - mounted view dispatches current targets and keeps session DOM through pause/resume # time=1.85ms
+    ok 9 - removing a card immediately unloads pending title render exactly once # time=0.97ms
+    ok 10 - disposed list handles cannot change the shared saved order # time=1.40ms
+    ok 11 - two mounted views share persisted order but retain their own DOM and drag authority # time=3.47ms
+    ok 12 - ready loading/idle states and duplicate session reconciliation never dispatch writes # time=1.13ms
+    ok 13 - header guards retain Pause all, Resume all and Stop all dispatch # time=1.12ms
+    ok 14 - unreadable Pomodoro ownership is scoped to Timers and survives both tab selections # time=0.88ms
+}

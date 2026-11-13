@@ -1,5 +1,20 @@
 import { afterEach, beforeEach, expect, test, vi } from "vitest";
 vi.mock("obsidian", () => import("./fakes/viewHost"));
+const pickerHost = vi.hoisted(() => ({ instances: [] as Array<{ options: { mode?: string }; close: () => void }> }));
+vi.mock("../src/ui/TaskPickerModal", () => ({ TaskPickerModal: class {
+	options: { mode?: string };
+	private off: (() => void) | undefined;
+	private gateway: ReturnType<typeof createFakeGateway>;
+	private didClose: () => void;
+	constructor(_app: unknown, options: { mode?: string; gateway: ReturnType<typeof createFakeGateway>; onClose: () => void } | ReturnType<typeof createFakeGateway>, _controller?: unknown, onClose?: () => void) {
+		this.options = options;
+		this.gateway = "gateway" in options ? options.gateway : options;
+		this.didClose = "gateway" in options ? options.onClose : onClose!;
+		pickerHost.instances.push(this);
+	}
+	open(): void { this.off = this.gateway.onState(() => { if (!this.gateway.startAvailability().available) this.close(); }); }
+	close(): void { this.off?.(); this.didClose(); }
+} }));
 import type { WorkspaceLeaf } from "obsidian";
 import { TimerPaneView, type TimerPaneServices } from "../src/ui/TimerPaneView";
 import type { OpenTimer, TimerSnapshot } from "../src/model/timeMath";
@@ -25,8 +40,21 @@ export function setup(initial: OpenTimer[] = [timer()], cardOrder = new CardOrde
 		busy(value: boolean) { busy = value; busyListeners.forEach(fn => fn()); },
 	};
 }
-beforeEach(() => { vi.useFakeTimers(); vi.setSystemTime(new Date("2026-11-13T12:01:00Z")); resetViewHost(); });
+beforeEach(() => { vi.useFakeTimers(); vi.setSystemTime(new Date("2026-11-13T12:01:00Z")); resetViewHost(); pickerHost.instances = []; });
 afterEach(() => { vi.clearAllTimers(); vi.useRealTimers(); vi.unstubAllGlobals(); });
+
+test("Start opens start-only options once and releases its guard after close and bridge loss", async () => {
+	const s = setup(); await s.view.onOpen(); await flush();
+	const start = s.root.querySelector(".tntp-start")!;
+	event(s.root.querySelector(".tntp-stage")!, "click"); expect(pickerHost.instances).toHaveLength(0);
+	s.busy(true); event(start, "click"); expect(pickerHost.instances).toHaveLength(0); s.busy(false);
+	event(start, "click"); event(start, "click"); expect(pickerHost.instances).toHaveLength(1);
+	expect(pickerHost.instances[0]!.options.mode).toBe("start");
+	pickerHost.instances[0]!.close(); event(start, "click"); expect(pickerHost.instances).toHaveLength(2);
+	s.gateway.setState({ kind: "missing" }); event(start, "click"); expect(pickerHost.instances).toHaveLength(2);
+	s.gateway.setState({ kind: "ready" }); event(start, "click"); expect(pickerHost.instances).toHaveLength(3);
+	await s.view.onClose(); s.view.unload();
+});
 
 test("both tabs share connection messages and disable cached header actions until the snapshot is ready", async () => {
 	for (const tab of ["staged", "timers"] as const) {
