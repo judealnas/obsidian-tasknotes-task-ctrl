@@ -56,3 +56,13 @@ test("removing a card immediately unloads pending title render exactly once", as
 	expect(s.root.querySelectorAll(".tntp-card")).toHaveLength(0);
 	await s.view.onClose();
 });
+
+test("disposed list handles cannot change the shared saved order", async () => {
+	const s = setup([timer(), timer({ sessionKey: "b", taskPath: "B.md" })]);
+	s.cardOrder.load(["a", "b"]);
+	await s.view.onOpen();
+	const handle = s.root.querySelector(".tntp-handle")!;
+	await s.view.onClose();
+	event(handle, "keydown", { key: "ArrowDown" });
+	expect(s.cardOrder.get().join(",")).toBe("a,b");
+});
