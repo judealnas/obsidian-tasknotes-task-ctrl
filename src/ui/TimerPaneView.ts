@@ -35,6 +35,15 @@ export interface TimerPaneServices {
 }
 
 const PANE_STATES: readonly PaneState[] = ["running", "idle", "loading", "missing", "incompatible"];
+export type PaneTab = "staged" | "timers";
+
+interface TabElements {
+	button: HTMLButtonElement;
+	panel: HTMLElement;
+	heading: HTMLElement;
+	body: HTMLElement;
+	meta: HTMLElement;
+}
 
 interface PaneElements {
 	root: HTMLElement;
@@ -47,6 +56,7 @@ interface PaneElements {
 	heading: HTMLElement;
 	body: HTMLElement;
 	meta: HTMLElement;
+	tabs: Record<PaneTab, TabElements>;
 }
 
 function setTextIfChanged(el: HTMLElement, text: string): void {
@@ -58,6 +68,8 @@ export class TimerPaneView extends ItemView {
 	private els: PaneElements | null = null;
 	/** Cards by timer key, in display order. */
 	private cards: CardList<OpenTimer, TaskCard> | null = null;
+	private stagedCards: CardList<OpenTimer, TaskCard> | null = null;
+	private tab: PaneTab = "timers";
 	/** Wall-clock time of the previous tick, for sleep/wake gap detection. */
 	private lastTickMs: number | null = null;
 	/** Whether the content was visible on the previous tick, for reveal detection. */
@@ -91,9 +103,34 @@ export class TimerPaneView extends ItemView {
 		this.lastTickMs = null;
 		this.wasShown = false;
 		this.cards?.dispose();
+		this.stagedCards?.dispose();
 		this.cards = null;
 		const root = this.contentEl.createDiv({ cls: ["tntp-pane", "tntp-pane--loading"] });
-		const header = root.createDiv({ cls: "tntp-header" });
+		const strip = root.createDiv({ cls: "tntp-tabs" });
+		const stagedButton = strip.createEl("button", { text: "Staged", cls: "tntp-tabs__tab" });
+		const timersButton = strip.createEl("button", { text: "Timers", cls: "tntp-tabs__tab" });
+		const stagedPanel = root.createDiv({ cls: ["tntp-panel", "tntp-panel--staged"] });
+		const timersPanel = root.createDiv({ cls: ["tntp-panel", "tntp-panel--timers"] });
+		const stage = stagedPanel.createDiv({ cls: "tntp-header" }).createEl("button", { text: "Stage", cls: "tntp-stage" });
+		stage.disabled = true;
+		setTooltip(stage, "Staging isn't available yet");
+		const stagedList = stagedPanel.createDiv({ cls: "tntp-cards" });
+		this.stagedCards = new CardList(stagedList, {
+			key: timer => timer.taskPath,
+			create: (parent, timer) => new TaskCard(parent, timer, { app: this.app, gateway, controller: this.services.controller }),
+			update: (card, timer) => card.update(timer, false),
+			dispose: card => card.dispose(),
+			commitOrder: () => {},
+		});
+		const stagedMessage = stagedPanel.createDiv({ cls: "tntp-message", attr: { "aria-live": "polite" } });
+		const stagedHeading = stagedMessage.createDiv({ cls: "tntp-message__heading" });
+		const stagedBody = stagedMessage.createDiv({ cls: "tntp-message__body" });
+		const stagedMeta = stagedMessage.createDiv({ cls: "tntp-message__meta" });
+		const stagedRetry = stagedMessage.createEl("button", { cls: "tntp-message__retry", text: "Check for TaskNotes" });
+		this.registerDomEvent(stagedRetry, "click", () => gateway.probe());
+		this.registerDomEvent(stagedButton, "click", () => this.selectTab("staged"));
+		this.registerDomEvent(timersButton, "click", () => this.selectTab("timers"));
+		const header = timersPanel.createDiv({ cls: "tntp-header" });
 		// D-02: Start task, Pause all, Resume all, Stop all; text labels in a wrapping row.
 		const start = header.createEl("button", { text: "Start task", cls: "tntp-start" });
 		const pauseAll = header.createEl("button", { text: "Pause all", cls: "tntp-pause-all" });
@@ -110,8 +147,8 @@ export class TimerPaneView extends ItemView {
 			if (!this.services.controller.isBusy() && !stopAll.disabled) void this.services.controller.stopAll();
 		});
 		// D-15: shown only while TaskNotes is ready but Pomodoro ownership cannot be read.
-		const pomodoroNote = root.createDiv({ cls: ["tntp-label", "tntp-pomodoro-note"], text: "Can't check Pomodoro. Showing all timers." });
-		const cards = root.createDiv({ cls: "tntp-cards" });
+		const pomodoroNote = timersPanel.createDiv({ cls: ["tntp-label", "tntp-pomodoro-note"], text: "Can't check Pomodoro. Showing all timers." });
+		const cards = timersPanel.createDiv({ cls: "tntp-cards" });
 		this.cards = new CardList(cards, {
 			key: timer => timer.sessionKey,
 			create: (parent, timer) => new TaskCard(parent, timer, { app: this.app, gateway, controller: this.services.controller }),
@@ -120,14 +157,18 @@ export class TimerPaneView extends ItemView {
 			commitOrder: order => this.services.cardOrder.set(order),
 		});
 
-		const message = root.createDiv({ cls: "tntp-message", attr: { "aria-live": "polite" } });
+		const message = timersPanel.createDiv({ cls: "tntp-message", attr: { "aria-live": "polite" } });
 		const heading = message.createDiv({ cls: "tntp-message__heading" });
 		const body = message.createDiv({ cls: "tntp-message__body" });
 		const meta = message.createDiv({ cls: ["tntp-label", "tntp-message__meta"] });
 		const retry = message.createEl("button", { cls: "tntp-message__retry", text: "Check for TaskNotes" });
 		this.registerDomEvent(retry, "click", () => gateway.probe());
 
-		this.els = { root, start, pauseAll, resumeAll, stopAll, pomodoroNote, cards, heading, body, meta };
+		this.els = { root, start, pauseAll, resumeAll, stopAll, pomodoroNote, cards, heading, body, meta, tabs: {
+			staged: { button: stagedButton, panel: stagedPanel, heading: stagedHeading, body: stagedBody, meta: stagedMeta },
+			timers: { button: timersButton, panel: timersPanel, heading, body, meta },
+		} };
+		this.updateTabs();
 
 		this.register(store.subscribe(() => { this.render(); void this.refreshCompletion(); }));
 		this.register(gateway.onState(() => { this.render(); void this.refreshCompletion(); }));
@@ -160,9 +201,26 @@ export class TimerPaneView extends ItemView {
 		this.picker?.close();
 		this.picker = null;
 		this.cards?.dispose();
+		this.stagedCards?.dispose();
+		this.stagedCards = null;
 		this.els = null;
 		this.cards = null;
 		return Promise.resolve();
+	}
+
+	private selectTab(tab: PaneTab): void {
+		this.tab = tab;
+		this.updateTabs();
+	}
+
+	private updateTabs(): void {
+		if (!this.els) return;
+		for (const tab of ["staged", "timers"] as const) {
+			const { button, panel } = this.els.tabs[tab];
+			button.toggleClass("tntp-tabs__tab--active", tab === this.tab);
+			if (tab === this.tab) panel.removeAttribute("hidden");
+			else panel.setAttribute("hidden", "");
+		}
 	}
 
 	private openPicker(): void {
@@ -203,6 +261,18 @@ export class TimerPaneView extends ItemView {
 		for (const candidate of PANE_STATES) els.root.toggleClass(`tntp-pane--${candidate}`, candidate === state);
 		els.root.toggleClass("tntp-pane--pomodoro-unknown", this.services.gateway.getState().kind === "ready" && !header.readable);
 		this.cards?.reconcile(timers);
+		this.stagedCards?.reconcile([]);
+		const connected = this.services.gateway.getState().kind === "ready";
+		const staged = els.tabs.staged;
+		if (connected) {
+			setTextIfChanged(staged.heading, "Nothing staged for today");
+			setTextIfChanged(staged.body, "Choose Stage above to pick today's tasks.");
+			setTextIfChanged(staged.meta, "");
+		} else this.renderMessage(staged, state);
+		for (const candidate of PANE_STATES) {
+			els.tabs.timers.panel.toggleClass(`tntp-panel--${candidate}`, candidate === state);
+			staged.panel.toggleClass(`tntp-panel--${candidate}`, !connected && candidate === state);
+		}
 		if (timers.length > 0) {
 			this.writeTimes(Date.now());
 			return;
@@ -220,7 +290,7 @@ export class TimerPaneView extends ItemView {
 		this.render();
 	}
 
-	private renderMessage(els: PaneElements, state: PaneState): void {
+	private renderMessage(els: Pick<TabElements, "heading" | "body" | "meta">, state: PaneState): void {
 		let heading = "";
 		let body = "";
 		let meta = "";

@@ -113,7 +113,7 @@ test("two mounted views share persisted order but retain their own DOM and drag 
 
 test("ready loading/idle states and duplicate session reconciliation never dispatch writes", async () => {
 	const s = setup([]); await s.view.onOpen(); await flush();
-	expect(s.root.querySelector(".tntp-message__heading")!.textContent).toBe("No task is being timed");
+	expect(s.root.querySelector(".tntp-panel--timers")!.querySelector(".tntp-message__heading")!.textContent).toBe("No task is being timed");
 	s.set(null); expect(s.root.querySelector(".tntp-pane")!.classes.has("tntp-pane--loading")).toBe(true);
 	s.set([timer(), timer(), timer({ sessionKey: "b", taskPath: "B.md" })]); await flush();
 	expect(s.root.querySelectorAll(".tntp-card")).toHaveLength(2);
