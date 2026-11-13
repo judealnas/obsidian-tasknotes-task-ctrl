@@ -11,13 +11,14 @@ import {
 	type WorkspaceLeaf,
 } from "obsidian";
 import { TaskCard } from "./TaskCard";
+import { CardList } from "./CardList";
 import {
 	derivePaneState,
 	detectWakeGap,
 	type OpenTimer,
 	type PaneState,
 } from "../model/timeMath";
-import { moveKey, moveKeyBy, orderTimers } from "../model/cardOrder";
+import { orderTimers } from "../model/cardOrder";
 import type { CardOrderStore } from "../state/CardOrderStore";
 import type { TimerController } from "../state/TimerController";
 import type { TimerStore } from "../state/TimerStore";
@@ -56,18 +57,15 @@ export class TimerPaneView extends ItemView {
 	private readonly services: TimerPaneServices;
 	private els: PaneElements | null = null;
 	/** Cards by timer key, in display order. */
-	private cards = new Map<string, TaskCard>();
+	private cards: CardList<OpenTimer, TaskCard> | null = null;
 	/** Wall-clock time of the previous tick, for sleep/wake gap detection. */
 	private lastTickMs: number | null = null;
 	/** Whether the content was visible on the previous tick, for reveal detection. */
 	private wasShown = false;
-	/** Keys of timers from a Stop click until that stop settles; render() keeps their busy label. */
 	private picker: TaskPickerModal | null = null;
 	private completionReady = false;
 	private completionGeneration = 0;
 	private closed = true;
-	/** Key of the card being dragged by its handle; null unless our own drag is active. */
-	private dragKey: string | null = null;
 
 	constructor(leaf: WorkspaceLeaf, services: TimerPaneServices) {
 		super(leaf);
@@ -92,8 +90,8 @@ export class TimerPaneView extends ItemView {
 		this.contentEl.empty();
 		this.lastTickMs = null;
 		this.wasShown = false;
-		this.cards = new Map();
-		this.dragKey = null;
+		this.cards?.dispose();
+		this.cards = null;
 		const root = this.contentEl.createDiv({ cls: ["tntp-pane", "tntp-pane--loading"] });
 		const header = root.createDiv({ cls: "tntp-header" });
 		// D-02: Start task, Pause all, Resume all, Stop all; text labels in a wrapping row.
@@ -114,6 +112,13 @@ export class TimerPaneView extends ItemView {
 		// D-15: shown only while TaskNotes is ready but Pomodoro ownership cannot be read.
 		const pomodoroNote = root.createDiv({ cls: ["tntp-label", "tntp-pomodoro-note"], text: "Can't check Pomodoro. Showing all timers." });
 		const cards = root.createDiv({ cls: "tntp-cards" });
+		this.cards = new CardList(cards, {
+			key: timer => timer.sessionKey,
+			create: (parent, timer) => new TaskCard(parent, timer, { app: this.app, gateway, controller: this.services.controller }),
+			update: (card, timer) => card.update(timer, this.completionReady),
+			dispose: card => card.dispose(),
+			commitOrder: order => this.services.cardOrder.set(order),
+		});
 
 		const message = root.createDiv({ cls: "tntp-message", attr: { "aria-live": "polite" } });
 		const heading = message.createDiv({ cls: "tntp-message__heading" });
@@ -154,10 +159,9 @@ export class TimerPaneView extends ItemView {
 		this.completionReady = false;
 		this.picker?.close();
 		this.picker = null;
-		this.dragKey = null;
-		for (const card of this.cards.values()) card.dispose();
+		this.cards?.dispose();
 		this.els = null;
-		this.cards = new Map();
+		this.cards = null;
 		return Promise.resolve();
 	}
 
@@ -179,69 +183,6 @@ export class TimerPaneView extends ItemView {
 		return { state, timers: orderTimers([snapshot.primary, ...snapshot.others], this.services.cardOrder.get()) };
 	}
 
-	/** Commits a new display order; the store subscription re-renders every pane. */
-	private commitOrder(order: string[]): void {
-		this.services.cardOrder.set(order);
-	}
-
-	private clearDropMarks(): void {
-		for (const { card } of this.cards.values()) {
-			card.removeClass("tntp-card--drop-before");
-			card.removeClass("tntp-card--drop-after");
-		}
-	}
-
-	private clearDragMarks(): void {
-		this.clearDropMarks();
-		for (const { card } of this.cards.values()) card.removeClass("tntp-card--dragging");
-	}
-
-	/** Handle events: keyboard reorder and the HTML5 drag source. */
-	private wireHandle(card: HTMLElement, handle: HTMLButtonElement, key: string): void {
-		handle.addEventListener("keydown", (evt) => {
-			if (evt.key !== "ArrowUp" && evt.key !== "ArrowDown") return;
-			evt.preventDefault();
-			this.commitOrder(moveKeyBy([...this.cards.keys()], key, evt.key === "ArrowUp" ? -1 : 1));
-			if (handle.ownerDocument.activeElement !== handle) handle.focus();
-		});
-		handle.addEventListener("dragstart", (evt) => {
-			this.dragKey = key;
-			const transfer = evt.dataTransfer;
-			if (transfer) {
-				transfer.effectAllowed = "move";
-				transfer.setData("application/x-tntp-card", key);
-				transfer.setDragImage(card, 0, 0);
-			}
-			card.addClass("tntp-card--dragging");
-		});
-		handle.addEventListener("dragend", () => {
-			this.dragKey = null;
-			this.clearDragMarks();
-		});
-		// Only our own handle's drag is acted on; foreign drags are left alone.
-		card.addEventListener("dragover", (evt) => {
-			if (this.dragKey === null || this.dragKey === key) return;
-			evt.preventDefault();
-			if (evt.dataTransfer) evt.dataTransfer.dropEffect = "move";
-			const rect = card.getBoundingClientRect();
-			const after = evt.clientY > rect.top + rect.height / 2;
-			this.clearDropMarks();
-			card.toggleClass("tntp-card--drop-before", !after);
-			card.toggleClass("tntp-card--drop-after", after);
-		});
-		card.addEventListener("drop", (evt) => {
-			const dragKey = this.dragKey;
-			if (dragKey === null || dragKey === key) return;
-			evt.preventDefault();
-			const rect = card.getBoundingClientRect();
-			const after = evt.clientY > rect.top + rect.height / 2;
-			this.dragKey = null;
-			this.clearDragMarks();
-			this.commitOrder(moveKey([...this.cards.keys()], dragKey, key, after));
-		});
-	}
-
-
 	private render(): void {
 		const els = this.els;
 		if (!els) return;
@@ -261,7 +202,7 @@ export class TimerPaneView extends ItemView {
 		setTooltip(els.stopAll, busy ? "A timer action is in progress" : !header.readable ? "Cannot verify Pomodoro ownership" : nothingToStop ? "No timers to stop" : "Stop all timers and clear paused ones");
 		for (const candidate of PANE_STATES) els.root.toggleClass(`tntp-pane--${candidate}`, candidate === state);
 		els.root.toggleClass("tntp-pane--pomodoro-unknown", this.services.gateway.getState().kind === "ready" && !header.readable);
-		this.reconcileCards(els, timers);
+		this.cards?.reconcile(timers);
 		if (timers.length > 0) {
 			this.writeTimes(Date.now());
 			return;
@@ -278,32 +219,6 @@ export class TimerPaneView extends ItemView {
 		this.completionReady = ready;
 		this.render();
 	}
-
-	/**
-	 * Keeps exactly one card per session, in display order, reusing existing cards. The
-	 * key is the session (path plus first start), so pause and resume keep the card.
-	 */
-	private reconcileCards(els: PaneElements, timers: readonly OpenTimer[]): void {
-  const next = new Map<string, TaskCard>();
-  for (const timer of timers) {
-   const key = timer.sessionKey;
-   if (next.has(key)) continue;
-   let card = this.cards.get(key);
-   if (!card) {
-    card = new TaskCard(els.cards, timer, { app: this.app, gateway: this.services.gateway, controller: this.services.controller });
-    this.wireHandle(card.card, card.handle, key);
-   }
-   next.set(key, card);
-   card.update(timer, this.completionReady);
-  }
-  for (const [key, card] of this.cards) if (!next.has(key)) card.dispose();
-  let i = 0;
-  for (const card of next.values()) {
-   if (els.cards.children[i] !== card.card) els.cards.insertBefore(card.card, els.cards.children[i] ?? null);
-   i++;
-  }
-  this.cards = next;
- }
 
 	private renderMessage(els: PaneElements, state: PaneState): void {
 		let heading = "";
@@ -340,7 +255,7 @@ export class TimerPaneView extends ItemView {
 	}
 
 	private writeTimes(nowMs: number): void {
-  for (const card of this.cards.values()) card.writeTimes(nowMs);
+  for (const card of this.cards?.values() ?? []) card.writeTimes(nowMs);
  }
 
 	/**

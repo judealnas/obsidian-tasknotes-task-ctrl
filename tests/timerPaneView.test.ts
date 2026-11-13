@@ -5,7 +5,7 @@ import { TimerPaneView, type TimerPaneServices } from "../src/ui/TimerPaneView";
 import type { OpenTimer, TimerSnapshot } from "../src/model/timeMath";
 import { CardOrderStore } from "../src/state/CardOrderStore";
 import { createFakeGateway } from "./fakes/fakeGateway";
-import { Element, event, flush, resetViewHost, viewHost } from "./fakes/viewHost";
+import { Element, event, flush, resetViewHost, viewHost, transfer, hostDocument } from "./fakes/viewHost";
 
 export function timer(patch: Partial<OpenTimer> = {}): OpenTimer {
 	return { taskPath: "A.md", title: "Task A", startTime: "2026-11-13T12:00:00Z", startMs: 0, state: "running", sessionStartedAt: "2026-11-13T12:00:00Z", sessionKey: "a", sortMs: 0, accumulatedMs: 0, segmentStartMs: Date.parse("2026-11-13T12:00:00Z"), totalKnown: true, entries: [], displayKey: "", ...patch };
@@ -65,4 +65,46 @@ test("disposed list handles cannot change the shared saved order", async () => {
 	await s.view.onClose();
 	event(handle, "keydown", { key: "ArrowDown" });
 	expect(s.cardOrder.get().join(",")).toBe("a,b");
+});
+
+test("two mounted views share persisted order but retain their own DOM and drag authority", async () => {
+	const persist = vi.fn(() => Promise.resolve());
+	const order = new CardOrderStore({ log: vi.fn(), persist }); order.load(["a", "b"]);
+	const timers = [timer(), timer({ sessionKey: "b", taskPath: "B.md", title: "Task A" })];
+	const one = setup(timers, order); const two = setup(timers, order);
+	await one.view.onOpen(); await two.view.onOpen(); await flush();
+	const first = one.root.querySelectorAll(".tntp-card"); const second = two.root.querySelectorAll(".tntp-card");
+	expect(first[0]).not.toBe(second[0]);
+	const handle = first[0]!.querySelector(".tntp-handle")!;
+	event(handle, "keydown", { key: "ArrowDown" });
+	expect(order.get()).toEqual(["b", "a"]); expect(persist).toHaveBeenCalledWith(["b", "a"]);
+	expect(one.root.querySelectorAll(".tntp-card")[1]).toBe(first[0]); expect(two.root.querySelectorAll(".tntp-card")[1]).toBe(second[0]);
+	expect(hostDocument.activeElement).toBe(handle);
+	const dataTransfer = transfer(); event(handle, "dragstart", { dataTransfer });
+	event(second[1]!, "drop", { dataTransfer, clientY: 10 }); expect(order.get()).toEqual(["b", "a"]);
+	event(first[1]!, "drop", { dataTransfer, clientY: 10 }); expect(order.get()).toEqual(["a", "b"]);
+	await one.view.onClose(); await two.view.onClose();
+});
+
+test("ready loading/idle states and duplicate session reconciliation never dispatch writes", async () => {
+	const s = setup([]); await s.view.onOpen(); await flush();
+	expect(s.root.querySelector(".tntp-message__heading")!.textContent).toBe("No task is being timed");
+	s.set(null); expect(s.root.querySelector(".tntp-pane")!.classes.has("tntp-pane--loading")).toBe(true);
+	s.set([timer(), timer(), timer({ sessionKey: "b", taskPath: "B.md" })]); await flush();
+	expect(s.root.querySelectorAll(".tntp-card")).toHaveLength(2);
+	expect(s.root.querySelector(".tntp-clock")!.textContent).toBe("0:01:00");
+	vi.advanceTimersByTime(5000); expect(s.root.querySelector(".tntp-clock")!.textContent).toBe("0:01:05");
+	for (const fn of [s.controller.stop, s.controller.start, s.controller.pause, s.controller.resume, s.controller.complete, s.controller.stopAll, s.controller.pauseAll, s.controller.resumeAll]) expect(fn).not.toHaveBeenCalled();
+	await s.view.onClose();
+});
+
+test("header guards retain Pause all, Resume all and Stop all dispatch", async () => {
+	const s = setup(); await s.view.onOpen(); await flush();
+	for (const [selector, fn] of [[".tntp-pause-all", s.controller.pauseAll], [".tntp-resume-all", s.controller.resumeAll], [".tntp-stop-all", s.controller.stopAll]] as const) {
+		event(s.root.querySelector(selector)!, "click"); expect(fn).toHaveBeenCalledTimes(1);
+		s.busy(true); event(s.root.querySelector(selector)!, "click"); expect(fn).toHaveBeenCalledTimes(1); s.busy(false);
+	}
+	expect(s.root.querySelector(".tntp-start")!.disabled).toBe(false);
+	s.gateway.setState({ kind: "missing" }); expect(s.root.querySelector(".tntp-start")!.disabled).toBe(true);
+	await s.view.onClose();
 });
