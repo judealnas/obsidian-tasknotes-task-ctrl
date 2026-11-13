@@ -149,7 +149,7 @@ test("switches stable panels with independent actions and empty states", async (
 	event(tabs[0]!, "click");
 	for (const value of [[], null, [timer()]]) {
 		s.set(value); await flush();
-		expect(panels[0]!.querySelector(".tntp-message__heading")!.textContent).toBe("Nothing staged for today");
+		expect(panels[0]!.querySelector(".tntp-message__heading")!.textContent).toBe(value === null ? "" : "Nothing staged for today");
 	}
 	const current = s.root.querySelector(".tntp-card");
 	event(tabs[1]!, "click"); event(tabs[0]!, "click"); event(tabs[1]!, "click");
@@ -238,4 +238,19 @@ test("header guards retain Pause all, Resume all and Stop all dispatch", async (
 	expect(s.root.querySelector(".tntp-start")!.disabled).toBe(false);
 	s.gateway.setState({ kind: "missing" }); expect(s.root.querySelector(".tntp-start")!.disabled).toBe(true);
 	await s.view.onClose();
+});
+
+test("unreadable Pomodoro ownership is scoped to Timers and survives both tab selections", async () => {
+	const s = setup(); s.store.getHeaderState = () => ({ readable: false, eligibleCount: 1, pausedCount: 1 });
+	await s.view.onOpen(); await flush();
+	const timers = s.root.querySelector(".tntp-panel--timers")!;
+	const staged = s.root.querySelector(".tntp-panel--staged")!;
+	expect(timers.querySelector(".tntp-pomodoro-note")!.textContent).toBe("Can't check Pomodoro. Showing all timers.");
+	expect(staged.querySelector(".tntp-pomodoro-note")).toBeNull();
+	for (const tab of s.root.querySelectorAll(".tntp-tabs__tab")) {
+		event(tab, "click"); expect(s.root.querySelector(".tntp-pane")!.classes.has("tntp-pane--pomodoro-unknown")).toBe(true);
+		expect(s.root.querySelectorAll(".tntp-card")).toHaveLength(1);
+	}
+	s.gateway.setState({ kind: "missing" }); expect(s.root.querySelector(".tntp-pane")!.classes.has("tntp-pane--pomodoro-unknown")).toBe(false);
+	await s.view.onClose(); s.view.unload();
 });
