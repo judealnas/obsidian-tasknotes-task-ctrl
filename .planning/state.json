@@ -1,0 +1,48 @@
+{
+  "contract": "1.0.0",
+  "flavor": "core",
+  "milestone": "v0.3 — Staging Tasks",
+  "phases": [
+    {
+      "number": "1",
+      "name": "Live Timer Pane",
+      "status": "complete"
+    },
+    {
+      "number": "2",
+      "name": "Start, Switch & Complete",
+      "status": "complete"
+    },
+    {
+      "number": "3",
+      "name": "Pause & Resume",
+      "status": "complete"
+    },
+    {
+      "number": "4",
+      "name": "Staging Foundations",
+      "status": "complete"
+    },
+    {
+      "number": "5",
+      "name": "Two-Tab Shell",
+      "status": "in_progress"
+    },
+    {
+      "number": "6",
+      "name": "Staged Tab Core",
+      "status": "pending"
+    },
+    {
+      "number": "7",
+      "name": "Complete, Roll Over & Release 0.3.0",
+      "status": "pending"
+    }
+  ],
+  "next": {
+    "command": "$gsd-verify-work 5",
+    "label": "Verify Phase 5",
+    "reason": "All 3 plans implemented; human_needed with 5 UAT items; automated checks passed"
+  },
+  "updated_at": "2026-11-13T20:19:37Z"
+}
