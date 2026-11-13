@@ -2,13 +2,13 @@
  * The sidebar pane. Builds its frame once in onOpen and updates it in place from the
  * bridge state and the store snapshot: one card per timer session (running or
  * paused), reconciled by session key.
- * Visibility of the card list and message area is driven only by the root
- * `tntp-pane--{state}` modifier class (styles.css).
+	 * Each tab panel owns its content visibility; bridge subscriptions stay shared.
  */
 import {
 	ItemView,
 	setTooltip,
 	type WorkspaceLeaf,
+	type ViewStateResult,
 } from "obsidian";
 import { TaskCard } from "./TaskCard";
 import { CardList } from "./CardList";
@@ -36,6 +36,7 @@ export interface TimerPaneServices {
 
 const PANE_STATES: readonly PaneState[] = ["running", "idle", "loading", "missing", "incompatible"];
 export type PaneTab = "staged" | "timers";
+let nextPaneId = 0;
 
 interface TabElements {
 	button: HTMLButtonElement;
@@ -70,6 +71,7 @@ export class TimerPaneView extends ItemView {
 	private cards: CardList<OpenTimer, TaskCard> | null = null;
 	private stagedCards: CardList<OpenTimer, TaskCard> | null = null;
 	private tab: PaneTab = "timers";
+	private readonly paneId = `tntp-pane-${++nextPaneId}`;
 	/** Wall-clock time of the previous tick, for sleep/wake gap detection. */
 	private lastTickMs: number | null = null;
 	/** Whether the content was visible on the previous tick, for reveal detection. */
@@ -96,6 +98,17 @@ export class TimerPaneView extends ItemView {
 		return "timer";
 	}
 
+	override getState(): Record<string, unknown> {
+		return { ...super.getState(), tab: this.tab };
+	}
+
+	override async setState(state: unknown, result: ViewStateResult): Promise<void> {
+		this.tab = state !== null && typeof state === "object" && !Array.isArray(state) &&
+			"tab" in state && (state.tab === "staged" || state.tab === "timers") ? state.tab : "timers";
+		this.updateTabs();
+		await super.setState(state, result);
+	}
+
 	onOpen(): Promise<void> {
 		this.closed = false;
 		const { gateway, store } = this.services;
@@ -106,7 +119,7 @@ export class TimerPaneView extends ItemView {
 		this.stagedCards?.dispose();
 		this.cards = null;
 		const root = this.contentEl.createDiv({ cls: ["tntp-pane", "tntp-pane--loading"] });
-		const strip = root.createDiv({ cls: "tntp-tabs" });
+		const strip = root.createDiv({ cls: "tntp-tabs", attr: { role: "tablist", "aria-label": "Task views" } });
 		const stagedButton = strip.createEl("button", { text: "Staged", cls: "tntp-tabs__tab" });
 		const timersButton = strip.createEl("button", { text: "Timers", cls: "tntp-tabs__tab" });
 		const stagedPanel = root.createDiv({ cls: ["tntp-panel", "tntp-panel--staged"] });
@@ -168,6 +181,18 @@ export class TimerPaneView extends ItemView {
 			staged: { button: stagedButton, panel: stagedPanel, heading: stagedHeading, body: stagedBody, meta: stagedMeta },
 			timers: { button: timersButton, panel: timersPanel, heading, body, meta },
 		} };
+		for (const tab of ["staged", "timers"] as const) {
+			const { button, panel } = this.els.tabs[tab];
+			const tabId = `${this.paneId}-${tab}-tab`;
+			const panelId = `${this.paneId}-${tab}-panel`;
+			button.setAttribute("id", tabId);
+			button.setAttribute("role", "tab");
+			button.setAttribute("aria-controls", panelId);
+			panel.setAttribute("id", panelId);
+			panel.setAttribute("role", "tabpanel");
+			panel.setAttribute("aria-labelledby", tabId);
+			this.registerDomEvent(button, "keydown", event => this.tabKeydown(event));
+		}
 		this.updateTabs();
 
 		this.register(store.subscribe(() => { this.render(); void this.refreshCompletion(); }));
@@ -209,8 +234,34 @@ export class TimerPaneView extends ItemView {
 	}
 
 	private selectTab(tab: PaneTab): void {
+		const changed = this.tab !== tab;
 		this.tab = tab;
 		this.updateTabs();
+		if (changed) this.app.workspace.requestSaveLayout();
+	}
+
+	private tabKeydown(event: KeyboardEvent): void {
+		if (!this.els) return;
+		let next: PaneTab;
+		switch (event.key) {
+			case "ArrowLeft":
+			case "ArrowRight": next = this.tab === "staged" ? "timers" : "staged"; break;
+			case "Home": next = "staged"; break;
+			case "End": next = "timers"; break;
+			case "Tab": {
+				if (event.shiftKey) return;
+				const panel = this.els.tabs[this.tab].panel;
+				if (panel.getAttribute("tabindex") === "0") {
+					event.preventDefault();
+					panel.focus();
+				}
+				return;
+			}
+			default: return;
+		}
+		event.preventDefault();
+		this.selectTab(next);
+		this.els.tabs[next].button.focus();
 	}
 
 	private updateTabs(): void {
@@ -218,8 +269,23 @@ export class TimerPaneView extends ItemView {
 		for (const tab of ["staged", "timers"] as const) {
 			const { button, panel } = this.els.tabs[tab];
 			button.toggleClass("tntp-tabs__tab--active", tab === this.tab);
+			button.setAttribute("aria-selected", String(tab === this.tab));
+			button.setAttribute("tabindex", tab === this.tab ? "0" : "-1");
 			if (tab === this.tab) panel.removeAttribute("hidden");
 			else panel.setAttribute("hidden", "");
+		}
+		this.updatePanelFocus();
+	}
+
+	private updatePanelFocus(): void {
+		if (!this.els) return;
+		for (const tab of ["staged", "timers"] as const) {
+			const { panel } = this.els.tabs[tab];
+			// Headers precede the body, so their enabled actions are the first Tab target.
+			const enabled = Array.from(panel.querySelectorAll<HTMLButtonElement>("button"))
+				.some(button => !button.disabled && (!button.classList.contains("tntp-message__retry") ||
+					panel.classList.contains("tntp-panel--missing") || panel.classList.contains("tntp-panel--incompatible")));
+			panel.setAttribute("tabindex", tab === this.tab && !enabled ? "0" : "-1");
 		}
 	}
 
@@ -273,6 +339,7 @@ export class TimerPaneView extends ItemView {
 			els.tabs.timers.panel.toggleClass(`tntp-panel--${candidate}`, candidate === state);
 			staged.panel.toggleClass(`tntp-panel--${candidate}`, !connected && candidate === state);
 		}
+		this.updatePanelFocus();
 		if (timers.length > 0) {
 			this.writeTimes(Date.now());
 			return;

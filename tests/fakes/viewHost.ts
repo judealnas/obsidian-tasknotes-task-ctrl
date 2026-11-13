@@ -136,7 +136,7 @@ export function setIcon(el: Element, name: string): void { el.setAttribute("data
 export function setTooltip(el: Element, text: string): void { el.setAttribute("aria-label", text); }
 export class Notice {}
 export function resetViewHost(): void {
-	viewHost.components = []; viewHost.renders = []; workspace.openLinkText.mockClear(); workspace.requestSaveLayout.mockClear();
+	viewHost.components = []; viewHost.renders = []; workspace.openLinkText.mockClear(); workspace.requestSaveLayout.mockReset();
 	hostDocument.activeElement = null; hostDocument.visibilityState = "visible"; hostDocument.listeners.clear(); hostWindow.listeners.clear();
 	vi.stubGlobal("createDiv", (options?: ConstructorParameters<typeof Element>[1]) => new Element("div", options));
 	vi.stubGlobal("window", Object.assign(hostWindow, { setInterval: schedule.setInterval }));

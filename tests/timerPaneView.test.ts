@@ -39,11 +39,11 @@ test("serializes explicit selection and requests layout saving after state chang
 });
 
 test("restores both lifecycle orders with malformed state falling back to timers", async () => {
-	const cases: Array<[unknown, string]> = [[{ tab: "staged" }, "staged"], [{ tab: "timers" }, "timers"], [undefined, "timers"], [null, "timers"], [{}, "timers"], ["staged", "timers"], [["staged"], "timers"], [{ tab: 1 }, "timers"], [{ tab: "other" }, "timers"]];
+	const cases: Array<[unknown, string]> = [[{ tab: "staged" }, "staged"], [{ tab: "timers" }, "timers"], [undefined, "timers"], [null, "timers"], [{}, "timers"], ["staged", "timers"], [true, "timers"], [42, "timers"], [["staged"], "timers"], [{ tab: 1 }, "timers"], [{ tab: "other" }, "timers"]];
 	for (const before of [true, false]) for (const [state, expected] of cases) {
 		const s = setup();
 		if (!before) await s.view.onOpen();
-		await s.view.setState(state, {});
+		await s.view.setState(state, { history: false });
 		if (before) await s.view.onOpen();
 		expect(s.view.getState().tab).toBe(expected);
 		expect(s.root.querySelectorAll(".tntp-tabs__tab")[expected === "staged" ? 0 : 1]!.getAttribute("aria-selected")).toBe("true");
@@ -54,7 +54,7 @@ test("restores both lifecycle orders with malformed state falling back to timers
 
 test("links unique leaf tabs and supports automatic wrapped keyboard activation", async () => {
 	const one = setup(); const two = setup();
-	await one.view.setState({ tab: "staged" }, {});
+	await one.view.setState({ tab: "staged" }, { history: false });
 	await one.view.onOpen(); await two.view.onOpen();
 	const tabs = one.root.querySelectorAll(".tntp-tabs__tab");
 	const panels = one.root.querySelectorAll(".tntp-panel");
@@ -73,6 +73,7 @@ test("links unique leaf tabs and supports automatic wrapped keyboard activation"
 		expect(tabs[index]!.getAttribute("tabindex")).toBe("0");
 		expect(tabs[index === 0 ? 1 : 0]!.getAttribute("tabindex")).toBe("-1");
 	}
+	expect(workspace.requestSaveLayout).toHaveBeenCalledTimes(4);
 	event(tabs[0]!, "keydown", { key: "Tab" });
 	expect(hostDocument.activeElement).toBe(panels[0]);
 	one.set([timer({ title: "Changed" })]); one.cardOrder.set(["a"]); await flush();
@@ -95,6 +96,9 @@ test("switches stable panels with independent actions and empty states", async (
 	expect(panels[0]!.querySelector(".tntp-stage")!.disabled).toBe(true);
 	expect(panels[0]!.querySelector(".tntp-message__heading")!.textContent).toBe("Nothing staged for today");
 	expect(panels[0]!.querySelector(".tntp-message__body")!.textContent).toBe("Choose Stage above to pick today's tasks.");
+	event(tabs[1]!, "click");
+	expect(s.root.querySelector(".tntp-card")).toBe(card);
+	event(tabs[0]!, "click");
 	for (const value of [[], null, [timer()]]) {
 		s.set(value); await flush();
 		expect(panels[0]!.querySelector(".tntp-message__heading")!.textContent).toBe("Nothing staged for today");
