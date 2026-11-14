@@ -62,6 +62,18 @@ test("externally staged tasks reach the production Staged panel without mutation
 	await s.view.onClose(); s.view.unload();
 });
 
+test("staging Retry is the enabled panel focus target after an initial read failure", async () => {
+	const s = setup([], undefined, true);
+	s.gateway.listTasks = () => Promise.reject(new Error("offline"));
+	await s.view.setState({ tab: "staged" }, { history: false }); await s.view.onOpen();
+	await s.staging.refreshNow(); await flush();
+	const panel = s.root.querySelector(".tntp-panel--staged")!;
+	expect(panel.textContent).toContain("Couldn't refresh");
+	expect(panel.getAttribute("tabindex")).toBe("-1");
+	expect(panel.querySelector(".tntp-message__retry")!.disabled).toBe(false);
+	await s.view.onClose(); s.view.unload();
+});
+
 test("Start opens start-only options once and releases its guard after close and bridge loss", async () => {
 	const s = setup(); await s.view.onOpen(); await flush();
 	const start = s.root.querySelector(".tntp-start")!;
