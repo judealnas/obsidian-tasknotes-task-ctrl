@@ -292,7 +292,7 @@ export class TimerPaneView extends ItemView {
 			// Headers precede the body, so their enabled actions are the first Tab target.
 			const enabled = Array.from(panel.querySelectorAll<HTMLButtonElement>("button"))
 				.some(button => !button.disabled && (!button.classList.contains("tntp-message__retry") ||
-					panel.classList.contains("tntp-panel--missing") || panel.classList.contains("tntp-panel--incompatible")));
+					panel.classList.contains("tntp-panel--missing") || panel.classList.contains("tntp-panel--incompatible") || panel.classList.contains("tntp-panel--staging-retry")));
 			panel.setAttribute("tabindex", tab === this.tab && !enabled ? "0" : "-1");
 		}
 	}

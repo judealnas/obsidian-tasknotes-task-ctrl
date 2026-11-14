@@ -2,7 +2,6 @@ import { normalizeTimerPath } from "../model/pomodoroOwnership";
 import { fieldStatus, type FieldStatus } from "../model/stagedField";
 import { deriveStaged, type StagedItem } from "../model/staging";
 import { stagingDay } from "../model/stagingDay";
-import type { TaskInfo } from "../tasknotes/runtime-api.types";
 import type { Schedule, TaskNotesGateway } from "../tasknotes/TaskNotesBridge";
 import { REFRESH_DEBOUNCE_MS } from "./TimerStore";
 

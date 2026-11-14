@@ -8,7 +8,7 @@ export function stagingFixture() {
 	const gateway = createFakeGateway();
 	gateway.setUserFields([{ id: "staged", displayName: "Staged", key: "staged", type: "date" }]);
 	gateway.listTasks = vi.fn(() => Promise.resolve([stagedTask()]));
-	const store = new StagingStore({ gateway, log: vi.fn(), now: () => new Date(2026, 10, 14, 12).getTime(), schedule: (fn, ms) => { const id = setTimeout(fn, ms); return () => clearTimeout(id); } });
+	const store = new StagingStore({ gateway, log: vi.fn(), now: () => new Date(2026, 10, 14, 12).getTime(), schedule: (fn, ms) => { const timers = { setTimeout, clearTimeout }; const id = timers.setTimeout(fn, ms); return () => timers.clearTimeout(id); } });
 	return { gateway, store };
 }
 beforeEach(() => vi.useFakeTimers());

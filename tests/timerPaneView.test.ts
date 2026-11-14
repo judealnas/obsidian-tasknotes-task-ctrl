@@ -34,7 +34,7 @@ export function setup(initial: OpenTimer[] = [timer()], cardOrder = new CardOrde
 	let busy = false;
 	const controller = { stop: vi.fn(() => Promise.resolve()), pause: vi.fn(() => Promise.resolve()), resume: vi.fn(() => Promise.resolve()), stopPaused: vi.fn(() => Promise.resolve()), complete: vi.fn(() => Promise.resolve()), start: vi.fn(), pauseAll: vi.fn(), resumeAll: vi.fn(), stopAll: vi.fn(), completionAvailable: vi.fn(() => Promise.resolve(true)), isBusy: () => busy, subscribeBusy: (fn: () => void) => { busyListeners.add(fn); return () => busyListeners.delete(fn); } };
 	const store = { getSnapshot: () => snapshot, getHeaderState: () => ({ readable: true, eligibleCount: 1, pausedCount: 1 }), subscribe: (fn: () => void) => { listeners.add(fn); return () => listeners.delete(fn); }, requestRefresh: vi.fn() };
-	const staging = new StagingStore({ gateway, schedule: (fn, ms) => { const id = setTimeout(fn, ms); return () => clearTimeout(id); }, log: vi.fn() });
+	const staging = new StagingStore({ gateway, schedule: (fn, ms) => { const timers = { setTimeout, clearTimeout }; const id = timers.setTimeout(fn, ms); return () => timers.clearTimeout(id); }, log: vi.fn() });
 	const view = new TimerPaneView({} as WorkspaceLeaf, { gateway, controller, store, cardOrder, staging: withStaging ? staging : undefined } as unknown as TimerPaneServices);
 	view.register(() => staging.dispose());
 	const root = view.contentEl as unknown as Element;
@@ -71,6 +71,34 @@ test("staging Retry is the enabled panel focus target after an initial read fail
 	expect(panel.textContent).toContain("Couldn't refresh");
 	expect(panel.getAttribute("tabindex")).toBe("-1");
 	expect(panel.querySelector(".tntp-message__retry")!.disabled).toBe(false);
+	await s.view.onClose(); s.view.unload();
+});
+
+test("staging setup corrections, default and unsupported states preserve cards and Timers", async () => {
+	const s = setup([timer()], undefined, true);
+	s.gateway.listTasks = () => Promise.resolve([{ path: "External.md", title: "Keep this card", status: "open", archived: false, staged: "2026-11-12" }]);
+	await s.view.onOpen(); await s.staging.refreshNow(); await flush();
+	const panel = s.root.querySelector(".tntp-panel--staged")!;
+	const card = panel.querySelector(".tntp-card")!; const title = card.querySelector(".tntp-title")!;
+	expect(panel.textContent).toContain("Custom User Fields");
+	expect(panel.textContent).toContain("type Date and no default");
+	s.gateway.setUserFields([{ id: "s", key: "staged", displayName: "Staged", type: "text" }]);
+	await s.staging.refreshNow(); expect(panel.textContent).toContain("Set up");
+	s.gateway.setUserFields([{ id: "s", key: "staged", displayName: "Staged", type: "date", defaultValue: "2026-11-13" }]);
+	await s.staging.refreshNow(); expect(panel.textContent).toContain("Remove the staged field default");
+	expect(card.querySelector(".tntp-pause-resume")!.disabled).toBe(false);
+	expect(card.querySelector(".tntp-complete")!.disabled).toBe(true);
+	event(card.querySelector(".tntp-complete")!, "click"); expect(s.controller.complete).not.toHaveBeenCalled();
+	event(title, "click"); expect(workspace.openLinkText).toHaveBeenCalledWith("External.md", "", false);
+	event(title, "contextmenu"); expect(s.gateway.menuCalls[s.gateway.menuCalls.length - 1]?.taskPath).toBe("External.md");
+	event(card.querySelector(".tntp-pause-resume")!, "click"); expect(s.controller.start).toHaveBeenCalledWith({ taskPath: "External.md", title: "Keep this card" });
+	s.gateway.failUserFieldsWith(new Error("offline")); await s.staging.refreshNow();
+	expect(panel.textContent).toContain("Couldn't check"); expect(panel.querySelector(".tntp-card")).toBe(card); expect(card.querySelector(".tntp-title")).toBe(title);
+	s.gateway.failUserFieldsWith(null); s.gateway.setUserFields([{ id: "s", key: "staged", displayName: "Staged", type: "date" }]); await s.staging.refreshNow();
+	expect(s.staging.getSnapshot().canStage).toBe(true);
+	s.gateway.setStagingAvailable(false); await s.staging.refreshNow(); expect(panel.textContent).toContain("4.13.0 or newer");
+	expect(s.root.querySelector(".tntp-start")!.disabled).toBe(false);
+	expect(s.gateway.updateCalls).toEqual([]);
 	await s.view.onClose(); s.view.unload();
 });
 
