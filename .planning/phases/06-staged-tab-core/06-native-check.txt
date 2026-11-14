@@ -1,0 +1,90 @@
+(async () => {
+ const api = app.plugins.getPlugin('tasknotes').api;
+ const plugin = app.plugins.getPlugin('tasknotes-timer-pane');
+ let leaves = app.workspace.getLeavesOfType('tasknotes-timer-pane');
+ let extraLeaf = null;
+ if (leaves.length < 2) {
+  extraLeaf=app.workspace.getLeaf('split');
+  await extraLeaf.setViewState({type:'tasknotes-timer-pane',state:{tab:'timers'},active:false});
+  leaves=app.workspace.getLeavesOfType('tasknotes-timer-pane');
+ }
+ const view = leaves.find(l => l.view.getState().tab === 'staged').view;
+ await app.workspace.revealLeaf(view.leaf);
+ const services = view.services;
+ const pause = ms => new Promise(resolve => setTimeout(resolve, ms));
+ const wait = async (test, name) => { for (let n=0;n<100;n++) { if (await test()) return; await pause(100); } throw Error(name); };
+ const results = [];
+ const assert = (value, name) => { if (!value) throw Error(name); results.push(name); };
+ const paths = ['TaskNotes/Tasks/Phase 6 UAT Alpha.md','TaskNotes/Tasks/Phase 6 UAT Beta.md'];
+ const panel = () => view.contentEl.querySelector('.tntp-panel--staged');
+ const cards = () => [...panel().querySelectorAll('.tntp-card')];
+ const card = word => cards().find(c => c.innerText.includes('UAT '+word));
+ const states = leaves.map(l=>l.view.getState().tab);
+ try {
+  for (const path of paths) {
+   if (app.vault.getFileByPath(path)) throw Error('Fixture already exists: '+path);
+   await app.vault.create(path,'---\nstatus: open\npriority: normal\ntags:\n  - task\n---\n');
+  }
+  await wait(async()=> (await api.tasks.list()).filter(t=>paths.includes(t.path)).length===2,'fixtures indexed');
+  await services.staging.refreshNow();
+  panel().querySelector('.tntp-stage').click();
+  await wait(()=>view.picker?.tasks?.length>0,'picker loaded');
+  const modal = view.picker;
+  const input = modal.inputEl;
+  input.value='Phase 6 UAT'; input.dispatchEvent(new Event('input',{bubbles:true})); input.focus();
+  await wait(()=>modal.modalEl.querySelectorAll('.tntp-picker-row').length===2,'two picker results');
+  input.dispatchEvent(new KeyboardEvent('keydown',{key:'Enter',code:'Enter',bubbles:true}));
+  await wait(()=>!services.stagingController.isBusy() && cards().length===1,'first stage');
+  assert(view.picker===modal && input.value==='Phase 6 UAT' && document.activeElement===input,'Batch picker remains open and retains query/focus');
+  assert(modal.modalEl.querySelectorAll('.tntp-picker-row').length===1,'Successful row removed');
+  modal.modalEl.querySelector('.tntp-picker-chip').click();
+  await wait(()=>!services.stagingController.isBusy() && cards().length===2,'second stage');
+  assert((await api.time.active()).length===0,'Staging starts no timer');
+  input.dispatchEvent(new KeyboardEvent('keydown',{key:'Escape',code:'Escape',bubbles:true}));
+  await wait(()=>!view.picker,'Escape closes picker');
+  await pause(350);
+  assert(cards().every(c=>c.querySelector('.tntp-complete').disabled),'Staged Complete disabled');
+  assert(cards().every(c=>c.innerText.includes('today')),'Native date and age metadata shown');
+  assert(cards().every(c=>c.getBoundingClientRect().height>0),'Idle staged cards have visible layout bounds');
+  const alpha=card('Alpha'); const title=alpha.querySelector('.tntp-title');
+  const handle=alpha.querySelector('.tntp-handle'); handle.focus();
+  const nextIndex=cards().indexOf(alpha)===0?1:0;
+  handle.dispatchEvent(new KeyboardEvent('keydown',{key:nextIndex===1?'ArrowDown':'ArrowUp',bubbles:true}));
+  assert(cards()[nextIndex]===alpha,'Keyboard reorder preserves card');
+  assert(document.activeElement===handle,'Keyboard reorder retains focus after native modal closes');
+  await plugin.saveChain;
+  assert((await plugin.loadData()).stagedOrder.filter(p=>paths.includes(p))[nextIndex]===paths[0],'Staged order persisted');
+  alpha.querySelector('.tntp-pause-resume').click();
+  await wait(()=>!services.controller.isBusy() && alpha.querySelector('.tntp-pause-resume').innerText==='Pause','native start');
+  assert((await api.time.active()).some(t=>t.taskPath===paths[0]),'Staged Start opens real TaskNotes timer');
+  assert(alpha.querySelector('.tntp-title')===title,'Timer transition retains title node');
+  assert([...document.querySelectorAll('.tntp-panel--timers .tntp-card')].some(c=>c.innerText.includes('Staged')),'Timers card shows Staged marker');
+  alpha.querySelector('.tntp-pause-resume').click();
+  await wait(()=>!services.controller.isBusy() && alpha.querySelector('.tntp-pause-resume').innerText==='Resume','native pause');
+  assert(!(await api.time.active()).some(t=>t.taskPath===paths[0]),'Pause closes real timer');
+  alpha.querySelector('.tntp-pause-resume').click();
+  await wait(()=>!services.controller.isBusy() && alpha.querySelector('.tntp-pause-resume').innerText==='Pause','native resume');
+  alpha.querySelector('.tntp-unstage').click();
+  await wait(()=>!services.stagingController.isBusy() && !card('Alpha'),'native unstage');
+  assert(!(await api.time.active()).some(t=>t.taskPath===paths[0]),'Unstage stops running regular timer');
+  const raw=await app.vault.read(app.vault.getFileByPath(paths[0]));
+  assert(/^staged:\s*$/m.test(raw) && (await api.tasks.get(paths[0])).staged===null,'Unstage leaves YAML null and reads as null');
+  const beta=card('Beta');
+  await services.gateway.updateTask(paths[1],{staged:'2020-01-01'},{source:'tasknotes-timer-pane',reason:'UAT external date'});
+  await services.staging.refreshNow();
+  assert(card('Beta')===beta && !beta.innerText.includes('today'),'External date update retains card and changes age');
+  assert(leaves.every((l,i)=>l.view.getState().tab===states[i]),'Shared updates retain independent leaf tabs');
+  return {passed:results.length,results,tabs:[...document.querySelectorAll('.tntp-tabs')].map(e=>e.innerText),tasknotes:app.plugins.getPlugin('tasknotes').manifest.version};
+ } catch(error) { return {passed:results.length,results,error:String(error),cards:cards().map(c=>c.innerText),modal:document.querySelector('.modal-container')?.innerText}; }
+ finally {
+  view.picker?.close();
+  for (const path of paths) {
+   if ((await api.time.active()).some(t=>t.taskPath===path)) await api.time.stop(path);
+   const file=app.vault.getFileByPath(path); if(file) await app.vault.delete(file);
+   plugin.stagedOrder.removePath(path);
+  }
+  await services.staging.refreshNow();
+  await plugin.saveChain;
+  extraLeaf?.detach();
+ }
+})()

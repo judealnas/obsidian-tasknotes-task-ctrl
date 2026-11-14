@@ -9,7 +9,8 @@
 /* Each panel owns its content state; hidden always wins over layout display. */
 .tntp-panel[hidden],
 .tntp-panel--running .tntp-message,
-.tntp-panel:not(.tntp-panel--running) .tntp-cards {
+.tntp-panel--timers:not(.tntp-panel--running) .tntp-cards,
+.tntp-panel--staged:not(.tntp-panel--has-staged) .tntp-cards {
 	display: none;
 }
 
