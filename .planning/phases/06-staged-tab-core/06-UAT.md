@@ -1,19 +1,14 @@
 ---
-status: testing
+status: complete
 phase: 06-staged-tab-core
 source: [06-VERIFICATION.md]
 started: "2026-11-14T22:00:00Z"
-updated: 2026-11-14T22:24:29Z
+updated: 2026-11-14T22:51:30.640Z
 ---
 
 ## Current Test
 
-number: 7
-name: Corrected Unstage and reorder controls
-expected: |
-  Open the corrected native screenshot: .planning/phases/06-staged-tab-core/06-controls-review.png
-  The X button and reorder grip should now appear separately, with a clear gap. Confirm the corrected appearance is acceptable.
-awaiting: user response
+[testing complete]
 
 ## Tests
 
@@ -50,14 +45,15 @@ severity: cosmetic
 
 ### 7. Corrected Unstage and reorder controls
 expected: The corrected screenshot shows the X button and reorder handle as distinct controls with a clear gap.
-result: [pending]
+result: pass
+source: human
 
 ## Summary
 
 total: 7
-passed: 5
+passed: 6
 issues: 1
-pending: 1
+pending: 0
 skipped: 0
 blocked: 0
 
@@ -95,3 +91,7 @@ blocked: 0
 ## Gap fix execution — 2026-11-14
 
 06-05 implemented G-06-6. Native checks passed 225 assertions across 36 layouts with a 4px gap throughout; the existing 17 native checks also passed. Build/lint/650 tests passed. Corrected screenshot: 06-controls-review.png. Historical test 6 remains an issue record with verified plan/SUMMARY resolution; test 7 awaits user visual acceptance.
+
+- Test 7: User reviewed the corrected screenshot and said it looks good.
+
+
