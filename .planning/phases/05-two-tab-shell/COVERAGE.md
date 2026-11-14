@@ -1,6 +1,8 @@
 # Phase 05 source coverage
 
-No external API integration: this phase extracts existing card/list behavior and adds a local tab shell using the existing Obsidian view-state lifecycle; it preserves all current TaskNotes calls and introduces no service capability. The API detector examined the plans plus the Phase 5 roadmap section and returned `detected:false` on 2026-11-13. This declaration documents scope rather than enumerating unrelated Obsidian/TaskNotes capabilities.
+No external API integration: extracts existing cards/lists and adds local tabs using Obsidian view state; preserves TaskNotes calls and adds no service capability.
+
+The API detector examined the plans plus the Phase 5 roadmap section and returned `detected:false` on 2026-11-13. This declaration documents scope rather than enumerating unrelated Obsidian/TaskNotes capabilities.
 
 | Source | ID | Feature or constraint | Plan/task | Status |
 |---|---|---|---|---|
