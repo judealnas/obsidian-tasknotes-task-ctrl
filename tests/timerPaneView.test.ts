@@ -96,6 +96,17 @@ test("the separate Unstage control is immediately usable on a staged idle task",
 	await s.view.onClose(); s.view.unload();
 });
 
+test("ArrowDown reorders only the Staged list and preserves handle focus", async () => {
+	const s = setup([timer()], undefined, true);
+	s.gateway.listTasks = () => Promise.resolve(["A", "B"].map(name => ({ path: `${name}.md`, title: name, status: "open", archived: false, staged: "2026-11-12" })));
+	await s.view.onOpen(); await s.staging.refreshNow(); await flush();
+	const panel = s.root.querySelector(".tntp-panel--staged")!;
+	const handle = panel.querySelector(".tntp-handle")!; handle.focus(); event(handle, "keydown", { key: "ArrowDown" });
+	expect(panel.querySelectorAll(".tntp-title").map(title => title.textContent).join(",")).toBe("B,A");
+	expect(s.cardOrder.get()).toEqual([]); expect(hostDocument.activeElement).toBe(handle);
+	await s.view.onClose(); s.view.unload();
+});
+
 test("staging setup corrections, default and unsupported states preserve cards and Timers", async () => {
 	const s = setup([timer()], undefined, true);
 	s.gateway.listTasks = () => Promise.resolve([{ path: "External.md", title: "Keep this card", status: "open", archived: false, staged: "2026-11-12" }]);
