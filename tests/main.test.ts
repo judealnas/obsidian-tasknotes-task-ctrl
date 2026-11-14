@@ -215,6 +215,13 @@ test("a failed Staged order save does not poison the single writer's next save",
 	expect(host.saved[host.saved.length - 1]).toMatchObject({ stagedOrder: ["B.md"], completionStatus: "done" }); log.mockRestore();
 });
 
+test("vault renames synchronously remap Staged order at slash boundaries", async () => {
+	host.data = { stagedOrder: ["Tasks/A.md", "Tasks2/B.md", "Tasks/C.md"] };
+	const plugin = new TaskNotesTimerPanePlugin({} as App, {} as PluginManifest); plugin.onload(); await flush();
+	emitVault("rename", { path: "Archive" }, "Tasks");
+	expect(stagedOrderOf(plugin).get().join(",")).toBe("Archive/A.md,Tasks2/B.md,Archive/C.md");
+});
+
 test("a stored card order loads and a settings save keeps it", async () => {
 	host.data = { cardOrder: ["a", "b"], extraKey: 1 };
 	const plugin = new TaskNotesTimerPanePlugin({} as App, {} as PluginManifest); plugin.onload();
