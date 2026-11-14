@@ -5,17 +5,17 @@ milestone_name: Staging Tasks
 current_phase: 06
 current_phase_name: Staged Tab Core
 status: verifying
-stopped_at: Completed all four Phase 6 plans; phase verification pending
+stopped_at: Phase 6 implemented and checked; five explicit prohibition reviews pending in 06-UAT.md
 last_updated: "2026-11-14T21:47:42.694Z"
 last_activity: 2026-11-14
-last_activity_desc: Phase 06 execution started
+last_activity_desc: Phase 6 execution finished; 650 tests and 17 native assertions pass; human verification pending
 state_head: 3e055538a24d8f8e06e9b95f09a69d09ab6dd0ef
 progress:
   total_phases: 4
-  completed_phases: 5
+  completed_phases: 2
   total_plans: 12
   completed_plans: 12
-  percent: 100
+  percent: 50
 ---
 
 # Project State
@@ -29,13 +29,13 @@ See: .planning/PROJECT.md (updated 2026-11-13)
 
 ## Current Position
 
-Phase: 06 (Staged Tab Core) — EXECUTING
+Phase: 06 (Staged Tab Core) — HUMAN VERIFICATION PENDING
 Plan: 4 of 4
-Status: Phase complete — ready for verification
+Status: Implementation complete; five explicit prohibition reviews pending
 Note: Phase 4 complete: UAT 6/6, VERIFICATION passed, SECURITY 19/19 closed. 04-01 spike cleanup done (`staged:` null line confirmed, `spikedefault` removed).
-Last activity: 2026-11-14 — Phase 06 execution started
+Last activity: 2026-11-14 — All four plans committed; final build/lint and 650 tests passed; 17 native assertions passed after fixing idle-card CSS visibility. Security 15/15 closed. Five reviews persisted in 06-UAT.md.
 
-Progress (v0.3): [█████░░░░░] 50% (2/4 phases). Planned work: 8/12 plans complete; Phase 6 has four plans ready to execute.
+Progress (v0.3): [█████░░░░░] 50% accepted (2/4 phases). Planned work: 12/12 current plans complete; Phase 6 awaits five explicit reviews before acceptance. Phase 7 has not started.
 
 ## Performance Metrics
 
