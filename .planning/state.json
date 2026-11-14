@@ -40,9 +40,9 @@
     }
   ],
   "next": {
-    "command": "/gsd:progress --next",
-    "label": "Advance to the next step (plan phase 6)",
-    "reason": "Phase 6 of 7 — needs a plan"
+    "command": "/gsd:execute-phase 6",
+    "label": "Execute Phase 6",
+    "reason": "Phase 6 planned: four sequential waves; 8 of 12 milestone plans complete"
   },
-  "updated_at": "2026-11-14T04:07:40.399Z"
+  "updated_at": "2026-11-14T06:19:01.057Z"
 }

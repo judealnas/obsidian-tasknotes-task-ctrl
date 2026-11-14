@@ -4,18 +4,18 @@ milestone: v0.3
 milestone_name: Staging Tasks
 current_phase: 6
 current_phase_name: Staged Tab Core
-status: planning
-stopped_at: Phase 6 context gathered
-last_updated: "2026-11-14T05:19:19.965Z"
-last_activity: 2026-11-13
-last_activity_desc: Phase 5 complete, transitioned to Phase 6
-state_head: 951a83a13eff0dcacb27bc826a867eaaa2a04b24
+status: executing
+stopped_at: Phase 6 planned — ready to execute
+last_updated: "2026-11-14T06:19:00.971Z"
+last_activity: 2026-11-14
+last_activity_desc: Phase 6 planned in four waves; research and coverage checks complete
+state_head: 487850174d9fa926b428e235bea40fb51c3a0ecf
 progress:
   total_phases: 4
-  completed_phases: 5
-  total_plans: 8
-  completed_plans: 20
-  percent: 100
+  completed_phases: 2
+  total_plans: 12
+  completed_plans: 8
+  percent: 67
 ---
 
 # Project State
@@ -29,13 +29,13 @@ See: .planning/PROJECT.md (updated 2026-11-13)
 
 ## Current Position
 
-Phase: 6 — Staged Tab Core
-Plan: Not started
-Status: Ready to plan
+Phase: 6 (Staged Tab Core) — READY TO EXECUTE
+Plan: 0 of 4 complete
+Status: Ready to execute
 Note: Phase 4 complete: UAT 6/6, VERIFICATION passed, SECURITY 19/19 closed. 04-01 spike cleanup done (`staged:` null line confirmed, `spikedefault` removed).
-Last activity: 2026-11-13 — Phase 5 complete, transitioned to Phase 6
+Last activity: 2026-11-14 — Phase 6 planned in four waves; research complete, 16/16 requirements and 16/16 decisions covered; independent plan-checker disabled by configuration.
 
-Progress (v0.3): [█████░░░░░] 50% (2/4 phases). Planned work: 8/8 plans complete.
+Progress (v0.3): [█████░░░░░] 50% (2/4 phases). Planned work: 8/12 plans complete; Phase 6 has four plans ready to execute.
 
 ## Performance Metrics
 
@@ -181,13 +181,13 @@ Items acknowledged and deferred at milestone close, most recent first:
 
 ## Session Continuity
 
-Last session: 2026-11-14T05:19:19.590Z
-Stopped at: Phase 6 context gathered
-Resume file: .planning/phases/06-staged-tab-core/06-CONTEXT.md
+Last session: 2026-11-14T06:19:27Z
+Stopped at: Phase 6 planned — ready to execute
+Resume file: .planning/phases/06-staged-tab-core/06-01-PLAN.md
 
 ## Operator Next Steps
 
 - Phase 5 is complete: canonical verification passed, UAT 13/13 accepted, security 10/10 closed, and regression suite 568/568 passed.
-- Next: $gsd-discuss-phase 6 — define Staged Tab Core behavior before planning.
+- Next: $gsd-execute-phase 6 — run the four sequential Staged Tab Core plans.
 - Implementation is committed on agent-phase-05-discuss (renamed from gsd/phase-05-discuss for the executor worktree commit guard).
 - Merge gsd/phase-04-plan when ready
