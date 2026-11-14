@@ -43,6 +43,22 @@ export function setup(initial: OpenTimer[] = [timer()], cardOrder = new CardOrde
 beforeEach(() => { vi.useFakeTimers(); vi.setSystemTime(new Date("2026-11-13T12:01:00Z")); resetViewHost(); pickerHost.instances = []; });
 afterEach(() => { vi.clearAllTimers(); vi.useRealTimers(); vi.unstubAllGlobals(); });
 
+test("externally staged tasks reach the production Staged panel without mutations", async () => {
+	const s = setup([]);
+	s.gateway.listTasks = vi.fn(() => Promise.resolve([{ path: "External.md", title: "Externally staged task", status: "open", archived: false, staged: "2026-11-12" }]));
+	s.gateway.setUserFields([{ id: "staged", displayName: "Staged", key: "staged", type: "date" }]);
+	await s.view.onOpen();
+	s.gateway.emitData();
+	await vi.advanceTimersByTimeAsync(200); await flush();
+	const panel = s.root.querySelector(".tntp-panel--staged")!;
+	expect(panel.querySelectorAll(".tntp-card")).toHaveLength(1);
+	expect(panel.textContent).toContain("Externally staged task");
+	expect(s.gateway.updateCalls).toHaveLength(0);
+	expect(s.gateway.startCalls).toHaveLength(0);
+	expect(s.gateway.stopCalls).toHaveLength(0);
+	await s.view.onClose(); s.view.unload();
+});
+
 test("Start opens start-only options once and releases its guard after close and bridge loss", async () => {
 	const s = setup(); await s.view.onOpen(); await flush();
 	const start = s.root.querySelector(".tntp-start")!;
