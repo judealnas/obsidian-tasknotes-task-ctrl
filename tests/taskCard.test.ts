@@ -8,17 +8,31 @@ import { createFakeGateway } from "./fakes/fakeGateway";
 import { Element, dom, event, flush, resetViewHost, viewHost, workspace } from "./fakes/viewHost";
 
 const model: OpenTimer = { taskPath: "Folder/A.md", title: "<script>title</script>", startTime: "entry1", startMs: 1000, state: "running", sessionStartedAt: "first", sessionKey: "a", sortMs: 1000, accumulatedMs: 2000, segmentStartMs: 1000, totalKnown: true, entries: [{ startMs: 1000, endMs: null }], displayKey: "" };
-function setup() {
+function setup(unstage?: (target: { taskPath: string; title: string }) => Promise<unknown>) {
 	let busy = false;
-	const controller = { isBusy: () => busy, pause: vi.fn(() => Promise.resolve()), resume: vi.fn(() => Promise.resolve()), stop: vi.fn(() => Promise.resolve()), stopPaused: vi.fn(() => Promise.resolve()), complete: vi.fn(() => Promise.resolve()) };
+	const controller = { isBusy: () => busy, start: vi.fn(() => Promise.resolve()), pause: vi.fn(() => Promise.resolve()), resume: vi.fn(() => Promise.resolve()), stop: vi.fn(() => Promise.resolve()), stopPaused: vi.fn(() => Promise.resolve()), complete: vi.fn(() => Promise.resolve()) };
 	const gateway = createFakeGateway();
 	const root = new Element();
-	const card = new TaskCard(dom(root), model, { app: { workspace } as unknown as App, gateway, controller: controller as unknown as TimerPaneServices["controller"] });
+	const card = new TaskCard(dom(root), model, { app: { workspace } as unknown as App, gateway, controller: controller as unknown as TimerPaneServices["controller"], unstage });
 	card.update(model, true);
 	return { card, root, el: root.children[0]!, controller, gateway, busy(value: boolean) { busy = value; card.update(card.currentModel, true); } };
 }
 beforeEach(resetViewHost);
 afterEach(() => vi.unstubAllGlobals());
+
+test("staged completion never dispatches, and separate Unstage reads the newest model", () => {
+	const unstage = vi.fn(() => Promise.resolve()); const s = setup(unstage);
+	const title = s.el.querySelector(".tntp-title");
+	for (const state of ["idle", "running", "paused"] as const) {
+		const card = state === "idle" ? { state, taskPath: "New.md", title: "New", displayKey: "" } : { ...model, state, taskPath: "New.md", title: "New", startTime: "latest" };
+		s.card.update({ ...card, stagedCard: true, stagedMetadata: "Nov 12 · 2 days ago" }, true);
+		expect(s.el.querySelector(".tntp-complete")!.disabled).toBe(true); event(s.el.querySelector(".tntp-complete")!, "click");
+		expect(s.el.querySelector(".tntp-title")).toBe(title); expect(s.el.querySelector(".tntp-staged-metadata")!.textContent).toBe("Nov 12 · 2 days ago");
+	}
+	const button = s.el.querySelector(".tntp-unstage")!; expect(button.getAttribute("aria-label")).toBe("Unstage task"); expect(button.parentElement).toBe(s.el);
+	event(button, "click"); expect(unstage).toHaveBeenCalledWith({ taskPath: "New.md", title: "New" }); expect(s.controller.complete).not.toHaveBeenCalled();
+	s.busy(true); event(button, "click"); expect(unstage).toHaveBeenCalledTimes(1); s.card.dispose(); event(button, "click"); expect(unstage).toHaveBeenCalledTimes(1);
+});
 
 test("card clocks derive from wall time, freeze paused sessions and show unknown totals", () => {
 	const s = setup(); s.card.writeTimes(61000);

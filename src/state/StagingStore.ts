@@ -42,6 +42,12 @@ export class StagingStore {
 	}
 	getSnapshot(): StagingSnapshot { return this.snapshot; }
 	get revision(): number { return this.generation; }
+	/** Successful explicit null write only; refreshes never mutate TaskNotes. */
+	removeItem(path: string): void {
+		this.invalidate();
+		this.snapshot = { ...this.snapshot, items: this.snapshot.items.filter(item => item.taskPath !== normalizeTimerPath(path)) };
+		this.notify();
+	}
 	subscribe(listener: () => void): () => void { this.listeners.add(listener); return () => { this.listeners.delete(listener); }; }
 	invalidate(): void {
 		this.generation++;

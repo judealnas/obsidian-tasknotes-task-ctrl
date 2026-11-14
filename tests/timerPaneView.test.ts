@@ -83,11 +83,16 @@ test("staging Retry is the enabled panel focus target after an initial read fail
 
 test("the separate Unstage control is immediately usable on a staged idle task", async () => {
 	const s = setup([], undefined, true);
-	s.gateway.listTasks = () => Promise.resolve([{ path: "External.md", title: "External", status: "open", archived: false, staged: "2026-11-12" }]);
+	let staged: string | null = "2026-11-12";
+	s.gateway.listTasks = () => Promise.resolve([{ path: "External.md", title: "External", status: "open", archived: false, staged }]);
+	const update = s.gateway.updateTask.bind(s.gateway); s.gateway.updateTask = async (...args) => { await update(...args); staged = null; };
 	s.gateway.setUserFields([{ id: "s", key: "staged", displayName: "Staged", type: "date" }]);
 	await s.view.onOpen(); await s.staging.refreshNow(); await flush();
 	const unstage = s.root.querySelector(".tntp-panel--staged")!.querySelector(".tntp-unstage")!;
 	expect(unstage.disabled).toBe(false);
+	event(unstage, "click"); for (let i = 0; i < 12; i++) await flush();
+	expect(s.gateway.updateCalls.map(call => call.patch)).toEqual([{ staged: null }]); expect(s.gateway.stopCalls).toHaveLength(0);
+	expect(s.root.querySelector(".tntp-panel--staged")!.querySelectorAll(".tntp-card")).toHaveLength(0);
 	await s.view.onClose(); s.view.unload();
 });
 

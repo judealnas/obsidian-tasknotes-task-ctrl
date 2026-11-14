@@ -111,7 +111,7 @@ export default class TaskNotesTimerPanePlugin extends Plugin {
 		const newCorrelationId = () => crypto.randomUUID();
 		const controller = new TimerController({ gateway: bridge, store, queue, notify, newCorrelationId, log, pauses,
 			getSettings: () => this.paneSettings, settingsReady: () => this.settingsReady });
-		const stagingController = new StagingController({ gateway: bridge, store, staging, queue, newCorrelationId, log,
+		const stagingController = new StagingController({ gateway: bridge, store, staging, queue, newCorrelationId, log, pauses, notify,
 			getSettings: () => this.paneSettings, settingsReady: () => this.settingsReady, timerBusy: () => controller.isBusy() });
 		this.register(() => {
 			store.dispose();

@@ -139,7 +139,7 @@ export class TimerPaneView extends ItemView {
 		const stagedList = stagedPanel.createDiv({ cls: "tntp-cards" });
 		this.stagedCards = new CardList(stagedList, {
 			key: timer => timer.taskPath,
-			create: (parent, timer) => new TaskCard(parent, timer, { app: this.app, gateway, controller: this.services.controller, isBusy: () => this.isBusy() }),
+			create: (parent, timer) => new TaskCard(parent, timer, { app: this.app, gateway, controller: this.services.controller, isBusy: () => this.isBusy(), unstage: this.services.stagingController ? target => this.services.stagingController!.unstage(target) : undefined }),
 			update: (card, timer) => card.update(timer, false),
 			dispose: card => card.dispose(),
 			commitOrder: () => {},
