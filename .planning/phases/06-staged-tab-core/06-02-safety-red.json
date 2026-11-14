@@ -1,0 +1,10 @@
+{
+  "targetFile": "tests/stagingController.test.ts",
+  "targetTest": "tests/stagingController.test.ts > a task staged during the final registration check is not overwritten",
+  "output": "TAP version 13\n1..1\nnot ok 1 - tests/stagingController.test.ts > a task staged during the final registration check is not overwritten # time=11.86ms\n    ---\n    error:\n        name: \"AssertionError\"\n        message: \"expected 1 to be +0 // Object.is equality\"\n    at: \"C:/Users/ja384/Home/obsidian-tasknotes-timer-pane/.claude/worktrees/phase-05-discuss/tests/stagingController.test.ts:27:39\"\n    actual: \"1\"\n    expected: \"0\"\n    ...",
+  "semanticAssessment": "The final field catalog await allowed external staging; controller used its older task read and overwrote it.",
+  "actual": "one update",
+  "expected": "zero updates",
+  "exitCode": 1,
+  "command": "npx vitest run --dir tests stagingController --reporter=tap-flat"
+}
