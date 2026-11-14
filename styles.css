@@ -68,6 +68,15 @@
 	position: absolute;
 	inset-block-start: var(--size-4-2);
 	inset-inline-end: var(--size-4-2);
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	box-sizing: border-box;
+	width: var(--size-4-6);
+	height: var(--size-4-6);
+	min-width: 0;
+	min-height: 0;
+	padding: 0;
 	color: var(--text-muted);
 	background: transparent;
 	box-shadow: none;
