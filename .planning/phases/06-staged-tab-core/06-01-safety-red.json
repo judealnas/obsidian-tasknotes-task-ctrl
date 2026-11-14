@@ -1,0 +1,10 @@
+{
+  "semanticAssessment": "Target assertion fails on stale write readiness while a new list read is pending.",
+  "exitCode": 1,
+  "targetFile": "tests/stagingStore.test.ts",
+  "expected": "canStage false",
+  "output": "TAP version 13\n1..1\nnot ok 1 - tests/stagingStore.test.ts > an in-flight refresh revokes registration readiness until its fresh check finishes # time=39.92ms\n    ---\n    error:\n        name: \"AssertionError\"\n        message: \"expected true to be false // Object.is equality\"\n    at: \"C:/Users/ja384/Home/obsidian-tasknotes-timer-pane/.claude/worktrees/phase-05-discuss/tests/stagingStore.test.ts:23:39\"\n    actual: \"true\"\n    expected: \"false\"\n    ...",
+  "targetTest": "tests/stagingStore.test.ts > an in-flight refresh revokes registration readiness until its fresh check finishes",
+  "actual": "canStage true",
+  "command": "npx vitest run --dir tests stagingStore --reporter=tap-flat"
+}
