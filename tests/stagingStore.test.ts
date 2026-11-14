@@ -91,3 +91,15 @@ test("old cached paths are remapped until the renamed task is indexed, without f
 	s.store.renamePath("Folder", "Dest"); await s.store.refreshNow();
 	expect(s.store.getSnapshot().items.map(item => item.taskPath)).toEqual(["Dest/A.md", "Folder2/A.md"]); s.store.dispose();
 });
+
+test("a newer explicit refresh cannot publish an older successful read while its retry is pending", async () => {
+	const s = stagingFixture(); await s.store.refreshNow();
+	let first!: (tasks: TaskInfo[]) => void; let second!: (tasks: TaskInfo[]) => void;
+	s.gateway.listTasks = vi.fn().mockImplementationOnce(() => new Promise(done => { first = done; })).mockImplementationOnce(() => new Promise(done => { second = done; }));
+	const observed: string[] = []; s.store.subscribe(() => { observed.push(s.store.getSnapshot().items[0]?.task.title ?? ""); });
+	const read = s.store.refreshNow(); await Promise.resolve(); const retry = s.store.refreshNow();
+	first([stagedTask({ title: "Old success" })]); for (let i = 0; i < 12; i++) await Promise.resolve();
+	const stalePublished = observed.includes("Old success"); const readyDuringRetry = s.store.getSnapshot().canStage;
+	second([stagedTask({ title: "Fresh success" })]); await Promise.all([read, retry]); s.store.dispose();
+	expect(stalePublished).toBe(false); expect(readyDuringRetry).toBe(false); expect(s.store.getSnapshot().items[0]?.task.title).toBe("Fresh success");
+});
