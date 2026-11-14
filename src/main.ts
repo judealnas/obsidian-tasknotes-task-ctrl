@@ -109,7 +109,8 @@ export default class TaskNotesTimerPanePlugin extends Plugin {
 		});
 		// The one serial queue every pane write goes through.
 		const queue = new WriteQueue();
-		const staging = new StagingStore({ gateway: bridge, log, schedule, getRolloverHour: () => this.paneSettings.rolloverHour, ready: () => this.settingsReady });
+		const staging = new StagingStore({ gateway: bridge, log, schedule, getRolloverHour: () => this.paneSettings.rolloverHour, ready: () => this.settingsReady, order: stagedOrder,
+			fileCheck: () => (layoutReady ? (path: string) => this.app.vault.getFileByPath(path) !== null : null) });
 		// The only place the plugin creates Notices; state and model code receive this function.
 		const notify = (message: string) => {
 			new Notice(message);
@@ -118,7 +119,8 @@ export default class TaskNotesTimerPanePlugin extends Plugin {
 		const controller = new TimerController({ gateway: bridge, store, queue, notify, newCorrelationId, log, pauses,
 			getSettings: () => this.paneSettings, settingsReady: () => this.settingsReady });
 		const stagingController = new StagingController({ gateway: bridge, store, staging, queue, newCorrelationId, log, pauses, notify,
-			getSettings: () => this.paneSettings, settingsReady: () => this.settingsReady, timerBusy: () => controller.isBusy() });
+			getSettings: () => this.paneSettings, settingsReady: () => this.settingsReady, timerBusy: () => controller.isBusy(),
+			commitOrder: async (path, action) => { if (action === "stage") stagedOrder.append(path); else stagedOrder.removePath(path, false); await stagedOrder.commit(); } });
 		this.register(() => {
 			store.dispose();
 			staging.dispose();
@@ -171,10 +173,14 @@ export default class TaskNotesTimerPanePlugin extends Plugin {
 		this.registerEvent(this.app.vault.on("delete", file => {
 			pauses.removePath(file.path);
 			store.requestRefresh();
+			staging.invalidate(); staging.requestRefresh();
 		}));
 		this.registerEvent(this.app.vault.on("rename", (file, oldPath) => {
 			pauses.renamePath(oldPath, file.path);
+			staging.renamePath(oldPath, file.path);
+			stagedOrder.renamePath(oldPath, file.path);
 			store.requestRefresh();
+			staging.requestRefresh();
 		}));
 	}
 

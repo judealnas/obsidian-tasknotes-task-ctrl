@@ -6,6 +6,7 @@ import { createFakeGateway } from "./fakes/fakeGateway";
 import type { TaskInfo } from "../src/tasknotes/runtime-api.types";
 import { makeActiveEntry } from "./fakes/fakeTaskNotes";
 import { PauseStore } from "../src/state/PauseStore";
+import { StagedOrderStore } from "../src/state/StagedOrderStore";
 
 export function commandFixture() {
 	const gateway = createFakeGateway();
@@ -123,4 +124,14 @@ test("a committed null stays successful after refresh/save failure and pending U
 	const first = controller.unstage(s.target); expect((await controller.unstage(s.target)).kind).toBe("busy");
 	release(); await hold; s.refreshNow.mockRejectedValueOnce(new Error("refresh"));
 	const result = await first; expect(result.kind).toBe("unstaged"); expect(result.warning).toBeDefined(); expect(s.gateway.updateCalls).toHaveLength(1); expect(controller.isBusy()).toBe(false); s.staging.dispose();
+});
+
+test("successful explicit Stage and Unstage commit independent order only after the field write", async () => {
+	const s = commandFixture(); const persist = vi.fn(() => Promise.resolve()); const order = new StagedOrderStore({ persist, log: vi.fn() }); order.load(["Older.md"]);
+	const controller = new StagingController({ ...s.deps, commitOrder: async (path, action) => {
+		expect(s.gateway.updateCalls).toHaveLength(action === "stage" ? 1 : 2);
+		if (action === "stage") order.append(path); else order.removePath(path, false); await order.commit();
+	} });
+	expect((await controller.stage(s.target)).kind).toBe("staged"); expect(order.get()).toEqual(["Older.md", "Task.md"]);
+	expect((await controller.unstage(s.target)).kind).toBe("unstaged"); expect(order.get()).toEqual(["Older.md"]); expect(persist).toHaveBeenCalledTimes(2); s.staging.dispose();
 });
