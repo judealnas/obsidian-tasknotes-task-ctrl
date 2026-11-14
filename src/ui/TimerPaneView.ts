@@ -10,7 +10,9 @@ import {
 	type WorkspaceLeaf,
 	type ViewStateResult,
 } from "obsidian";
-import { TaskCard } from "./TaskCard";
+import { TaskCard, type TaskCardModel } from "./TaskCard";
+import type { StagingStore } from "../state/StagingStore";
+import { displayTitle, taskDisplayKey } from "../model/timeMath";
 import { CardList } from "./CardList";
 import {
 	derivePaneState,
@@ -32,6 +34,7 @@ export interface TimerPaneServices {
 	store: TimerStore;
 	cardOrder: CardOrderStore;
 	controller: Pick<TimerController, "stop" | "start" | "stopAll" | "complete" | "pause" | "resume" | "stopPaused" | "pauseAll" | "resumeAll" | "completionAvailable" | "isBusy" | "subscribeBusy">;
+	staging?: StagingStore;
 }
 
 const PANE_STATES: readonly PaneState[] = ["running", "idle", "loading", "missing", "incompatible"];
@@ -44,6 +47,8 @@ interface TabElements {
 	heading: HTMLElement;
 	body: HTMLElement;
 	meta: HTMLElement;
+	stage?: HTMLButtonElement;
+	retry?: HTMLButtonElement;
 }
 
 interface PaneElements {
@@ -69,7 +74,7 @@ export class TimerPaneView extends ItemView {
 	private els: PaneElements | null = null;
 	/** Cards by timer key, in display order. */
 	private cards: CardList<OpenTimer, TaskCard> | null = null;
-	private stagedCards: CardList<OpenTimer, TaskCard> | null = null;
+	private stagedCards: CardList<TaskCardModel, TaskCard> | null = null;
 	private tab: PaneTab = "timers";
 	private readonly paneId = `tntp-pane-${++nextPaneId}`;
 	/** Wall-clock time of the previous tick, for sleep/wake gap detection. */
@@ -140,7 +145,7 @@ export class TimerPaneView extends ItemView {
 		const stagedBody = stagedMessage.createDiv({ cls: "tntp-message__body" });
 		const stagedMeta = stagedMessage.createDiv({ cls: "tntp-message__meta" });
 		const stagedRetry = stagedMessage.createEl("button", { cls: "tntp-message__retry", text: "Check for TaskNotes" });
-		this.registerDomEvent(stagedRetry, "click", () => gateway.probe());
+		this.registerDomEvent(stagedRetry, "click", () => { gateway.probe(); void this.services.staging?.refreshNow(); });
 		this.registerDomEvent(stagedButton, "click", () => this.selectTab("staged"));
 		this.registerDomEvent(timersButton, "click", () => this.selectTab("timers"));
 		const header = timersPanel.createDiv({ cls: "tntp-header" });
@@ -178,7 +183,7 @@ export class TimerPaneView extends ItemView {
 		this.registerDomEvent(retry, "click", () => gateway.probe());
 
 		this.els = { root, start, pauseAll, resumeAll, stopAll, pomodoroNote, cards, heading, body, meta, tabs: {
-			staged: { button: stagedButton, panel: stagedPanel, heading: stagedHeading, body: stagedBody, meta: stagedMeta },
+			staged: { button: stagedButton, panel: stagedPanel, heading: stagedHeading, body: stagedBody, meta: stagedMeta, stage, retry: stagedRetry },
 			timers: { button: timersButton, panel: timersPanel, heading, body, meta },
 		} };
 		for (const tab of ["staged", "timers"] as const) {
@@ -196,6 +201,7 @@ export class TimerPaneView extends ItemView {
 		this.updateTabs();
 
 		this.register(store.subscribe(() => { this.render(); void this.refreshCompletion(); }));
+		if (this.services.staging) this.register(this.services.staging.subscribe(() => this.render()));
 		this.register(gateway.onState(() => { this.render(); void this.refreshCompletion(); }));
 		this.register(this.services.controller.subscribeBusy(() => this.render()));
 		// Keeps two open panes in the same order.
@@ -208,10 +214,12 @@ export class TimerPaneView extends ItemView {
 			if (this.containerEl.doc.visibilityState !== "visible") return;
 			this.tick();
 			store.requestRefresh();
+			this.services.staging?.requestRefresh();
 		});
 		this.registerDomEvent(this.containerEl.win, "focus", () => {
 			this.tick();
 			store.requestRefresh();
+			this.services.staging?.requestRefresh();
 		});
 		gateway.probe();
 		this.render();
@@ -328,12 +336,25 @@ export class TimerPaneView extends ItemView {
 		for (const candidate of PANE_STATES) els.root.toggleClass(`tntp-pane--${candidate}`, candidate === state);
 		els.root.toggleClass("tntp-pane--pomodoro-unknown", this.services.gateway.getState().kind === "ready" && !header.readable);
 		this.cards?.reconcile(timers);
-		this.stagedCards?.reconcile([]);
+		const staging = this.services.staging?.getSnapshot();
+		this.stagedCards?.reconcile(connected ? (staging?.items ?? []).map(item => ({ state: "idle" as const, taskPath: item.taskPath, title: displayTitle(item.task.title, item.taskPath), displayKey: taskDisplayKey(item.task), stagedCard: true, stagedMetadata: item.metadata })) : []);
 		const staged = els.tabs.staged;
 		if (connected) {
 			setTextIfChanged(staged.heading, "Nothing staged for today");
 			setTextIfChanged(staged.body, "Choose Stage above to pick today's tasks.");
 			setTextIfChanged(staged.meta, "");
+			if (staging) {
+				let heading = staging.items.length ? "" : staging.loaded ? "Nothing staged for today" : "Loading staged tasks…";
+				let body = staging.items.length ? "" : "Choose Stage above to pick today's tasks.";
+				if (!staging.supported) { heading = "Staging needs a TaskNotes update"; body = "Staging requires TaskNotes 4.13.0 or newer and the staging APIs. Update TaskNotes to use this tab."; }
+				else if (staging.field.kind === "missing" || staging.field.kind === "wrong-type") { heading = "Set up the staged field"; body = "In TaskNotes settings → Task Properties → Custom User Fields, register key staged with type Date and no default value."; }
+				else if (staging.field.kind === "ok" && staging.field.hasDefault) { heading = "Remove the staged field default"; body = "In TaskNotes settings → Task Properties → Custom User Fields, remove the default value from the staged Date field. Existing tasks remain usable."; }
+				if (staging.warning) { heading = "Couldn't refresh staging"; body = staging.warning; }
+				setTextIfChanged(staged.heading, heading); setTextIfChanged(staged.body, body);
+				staged.panel.toggleClass("tntp-panel--has-staged", staging.items.length > 0);
+				staged.panel.toggleClass("tntp-panel--staging-retry", !!staging.warning || staging.field.kind === "unknown");
+				staged.retry?.setText("Retry");
+			}
 		} else this.renderMessage(staged, state);
 		for (const candidate of PANE_STATES) {
 			els.tabs.timers.panel.toggleClass(`tntp-panel--${candidate}`, candidate === state);
@@ -393,6 +414,7 @@ export class TimerPaneView extends ItemView {
 
 	private writeTimes(nowMs: number): void {
   for (const card of this.cards?.values() ?? []) card.writeTimes(nowMs);
+  for (const card of this.stagedCards?.values() ?? []) card.writeTimes(nowMs);
  }
 
 	/**
@@ -404,11 +426,11 @@ export class TimerPaneView extends ItemView {
 		const now = Date.now();
 		const { store } = this.services;
 		// A wake or throttle gap: data may have changed while timers were suspended.
-		if (detectWakeGap(this.lastTickMs, now)) store.requestRefresh();
+		if (detectWakeGap(this.lastTickMs, now)) { store.requestRefresh(); this.services.staging?.requestRefresh(); }
 		this.lastTickMs = now;
 		const shown = this.contentEl.isShown();
 		// Revealed (sidebar tab switched back, pane expanded): re-read TaskNotes.
-		if (shown && !this.wasShown) store.requestRefresh();
+		if (shown && !this.wasShown) { store.requestRefresh(); this.services.staging?.requestRefresh(); }
 		this.wasShown = shown;
 		// Hidden: no DOM writes.
 		if (!shown) return;

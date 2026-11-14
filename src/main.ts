@@ -11,6 +11,7 @@ import { DEFAULT_SETTINGS, loadSettings, type TimerPaneSettings } from "./settin
 import { TimerPaneSettingTab } from "./ui/TimerPaneSettingTab";
 import { PAUSE_RECORDS_VERSION, loadPauseRecords } from "./model/pauseLedger";
 import { DEFAULT_ROLLOVER_HOUR, isRolloverHour } from "./model/stagingDay";
+import { StagingStore } from "./state/StagingStore";
 
 /** The data.json keys this plugin owns; everything else is kept as found. */
 const OWNED_KEYS = new Set(["completionStatus", "rolloverHour", "pauseRecordsVersion", "pauseRecords", "cardOrder"]);
@@ -101,6 +102,7 @@ export default class TaskNotesTimerPanePlugin extends Plugin {
 		});
 		// The one serial queue every pane write goes through.
 		const queue = new WriteQueue();
+		const staging = new StagingStore({ gateway: bridge, log, schedule, getRolloverHour: () => this.paneSettings.rolloverHour, ready: () => this.settingsReady });
 		// The only place the plugin creates Notices; state and model code receive this function.
 		const notify = (message: string) => {
 			new Notice(message);
@@ -110,11 +112,12 @@ export default class TaskNotesTimerPanePlugin extends Plugin {
 			getSettings: () => this.paneSettings, settingsReady: () => this.settingsReady });
 		this.register(() => {
 			store.dispose();
+			staging.dispose();
 			bridge.dispose();
 		});
 
 		// Registered synchronously so Obsidian can restore a saved pane leaf (PANE-03).
-		this.registerView(VIEW_TYPE_TIMER_PANE, (leaf) => new TimerPaneView(leaf, { gateway: bridge, store, controller, cardOrder }));
+		this.registerView(VIEW_TYPE_TIMER_PANE, (leaf) => new TimerPaneView(leaf, { gateway: bridge, store, controller, cardOrder, staging }));
 		this.settingsReady = this.loadData().then((data: unknown) => {
 			this.paneSettings = loadSettings(data);
 			this.fileSettings = { ...this.paneSettings };
@@ -131,6 +134,7 @@ export default class TaskNotesTimerPanePlugin extends Plugin {
 				await this.persistAll(settings);
 				this.paneSettings = { ...settings };
 				await store.refreshNow();
+				await staging.refreshNow();
 			},
 		}));
 
@@ -149,6 +153,7 @@ export default class TaskNotesTimerPanePlugin extends Plugin {
 		this.registerInterval(window.setInterval(() => bridge.probe(), PROBE_INTERVAL_MS));
 		// Backstop for anything no event reports; a no-op unless TaskNotes is ready.
 		this.registerInterval(window.setInterval(() => store.resync(), SAFETY_RESYNC_MS));
+		this.registerInterval(window.setInterval(() => staging.resync(), SAFETY_RESYNC_MS));
 		// Deleting or renaming a note in Obsidian emits no TaskNotes runtime event (Pitfall 4).
 		// These are Obsidian-owned events, so Obsidian's registry releases them on unload.
 		// The pause changes synchronously, before TaskNotes re-indexes the note under its new

@@ -17,7 +17,7 @@
 	display: none;
 }
 
-.tntp-panel:not(.tntp-panel--missing):not(.tntp-panel--incompatible) .tntp-message__retry {
+.tntp-panel:not(.tntp-panel--missing):not(.tntp-panel--incompatible):not(.tntp-panel--staging-retry) .tntp-message__retry {
 	display: none;
 }
 
@@ -50,6 +50,13 @@
 .tntp-message__meta:empty {
 	display: none;
 }
+
+.tntp-panel--has-staged .tntp-cards { display: flex; }
+.tntp-panel--staging-retry .tntp-message__retry { display: inline-block; }
+.tntp-card--idle .tntp-stat,
+.tntp-card--idle .tntp-stop,
+.tntp-staged-metadata:empty { display: none; }
+.tntp-staged-metadata { margin-block: var(--size-4-1); }
 
 /* D-15: the Pomodoro line shows only while ownership is unreadable and TaskNotes is ready. */
 .tntp-pane:not(.tntp-pane--pomodoro-unknown) .tntp-pomodoro-note {
