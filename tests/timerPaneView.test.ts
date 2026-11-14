@@ -109,6 +109,13 @@ test("ArrowDown reorders only the Staged list and preserves handle focus", async
 	await s.view.onClose(); s.view.unload();
 });
 
+test("both tab labels always encode numeric zero counts", async () => {
+	const s = setup([], undefined, true); s.store.getHeaderState = () => ({ readable: true, eligibleCount: 0, pausedCount: 0 });
+	await s.view.onOpen(); await s.staging.refreshNow(); await flush();
+	expect(s.root.querySelectorAll(".tntp-tabs__tab").map(tab => tab.textContent).join(",")).toBe("Staged 0,Timers 0");
+	await s.view.onClose(); s.view.unload();
+});
+
 test("staging setup corrections, default and unsupported states preserve cards and Timers", async () => {
 	const s = setup([timer()], undefined, true);
 	s.gateway.listTasks = () => Promise.resolve([{ path: "External.md", title: "Keep this card", status: "open", archived: false, staged: "2026-11-12" }]);
