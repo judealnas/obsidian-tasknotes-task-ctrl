@@ -48,6 +48,9 @@ export class StagingController {
 				if (isStageReserved(task)) return { kind: "already-staged" };
 				const latestField = fieldStatus(await gateway.userFields());
 				if (revision !== staging.revision || !gateway.stagingAvailability().available || latestField.kind !== "ok" || latestField.hasDefault) return { kind: "blocked", message: "TaskNotes changed while checking this task. Retry." };
+				const latestTask = await gateway.getTask(target.taskPath);
+				if (revision !== staging.revision || !gateway.stagingAvailability().available || !latestTask || latestTask.archived || statuses.some(status => status.isCompleted && status.value === latestTask.status)) return { kind: "blocked", message: "This task changed while checking. Retry." };
+				if (isStageReserved(latestTask)) return { kind: "already-staged" };
 				const date = stagingDay((this.deps.now ?? Date.now)(), this.deps.getSettings().rolloverHour);
 				staging.invalidate();
 				await gateway.updateTask(task.path, { [STAGED_FIELD_KEY]: date }, { source: MUTATION_SOURCE, reason: "user stage", correlationId: this.deps.newCorrelationId() });

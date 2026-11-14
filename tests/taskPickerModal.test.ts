@@ -70,6 +70,24 @@ test("Stage selection keeps the native public modal path open and preserves its 
  expect((modal.inputEl as unknown as Element).focusCalls).toBe(1);
  modal.onClose(); staging.dispose();
 });
+
+test("Stage failures retain rows and query, pending selection is unique, and closed results never refocus", async () => {
+ host.notices = 0; vi.stubGlobal("createDiv", () => new Element());
+ const gateway = createFakeGateway(); gateway.listTasks = () => Promise.resolve([task, { ...task, path: "Done.md", status: "done" }, { ...task, path: "Archived.md", archived: true }, { ...task, path: "Future.md", staged: "2026-12-31" }]);
+ gateway.statuses = () => Promise.resolve([{ value: "done", isCompleted: true }]);
+ let settle!: (result: { kind: "staged" | "failed"; message?: string }) => void;
+ const stage = vi.fn(() => new Promise<{ kind: "staged" | "failed"; message?: string }>(resolve => { settle = resolve; }));
+ const close = vi.fn(); const modal = new TaskPickerModal({} as App, { mode: "stage", gateway, controller: { stage, isBusy: () => false }, onClose: close });
+ modal.onOpen(); await flush(); expect(modal.getSuggestions("").map(item => item.path)).toEqual(["Task.md"]);
+ modal.inputEl.value = "Task"; modal.selectSuggestion(task, {} as MouseEvent); modal.selectSuggestion(task, {} as KeyboardEvent);
+ expect(stage).toHaveBeenCalledTimes(1); modal.inputEl.value = "newest"; settle({ kind: "failed", message: "Try again" }); await flush();
+ expect(modal.inputEl.value).toBe("newest"); expect(modal.getSuggestions("")).toHaveLength(1); expect((modal.contentEl as unknown as Element).children[0]?.textContent).toBe("Try again");
+ modal.selectSuggestion(task, {} as KeyboardEvent); expect(stage).toHaveBeenCalledTimes(2); settle({ kind: "staged" }); await flush();
+ expect(modal.inputEl.value).toBe("newest"); expect(modal.getSuggestions("")).toHaveLength(0); expect(close).not.toHaveBeenCalled();
+ const input = modal.inputEl as unknown as Element; const focuses = input.focusCalls;
+ modal.selectSuggestion(task, {} as KeyboardEvent); modal.onClose(); settle({ kind: "staged" }); await flush();
+ expect(input.focusCalls).toBe(focuses); expect(host.notices).toBe(0);
+});
 describe("task picker lifecycle", () => {
  beforeEach(() => { host.loaded = 0; host.unloaded = 0; host.notices = 0; host.throwNotice = false; host.renders = []; vi.stubGlobal("createDiv", () => new Element()); });
  function setup() {
