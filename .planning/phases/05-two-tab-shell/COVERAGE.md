@@ -44,7 +44,7 @@ The input probe reported four applicable, four unresolved items, including one u
 | TABS-01 | adjacency | Resolved, explicit | Identical task titles with distinct sessionKey values remain separate cards; repeated identical sessionKey values reconcile once (05-01). |
 | TABS-01 | empty | Resolved, explicit | Empty/single Timers input yields idle/one card; null ready snapshot yields loading. Connected Staged retains its independent fixed empty state (05-01/05-02). |
 | TABS-01 | ordering | Resolved, explicit | Equal ranks retain incoming order, unseen Timers keys precede saved keys, pause/resume preserves session identity (05-01). |
-| TABS-02 | unclassified | Unresolved, flagged assumption | Generic "review manually" classification remains unresolved; D-05/D-06 concretely require invalid-state fallback, before/after-open restore, layout-save requests and per-leaf independence (05-02). Native restart evidence remains separately recorded (05-03). |
+| TABS-02 | persistence and saved-state validation | Resolved by user review | User accepted the passing native restart, independent-pane restoration and absent/invalid-state fallback evidence in 05-UAT.md test 6. D-05/D-06 lifecycle-order and save-request checks also pass. No additional unspecified predicate is inferred. |
 
 Post-authoring coverage: applicable 4, explicit resolved 3, unresolved 1, unclassified 1. Native restart is not claimed from mock tests. No unresolved probe item was silently dropped or converted into a human decision.
 
@@ -63,3 +63,7 @@ Recall considered silently adding staging actions, changing Timers identity/orde
 Every plan starts with a working tracer path, then expands behavior. Sequential waves are required by overlapping TimerPaneView/test ownership. Each task modifies at most five files. All listed existing source/test/script paths were grounded against tracked files; new intended artifacts are explicitly listed in each plan. No ORM schema files are in scope, so no schema push task is applicable. Graph context is unavailable because graphify is disabled; no graph was created. The assumption-delta scan supplied by the orchestrator returned `detected:false`.
 
 Estimates use calibration factor 1, sample count 0 and derived confidence low. No packages are added, so no package installation/audit checkpoint is required. TaskCard/CardList interfaces are rated costly; leaf state and private UI seams are reversible. No one-way choice or new approval checkpoint is introduced. Security enforcement is ASVS L1, blocking high severity; mitigations are concrete and tested in each plan's threat register.
+
+## UAT review disposition
+
+The earlier unclassified TABS-02 flag is resolved. After reviewing the concrete passing restoration checks, the user stated: "2. sounds like everything passed". This is an explicit user disposition, recorded in 05-UAT.md test 6; the earlier unresolved counts above describe the original planning probe. Current disposition: 4 explicit resolved, 0 unresolved, 0 unclassified. Physical Windows sleep/wake remains separately unverified in UAT test 5.

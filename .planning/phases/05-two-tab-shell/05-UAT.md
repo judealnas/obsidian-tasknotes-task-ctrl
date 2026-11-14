@@ -3,12 +3,12 @@ status: partial
 phase: 05-two-tab-shell
 source: [05-01-SUMMARY.md, 05-02-SUMMARY.md, 05-03-SUMMARY.md]
 started: 2026-11-14T03:44:36.382Z
-updated: 2026-11-14T03:56:24.964Z
+updated: 2026-11-14T04:01:41.481Z
 ---
 
 ## Current Test
 
-[testing complete]
+[testing paused — physical Windows sleep/wake remains unverified]
 
 ## Tests
 
@@ -47,9 +47,10 @@ evidence: 05-CDP-UAT-evidence.jsonl cases native-renderer-suspend-timers, native
 
 ### 6. Review the retained TABS-02 assumption
 expected: Explicitly classify the generic review-manually item against concrete native restoration and saved-state evidence.
-result: blocked
-blocked_by: other
-reason: The existing verification report explicitly reserves this classification for human disposition. No new behavioral predicate is specified, and no acceptance was invented. No visible window is required to review the evidence.
+result: pass
+source: user review of automated evidence
+reported: "2. sounds like everything passed"
+disposition: User accepted the concrete native restart, independent-pane selection and invalid-state fallback evidence; no additional behavioral predicate remains.
 evidence: Current native-full-restart-selections restored c88f9ce6849cf981 to Timers and c2a2a844402f0a8e to Staged; native-saved-state-validation confirms absent/invalid values fall back to Timers and both valid values restore correctly.
 
 ### 7. Current-model card actions, timestamp clocks and renderer cleanup through TaskCard
@@ -104,11 +105,11 @@ evidence: 05-03-native-evidence.jsonl#native-restart; current cold launch restor
 ## Summary
 
 total: 13
-passed: 11
+passed: 12
 issues: 0
 pending: 0
 skipped: 0
-blocked: 2
+blocked: 1
 
 ## Gaps
 
