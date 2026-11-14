@@ -6,6 +6,7 @@ class Element {
  value = "";
  focusCalls = 0;
  focus(): void { this.focusCalls++; }
+ setText(text: string): void { this.textContent = text; }
  textContent = "";
  children: Element[] = [];
  attrs = new Map<string, string>();
@@ -40,22 +41,34 @@ vi.mock("obsidian", () => ({
   selectSuggestion(task: unknown): void { this.close(); (this as unknown as { onChooseSuggestion(t: unknown): void }).onChooseSuggestion(task); }
  }
 }));
-import { TaskPickerModal, type TaskPickerOptions } from "../src/ui/TaskPickerModal";
+import { TaskPickerModal } from "../src/ui/TaskPickerModal";
+import { StagingController } from "../src/state/StagingController";
+import { StagingStore } from "../src/state/StagingStore";
+import { WriteQueue } from "../src/state/WriteQueue";
 const task = { title: "Task", path: "Task.md", status: "open", archived: false, due: "2026-10-15" };
 const flush = async () => { await Promise.resolve(); await Promise.resolve(); await Promise.resolve(); };
 
 test("Stage selection keeps the native public modal path open and preserves its newest query", async () => {
- const gateway = createFakeGateway(); gateway.listTasks = () => Promise.resolve([task]);
+ const gateway = createFakeGateway(); let current = { ...task, staged: null as string | null };
+ gateway.listTasks = () => Promise.resolve([current]); gateway.getTask = () => Promise.resolve(current);
+ gateway.setUserFields([{ id: "s", key: "staged", type: "date", displayName: "Staged" }]);
+ const original = gateway.updateTask; gateway.updateTask = async (path, patch, context) => { await original(path, patch, context); current = { ...current, staged: patch.staged as string }; };
+ const staging = new StagingStore({ gateway, log: vi.fn(), schedule: () => () => undefined, now: () => new Date(2026, 10, 14, 12).getTime() });
+ const controller = new StagingController({ gateway, staging, store: { refreshNow: () => Promise.resolve() }, queue: new WriteQueue(), timerBusy: () => false, getSettings: () => ({ rolloverHour: 4, completionStatus: null }), settingsReady: () => Promise.resolve(), now: () => new Date(2026, 10, 14, 12).getTime(), newCorrelationId: () => "test", log: vi.fn() });
  const closed = vi.fn(); const start = vi.fn();
- const options = { mode: "stage", gateway, controller: { start, isBusy: () => false, stage: () => Promise.resolve({ kind: "staged" }) }, onClose: closed };
- const modal = new TaskPickerModal({} as App, options as unknown as TaskPickerOptions);
+ const modal = new TaskPickerModal({} as App, { mode: "stage", gateway, controller, onClose: closed });
  modal.onOpen(); await flush(); modal.inputEl.value = "Task";
- modal.selectSuggestion(task, {} as KeyboardEvent); await flush();
+ modal.selectSuggestion(task, {} as KeyboardEvent);
+ for (let i = 0; i < 12; i++) await flush();
  expect(closed.mock.calls.length).toBe(0);
  expect(modal.inputEl.value).toBe("Task");
  expect(modal.getSuggestions("")).toEqual([]);
  expect(start).not.toHaveBeenCalled();
- modal.onClose();
+ expect(gateway.updateCalls[0]?.patch).toEqual({ staged: "2026-11-14" });
+ expect(staging.getSnapshot().items.map(item => item.taskPath)).toEqual(["Task.md"]);
+ expect(gateway.startCalls).toEqual([]); expect(host.notices).toBe(0);
+ expect((modal.inputEl as unknown as Element).focusCalls).toBe(1);
+ modal.onClose(); staging.dispose();
 });
 describe("task picker lifecycle", () => {
  beforeEach(() => { host.loaded = 0; host.unloaded = 0; host.notices = 0; host.throwNotice = false; host.renders = []; vi.stubGlobal("createDiv", () => new Element()); });

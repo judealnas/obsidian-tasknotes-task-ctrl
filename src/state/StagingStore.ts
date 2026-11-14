@@ -41,6 +41,7 @@ export class StagingStore {
 		if (deps.gateway.getState().kind === "ready") this.requestRefresh();
 	}
 	getSnapshot(): StagingSnapshot { return this.snapshot; }
+	get revision(): number { return this.generation; }
 	subscribe(listener: () => void): () => void { this.listeners.add(listener); return () => { this.listeners.delete(listener); }; }
 	invalidate(): void {
 		this.generation++;

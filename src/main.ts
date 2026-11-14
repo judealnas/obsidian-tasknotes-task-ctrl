@@ -12,6 +12,7 @@ import { TimerPaneSettingTab } from "./ui/TimerPaneSettingTab";
 import { PAUSE_RECORDS_VERSION, loadPauseRecords } from "./model/pauseLedger";
 import { DEFAULT_ROLLOVER_HOUR, isRolloverHour } from "./model/stagingDay";
 import { StagingStore } from "./state/StagingStore";
+import { StagingController } from "./state/StagingController";
 
 /** The data.json keys this plugin owns; everything else is kept as found. */
 const OWNED_KEYS = new Set(["completionStatus", "rolloverHour", "pauseRecordsVersion", "pauseRecords", "cardOrder"]);
@@ -110,6 +111,8 @@ export default class TaskNotesTimerPanePlugin extends Plugin {
 		const newCorrelationId = () => crypto.randomUUID();
 		const controller = new TimerController({ gateway: bridge, store, queue, notify, newCorrelationId, log, pauses,
 			getSettings: () => this.paneSettings, settingsReady: () => this.settingsReady });
+		const stagingController = new StagingController({ gateway: bridge, store, staging, queue, newCorrelationId, log,
+			getSettings: () => this.paneSettings, settingsReady: () => this.settingsReady, timerBusy: () => controller.isBusy() });
 		this.register(() => {
 			store.dispose();
 			staging.dispose();
@@ -117,7 +120,7 @@ export default class TaskNotesTimerPanePlugin extends Plugin {
 		});
 
 		// Registered synchronously so Obsidian can restore a saved pane leaf (PANE-03).
-		this.registerView(VIEW_TYPE_TIMER_PANE, (leaf) => new TimerPaneView(leaf, { gateway: bridge, store, controller, cardOrder, staging }));
+		this.registerView(VIEW_TYPE_TIMER_PANE, (leaf) => new TimerPaneView(leaf, { gateway: bridge, store, controller, cardOrder, staging, stagingController }));
 		this.settingsReady = this.loadData().then((data: unknown) => {
 			this.paneSettings = loadSettings(data);
 			this.fileSettings = { ...this.paneSettings };

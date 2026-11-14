@@ -12,6 +12,7 @@ import {
 } from "obsidian";
 import { TaskCard, type TaskCardModel } from "./TaskCard";
 import type { StagingStore } from "../state/StagingStore";
+import type { StagingController } from "../state/StagingController";
 import { displayTitle, taskDisplayKey } from "../model/timeMath";
 import { CardList } from "./CardList";
 import {
@@ -35,6 +36,7 @@ export interface TimerPaneServices {
 	cardOrder: CardOrderStore;
 	controller: Pick<TimerController, "stop" | "start" | "stopAll" | "complete" | "pause" | "resume" | "stopPaused" | "pauseAll" | "resumeAll" | "completionAvailable" | "isBusy" | "subscribeBusy">;
 	staging?: StagingStore;
+	stagingController?: StagingController;
 }
 
 const PANE_STATES: readonly PaneState[] = ["running", "idle", "loading", "missing", "incompatible"];
@@ -132,6 +134,7 @@ export class TimerPaneView extends ItemView {
 		const stage = stagedPanel.createDiv({ cls: "tntp-header" }).createEl("button", { text: "Stage", cls: "tntp-stage" });
 		stage.disabled = true;
 		setTooltip(stage, "Staging isn't available yet");
+		this.registerDomEvent(stage, "click", () => this.openStagePicker());
 		const stagedList = stagedPanel.createDiv({ cls: "tntp-cards" });
 		this.stagedCards = new CardList(stagedList, {
 			key: timer => timer.taskPath,
@@ -202,6 +205,7 @@ export class TimerPaneView extends ItemView {
 
 		this.register(store.subscribe(() => { this.render(); void this.refreshCompletion(); }));
 		if (this.services.staging) this.register(this.services.staging.subscribe(() => this.render()));
+		if (this.services.stagingController) this.register(this.services.stagingController.subscribeBusy(() => this.render()));
 		this.register(gateway.onState(() => { this.render(); void this.refreshCompletion(); }));
 		this.register(this.services.controller.subscribeBusy(() => this.render()));
 		// Keeps two open panes in the same order.
@@ -307,6 +311,13 @@ export class TimerPaneView extends ItemView {
   modal.open();
  }
 
+	private openStagePicker(): void {
+		const { gateway, staging, stagingController } = this.services;
+		if (this.picker || !stagingController || !staging?.getSnapshot().canStage || stagingController.isBusy() || this.services.controller.isBusy()) return;
+		const modal = new TaskPickerModal(this.app, { mode: "stage", gateway, controller: stagingController, onClose: () => { if (this.picker === modal) this.picker = null; } });
+		this.picker = modal; modal.open();
+	}
+
 	/** Every open timer in display order (the saved order, new timers on top); none unless running. */
 	private currentTimers(): { state: PaneState; timers: OpenTimer[] } {
 		const snapshot = this.services.store.getSnapshot();
@@ -324,7 +335,7 @@ export class TimerPaneView extends ItemView {
 		els.start.disabled = !connected || !gate.available || this.services.controller.isBusy();
 		setTooltip(els.start, gate.reason);
 		const header = this.services.store.getHeaderState();
-		const busy = this.services.controller.isBusy();
+		const busy = this.services.controller.isBusy() || !!this.services.stagingController?.isBusy();
 		const busyTip = "A timer action is in progress";
 		els.pauseAll.disabled = !connected || busy || !header.readable || header.eligibleCount === 0;
 		setTooltip(els.pauseAll, busy ? busyTip : !header.readable ? "Cannot verify Pomodoro ownership" : header.eligibleCount === 0 ? "No running timers to pause" : "Pause all running timers");
@@ -337,6 +348,10 @@ export class TimerPaneView extends ItemView {
 		els.root.toggleClass("tntp-pane--pomodoro-unknown", this.services.gateway.getState().kind === "ready" && !header.readable);
 		this.cards?.reconcile(timers);
 		const staging = this.services.staging?.getSnapshot();
+		if (els.tabs.staged.stage) {
+			els.tabs.staged.stage.disabled = !connected || !staging?.canStage || !this.services.stagingController || busy;
+			setTooltip(els.tabs.staged.stage, busy ? "A task action is in progress" : staging?.canStage ? "Stage tasks for today" : "Check the staged field setup below");
+		}
 		this.stagedCards?.reconcile(connected ? (staging?.items ?? []).map(item => ({ state: "idle" as const, taskPath: item.taskPath, title: displayTitle(item.task.title, item.taskPath), displayKey: taskDisplayKey(item.task), stagedCard: true, stagedMetadata: item.metadata })) : []);
 		const staged = els.tabs.staged;
 		if (connected) {

@@ -5,18 +5,22 @@ import { normalizeTimerPath, type Ownership } from "../model/pomodoroOwnership";
 import type { TimerController } from "../state/TimerController";
 import type { TaskNotesGateway } from "../tasknotes/TaskNotesBridge";
 import type { TaskInfo } from "../tasknotes/runtime-api.types";
+import { isStageReserved } from "../model/staging";
+import type { StagingController } from "../state/StagingController";
 
 /** Each opening reads once; keystrokes rank the local snapshot through public SuggestModal. */
-export interface TaskPickerOptions {
- mode: "start";
+interface PickerBase {
  gateway: TaskNotesGateway;
- controller: Pick<TimerController, "start" | "isBusy">;
  onClose: () => void;
 }
+export type TaskPickerOptions = PickerBase & (
+ { mode: "start"; controller: Pick<TimerController, "start" | "isBusy"> } |
+ { mode: "stage"; controller: Pick<StagingController, "stage" | "isBusy"> }
+);
 
 export class TaskPickerModal extends SuggestModal<TaskInfo> {
  private readonly gateway: TaskNotesGateway;
- private readonly controller: TaskPickerOptions["controller"];
+ private readonly options: TaskPickerOptions;
  private readonly didClose: () => void;
  private tasks: TaskInfo[] = [];
  private completed = new Set<string>();
@@ -28,13 +32,15 @@ export class TaskPickerModal extends SuggestModal<TaskInfo> {
  private chosen = false;
  private components = new Set<Component>();
  private offState: (() => void) | null = null;
+ private pending = false;
+ private inlineError: HTMLElement | null = null;
 
  constructor(app: App, options: TaskPickerOptions) {
   super(app);
   this.gateway = options.gateway;
-  this.controller = options.controller;
+  this.options = options;
   this.didClose = options.onClose;
-  this.setPlaceholder("Choose a task to start");
+  this.setPlaceholder(options.mode === "stage" ? "Choose tasks to stage" : "Choose a task to start");
   this.emptyStateText = "Loading tasks…";
  }
 
@@ -42,9 +48,11 @@ export class TaskPickerModal extends SuggestModal<TaskInfo> {
   void super.onOpen();
   this.opened = true;
   this.chosen = false;
+  this.pending = false;
+  if (this.options.mode === "stage") this.inlineError = this.contentEl.createDiv({ cls: "tntp-picker-error", attr: { role: "status", "aria-live": "polite" } });
   const generation = ++this.opening;
   this.offState = this.gateway.onState(() => {
-   if (!this.gateway.startAvailability().available) this.close();
+   if (!this.available()) this.close();
   });
   void this.loadTasks(generation);
  }
@@ -54,7 +62,7 @@ export class TaskPickerModal extends SuggestModal<TaskInfo> {
    // An ownership failure never closes the picker: it only means no row is tagged.
    const ownershipRead: Promise<Ownership> = this.gateway.pomodoroOwnership().catch((): Ownership => ({ readable: false }));
    const [tasks, statuses, ownership] = await Promise.all([this.gateway.listTasks(), this.gateway.statuses(), ownershipRead]);
-   if (!this.opened || generation !== this.opening || !this.gateway.startAvailability().available) return;
+   if (!this.opened || generation !== this.opening || !this.available()) return;
    this.tasks = tasks;
    this.completed = new Set(statuses.filter(status => status.isCompleted).map(status => status.value));
    this.pomodoroPath = ownership.readable && ownership.owner ? normalizeTimerPath(ownership.owner.taskPath) : null;
@@ -64,6 +72,10 @@ export class TaskPickerModal extends SuggestModal<TaskInfo> {
    this.inputEl.dispatchEvent(new host.Event("input"));
   } catch (error) {
    if (!this.opened || generation !== this.opening) return;
+   if (this.options.mode === "stage") {
+    if (this.inlineError) this.inlineError.setText("Couldn't load tasks. Close this picker and try Stage again.");
+    return;
+   }
    try {
     new Notice("Couldn't load tasks: " + (this.gateway.normalizeError(error).message || "TaskNotes reported an error"));
    } catch (noticeError) {
@@ -74,7 +86,8 @@ export class TaskPickerModal extends SuggestModal<TaskInfo> {
 
  getSuggestions(query: string): TaskInfo[] {
   this.clearRows();
-  return filterAndSortTasks(this.tasks, this.completed, query);
+  const tasks = this.options.mode === "stage" ? this.tasks.filter(task => !task.archived && !this.completed.has(task.status) && !isStageReserved(task)) : this.tasks;
+  return filterAndSortTasks(tasks, this.completed, query);
  }
 
  renderSuggestion(task: TaskInfo, el: HTMLElement): void {
@@ -113,15 +126,37 @@ export class TaskPickerModal extends SuggestModal<TaskInfo> {
  }
 
  selectSuggestion(task: TaskInfo, event: MouseEvent | KeyboardEvent): void {
-  if (!this.opened || this.chosen || this.controller.isBusy() || !this.gateway.startAvailability().available) return;
+  if (!this.opened || this.chosen || this.pending || this.options.controller.isBusy() || !this.available()) return;
+  if (this.options.mode === "stage") { void this.stageSelection(task); return; }
   super.selectSuggestion(task, event);
  }
 
  onChooseSuggestion(task: TaskInfo): void {
   // SuggestModal may close before invoking this callback, so closed is not a veto.
-  if (this.chosen || this.controller.isBusy() || !this.gateway.startAvailability().available) return;
+  if (this.options.mode !== "start" || this.chosen || this.options.controller.isBusy() || !this.gateway.startAvailability().available) return;
   this.chosen = true;
-  void this.controller.start({ taskPath: task.path, title: task.title });
+  void this.options.controller.start({ taskPath: task.path, title: task.title });
+ }
+
+ private available(): boolean { return (this.options.mode === "stage" ? this.gateway.stagingAvailability() : this.gateway.startAvailability()).available; }
+ private async stageSelection(task: TaskInfo): Promise<void> {
+  if (this.options.mode !== "stage") return;
+  this.pending = true;
+  const opening = this.opening;
+  this.inlineError?.setText("");
+  try {
+   const outcome = await this.options.controller.stage({ taskPath: task.path, title: task.title });
+   if (!this.opened || opening !== this.opening) return;
+   if (outcome.kind === "staged" || outcome.kind === "already-staged") {
+    this.tasks = this.tasks.filter(candidate => normalizeTimerPath(candidate.path) !== normalizeTimerPath(task.path));
+    const host = this.inputEl.win as unknown as { Event: typeof Event };
+    this.inputEl.dispatchEvent(new host.Event("input"));
+    this.inputEl.focus();
+    this.inlineError?.setText(outcome.warning ?? "");
+   } else this.inlineError?.setText(outcome.message ?? "Couldn't stage this task. Try again.");
+  } catch {
+   if (this.opened && opening === this.opening) this.inlineError?.setText("Couldn't stage this task. Try again.");
+  } finally { if (opening === this.opening) this.pending = false; }
  }
 
  onClose(): void {
@@ -129,6 +164,7 @@ export class TaskPickerModal extends SuggestModal<TaskInfo> {
   ++this.opening;
   this.clearRows();
   this.tasks = [];
+  this.inlineError = null;
   this.pomodoroPath = null;
   this.offState?.(); this.offState = null;
   this.didClose();
