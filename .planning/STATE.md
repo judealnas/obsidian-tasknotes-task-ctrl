@@ -2,20 +2,20 @@
 gsd_state_version: "1.0"
 milestone: v0.3
 milestone_name: Staging Tasks
-current_phase: 05
-current_phase_name: Two-Tab Shell
-status: verifying
-stopped_at: Phase 5 implementation complete; 5 human verification items saved in 05-UAT.md
-last_updated: "2026-11-13T20:19:51.538Z"
+current_phase: 6
+current_phase_name: Staged Tab Core
+status: planning
+stopped_at: Phase 5 complete, ready to plan Phase 6
+last_updated: "2026-11-14T04:06:45.348Z"
 last_activity: 2026-11-13
-last_activity_desc: Phase 05 plans complete; 568 tests pass; security 10/10 closed; human verification pending
-state_head: 564b36b3e7eb9e58c1ff269ed16f1d9c5e6d9f83
+last_activity_desc: Phase 5 complete, transitioned to Phase 6
+state_head: 0914c563050c02e9bff31c3e1e380a58b770d754
 progress:
-  total_phases: 4
-  completed_phases: 1
-  total_plans: 8
-  completed_plans: 8
-  percent: 25
+  total_phases: 7
+  completed_phases: 5
+  total_plans: 20
+  completed_plans: 20
+  percent: 71
 ---
 
 # Project State
@@ -25,22 +25,22 @@ progress:
 See: .planning/PROJECT.md (updated 2026-11-13)
 
 **Core value:** With the pane open, I can always see what task is being timed and how long I've spent on it, and stop, pause, or switch tasks in one to two clicks, without leaving the pane.
-**Current focus:** Phase 05 — Two-Tab Shell
+**Current focus:** Phase 6 — Staged Tab Core
 
 ## Current Position
 
-Phase: 05 (Two-Tab Shell) — HUMAN VERIFICATION PENDING
-Plan: 3 of 3 complete
-Status: Implementation complete; verification human_needed (18/18 automated must-haves verified)
+Phase: 6 — Staged Tab Core
+Plan: Not started
+Status: Ready to plan
 Note: Phase 4 complete: UAT 6/6, VERIFICATION passed, SECURITY 19/19 closed. 04-01 spike cleanup done (`staged:` null line confirmed, `spikedefault` removed).
-Last activity: 2026-11-13 — Completed all three plans; build/typecheck/lint and 568 tests pass; security 10/10 closed; five UAT items pending
+Last activity: 2026-11-13 — Phase 5 complete, transitioned to Phase 6
 
-Progress (v0.3): [██▌░░░░░░░] 25% (1/4 phases)
+Progress (v0.3): [█████░░░░░] 50% (2/4 phases). Planned work: 8/8 plans complete.
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 15
+- Total plans completed: 20
 - Average duration: -
 - Total execution time: 0.0 hours
 
@@ -51,6 +51,7 @@ Progress (v0.3): [██▌░░░░░░░] 25% (1/4 phases)
 | 2 | 3 | - | - |
 | 03 | 4 | - | - |
 | 4 | 5 | - | - |
+| 5 | 3 | - | - |
 
 **Recent Trend:**
 - Last 5 plans: -
@@ -81,6 +82,8 @@ Progress (v0.3): [██▌░░░░░░░] 25% (1/4 phases)
 ## Accumulated Context
 
 ### Decisions
+
+- [Phase 5 acceptance]: The two-tab shell and independent per-leaf selection are verified; Staged remains a disabled placeholder until Phase 6. All 13 UAT checks passed or were explicitly accepted. Physical Windows sleep was not exercised; its observation limit was accepted after native renderer suspension/reconnect passed.
 
 Decisions are logged in PROJECT.md Key Decisions table.
 Recent decisions affecting current work:
@@ -148,7 +151,7 @@ None yet.
 - [Phase 1]: Check cold-start readiness timing by hand. `layout.ready` fires only once, and `isReady()` and `ready()` change at different points.
 - [Phase 3]: Deferred UAT follow-up: the muted can't-check Pomodoro line (unreadable ownership) has not been observed on desktop; logic is store-tested.
 - [Phase 4 UAT 2026-11-13]: Pausing an already-completed task drops its card (pauseLedger reconcile rule 4 ignores whether completion preceded the pause). Pre-existing since v0.2; deferred to ROADMAP backlog 999.1 (`.planning/debug/pause-removes-card.md`).
-- [Phase 4 UAT 2026-11-13]: Dev vault now runs TaskNotes 4.18.2, not the 4.13.8 the Phase 4 contract pins were read from. Also, a build inside a `.claude/worktrees/*` checkout deploys to that worktree's own `dev-vault/`, not the registered dev vault; copy `main.js`/`manifest.json`/`styles.css` over before desktop UAT.
+- [Phase 4/5 UAT]: Dev vault runs TaskNotes 4.18.2; Phase 4 contract pins came from 4.13.8. Use npm run uat:start from the checkout under test: its tracked launcher builds that checkout and installs only main.js/manifest.json/styles.css into the main dev-vault. Drive it through CDP; no visible-window handoff is needed.
 - [Phase 7 research flag]: Run `/gsd-plan-phase --research-phase 7`. It covers recurring occurrence snapping, occurrence materialization, whether the toggle stops timers, and the date basis of `completedDate` near midnight.
 - [v0.2 close]: Phase 1 UAT partial and verification human_needed were acknowledged and deferred at milestone close (see Deferred Items); they carry into the next milestone as candidate work, not as blockers.
 
@@ -178,12 +181,13 @@ Items acknowledged and deferred at milestone close, most recent first:
 
 ## Session Continuity
 
-Last session: 2026-11-13T20:19:51.376Z
-Stopped at: Phase 5 implementation complete; human verification pending
-Resume file: .planning/phases/05-two-tab-shell/05-UAT.md
+Last session: 2026-11-14T04:07:40.399Z
+Stopped at: Phase 5 complete, ready to plan Phase 6
+Resume file: None
 
 ## Operator Next Steps
 
-- Run $gsd-verify-work 5 to walk through the five pending UAT items; Phase 5 remains pending until verification passes.
+- Phase 5 is complete: canonical verification passed, UAT 13/13 accepted, security 10/10 closed, and regression suite 568/568 passed.
+- Next: $gsd-discuss-phase 6 — define Staged Tab Core behavior before planning.
 - Implementation is committed on agent-phase-05-discuss (renamed from gsd/phase-05-discuss for the executor worktree commit guard).
 - Merge gsd/phase-04-plan when ready

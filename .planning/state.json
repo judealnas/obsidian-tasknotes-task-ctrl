@@ -26,7 +26,7 @@
     {
       "number": "5",
       "name": "Two-Tab Shell",
-      "status": "in_progress"
+      "status": "complete"
     },
     {
       "number": "6",
@@ -40,9 +40,9 @@
     }
   ],
   "next": {
-    "command": "$gsd-verify-work 5",
-    "label": "Verify Phase 5",
-    "reason": "All 3 plans implemented; human_needed with 5 UAT items; automated checks passed"
+    "command": "/gsd:progress --next",
+    "label": "Advance to the next step (plan phase 6)",
+    "reason": "Phase 6 of 7 — needs a plan"
   },
-  "updated_at": "2026-11-13T20:19:37Z"
+  "updated_at": "2026-11-14T04:07:40.399Z"
 }

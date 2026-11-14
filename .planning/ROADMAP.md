@@ -36,7 +36,7 @@ Two rules hold in every phase: refresh and render never write, and every write g
 **Milestone Goal:** Let me pick the tasks I'll tackle today, put them in order, and start, stop, pause, or complete each from that list, with the all-timers view one tab away.
 
 - [x] **Phase 4: Staging Foundations** - Rollover-hour setting, a DST-safe staging day, and a feature-gated TaskNotes staging contract for the fixed `staged` key (completed 2026-11-13)
-- [ ] **Phase 5: Two-Tab Shell** - Pane split into Staged and Timers tabs, with Timers unchanged from v0.2 and the last-active tab remembered
+- [x] **Phase 5: Two-Tab Shell** - Pane split into Staged and Timers tabs, with Timers unchanged from v0.2 and the last-active tab remembered (completed 2026-11-13)
 - [ ] **Phase 6: Staged Tab Core** - Stage from the picker, unstage, order, and start/pause/stop each staged task from its card, with setup notices, tab counts and staged markers
 - [ ] **Phase 7: Complete, Roll Over & Release 0.3.0** - ✓ completion (recurring-safe on both tabs), Done today, daily rollover, mobile ▲▼ reordering, rename, and BRAT release
 
@@ -86,7 +86,7 @@ Plans:
   3. After restarting Obsidian, the pane reopens on the tab that was last active.
   4. Bridge-state messages (TaskNotes missing, disabled, too old, reconnecting) still show correctly. Reconnecting after a TaskNotes reload and after sleep/wake still works from either tab.
 
-**Plans**: 3/3 plans executed
+**Plans**: 3/3 plans complete
 
 Plans:
 **Wave 1**
@@ -178,7 +178,7 @@ Phases execute in numeric order: 4 → 5 → 6 → 7 (Phases 4 and 5 are indepen
 | 2. Start, Switch & Complete | v0.2 | 3/3 | Complete | 2026-10-16 |
 | 3. Pause & Resume | v0.2 | 4/4 | Complete | 2026-10-16 |
 | 4. Staging Foundations | v0.3 | 5/5 | Complete    | 2026-11-13 |
-| 5. Two-Tab Shell | v0.3 | 3/3 | In Progress | - |
+| 5. Two-Tab Shell | v0.3 | 3/3 | Complete    | 2026-11-13 |
 | 6. Staged Tab Core | v0.3 | 0/? | Not started | - |
 | 7. Complete, Roll Over & Release 0.3.0 | v0.3 | 0/? | Not started | - |
 

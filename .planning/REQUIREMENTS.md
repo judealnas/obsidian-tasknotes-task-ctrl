@@ -9,8 +9,8 @@ Design sources: `.planning/research/STAGING-DECISIONS.md` (settled decisions; v0
 
 ### Tabs
 
-- [ ] **TABS-01**: Pane has two tabs: **Staged** and **Timers**; Timers shows every regular timed task exactly as in v0.2 (cards, Start, Pause all, Resume all, Stop all)
-- [ ] **TABS-02**: Pane remembers the last-active tab across restarts
+- [x] **TABS-01**: Pane has two tabs: **Staged** and **Timers**; Timers shows every regular timed task exactly as in v0.2 (cards, Start, Pause all, Resume all, Stop all)
+- [x] **TABS-02**: Pane remembers the last-active tab across restarts
 - [ ] **TABS-03**: Tab labels show counts (e.g. "Staged 4 · Timers 1"), and the Timers tab is visibly highlighted while any regular timer runs
 - [ ] **TABS-04**: Timers-tab cards for staged tasks show a small staged marker
 
@@ -89,8 +89,8 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| TABS-01 | Phase 5 | Pending |
-| TABS-02 | Phase 5 | Pending |
+| TABS-01 | Phase 5 | Complete |
+| TABS-02 | Phase 5 | Complete |
 | TABS-03 | Phase 6 | Pending |
 | TABS-04 | Phase 6 | Pending |
 | SETUP-01 | Phase 4 | Complete |
