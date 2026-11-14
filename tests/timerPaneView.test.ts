@@ -20,6 +20,11 @@ import { TimerPaneView, type TimerPaneServices } from "../src/ui/TimerPaneView";
 import type { OpenTimer, TimerSnapshot } from "../src/model/timeMath";
 import { CardOrderStore } from "../src/state/CardOrderStore";
 import { StagingStore } from "../src/state/StagingStore";
+import { TimerStore } from "../src/state/TimerStore";
+import { TimerController } from "../src/state/TimerController";
+import { PauseStore } from "../src/state/PauseStore";
+import { WriteQueue } from "../src/state/WriteQueue";
+import type { ActiveTimeEntry, TaskInfo } from "../src/tasknotes/runtime-api.types";
 import { createFakeGateway } from "./fakes/fakeGateway";
 import { Element, event, flush, resetViewHost, viewHost, transfer, hostDocument, hostWindow, HostEvent, workspace } from "./fakes/viewHost";
 
@@ -100,6 +105,44 @@ test("staging setup corrections, default and unsupported states preserve cards a
 	expect(s.root.querySelector(".tntp-start")!.disabled).toBe(false);
 	expect(s.gateway.updateCalls).toEqual([]);
 	await s.view.onClose(); s.view.unload();
+});
+
+test("a real staged card joins running and paused timer sessions without replacing its DOM", async () => {
+	const gateway = createFakeGateway();
+	let task: TaskInfo = { path: "Work.md", title: "Work", status: "open", archived: false, timeEntries: [], ...{ staged: "2026-11-12" } };
+	gateway.listTasks = () => Promise.resolve([task]); gateway.getTask = () => Promise.resolve(task);
+	gateway.setUserFields([{ id: "s", key: "staged", displayName: "Staged", type: "date" }]);
+	const originalStart = gateway.start.bind(gateway); const originalStop = gateway.stop.bind(gateway);
+	gateway.start = async (path, options, context) => {
+		await originalStart(path, options, context);
+		const entry = { startTime: new Date().toISOString() }; task = { ...task, timeEntries: [...task.timeEntries ?? [], entry] };
+		gateway.setActive([{ taskPath: path, task, entry, index: task.timeEntries!.length - 1 }]);
+	};
+	gateway.stop = async (path, context) => { task = await originalStop(path, context); task = { ...task, ...{ staged: "2026-11-12" } }; gateway.setActive([]); return task; };
+	const schedule = (fn: () => void, ms: number) => { const timers = { setTimeout, clearTimeout }; const id = timers.setTimeout(fn, ms); return () => timers.clearTimeout(id); };
+	const pauses = new PauseStore({ log: vi.fn() }); pauses.load([]);
+	const store = new TimerStore({ gateway, pauses, log: vi.fn(), schedule });
+	const staging = new StagingStore({ gateway, schedule, log: vi.fn() });
+	const notify = vi.fn(); const controller = new TimerController({ gateway, store, pauses, queue: new WriteQueue(), log: vi.fn(), notify, newCorrelationId: () => "test" });
+	const view = new TimerPaneView({} as WorkspaceLeaf, { gateway, store, staging, controller, cardOrder: new CardOrderStore({ log: vi.fn() }) });
+	await view.onOpen(); await Promise.all([store.refreshNow(), staging.refreshNow()]); await flush();
+	const panel = (view.contentEl as unknown as Element).querySelector(".tntp-panel--staged")!;
+	const card = panel.querySelector(".tntp-card")!; const title = card.querySelector(".tntp-title")!;
+	const action = card.querySelector(".tntp-pause-resume")!; action.focus();
+	event(action, "click"); for (let i = 0; i < 8; i++) await flush();
+	expect(card.querySelector(".tntp-pause-resume__label")!.textContent).toBe("Pause");
+	await vi.advanceTimersByTimeAsync(2000); expect(card.querySelector(".tntp-clock")!.textContent).toBe("0:00:02");
+	event(action, "click"); for (let i = 0; i < 8; i++) await flush();
+	expect(card.querySelector(".tntp-pause-resume__label")!.textContent).toBe("Resume");
+	await vi.advanceTimersByTimeAsync(3000); expect(card.querySelector(".tntp-clock")!.textContent).toBe("0:00:02");
+	event(action, "click"); for (let i = 0; i < 8; i++) await flush();
+	await vi.advanceTimersByTimeAsync(1000); expect(card.querySelector(".tntp-clock")!.textContent).toBe("0:00:03");
+	expect(panel.querySelector(".tntp-card")).toBe(card); expect(card.querySelector(".tntp-title")).toBe(title); expect(hostDocument.activeElement).toBe(action);
+	expect(card.querySelector(".tntp-complete")!.disabled).toBe(true);
+	event(card.querySelector(".tntp-stop")!, "click"); for (let i = 0; i < 8; i++) await flush();
+	expect(card.querySelector(".tntp-pause-resume__label")!.textContent).toBe("Start");
+	expect(panel.querySelector(".tntp-card")).toBe(card);
+	await view.onClose(); view.unload(); staging.dispose(); store.dispose();
 });
 
 test("Start opens start-only options once and releases its guard after close and bridge loss", async () => {
