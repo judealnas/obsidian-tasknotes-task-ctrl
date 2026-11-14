@@ -127,7 +127,7 @@ Plans:
      - If the key isn't registered as a TaskNotes date field, the Staged tab shows how to register it (type date, no default value), Stage is disabled, and nothing is written.
      - If TaskNotes lacks the staging APIs, the Staged tab explains why while Timers keeps working.
 
-**Plans**: 3/4 plans executed
+**Plans**: 4/4 plans executed
 
 Plans:
 **Wave 1**
@@ -140,7 +140,7 @@ Plans:
 - [x] 06-03-PLAN.md — Staged timer controls and ownership-safe Unstage
 
 **Wave 4** *(blocked on Wave 3 completion)*
-- [ ] 06-04-PLAN.md — Independent persisted order, counts, running cue and markers
+- [x] 06-04-PLAN.md — Independent persisted order, counts, running cue and markers
 
 **UI hint**: yes
 **Notes**:
@@ -193,7 +193,7 @@ Phases execute in numeric order: 4 → 5 → 6 → 7 (Phases 4 and 5 are indepen
 | 3. Pause & Resume | v0.2 | 4/4 | Complete | 2026-10-16 |
 | 4. Staging Foundations | v0.3 | 5/5 | Complete    | 2026-11-13 |
 | 5. Two-Tab Shell | v0.3 | 3/3 | Complete    | 2026-11-13 |
-| 6. Staged Tab Core | v0.3 | 3/4 | In Progress | - |
+| 6. Staged Tab Core | v0.3 | 4/4 | In Progress | - |
 | 7. Complete, Roll Over & Release 0.3.0 | v0.3 | 0/? | Not started | - |
 
 ## Backlog

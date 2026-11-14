@@ -11,8 +11,8 @@ Design sources: `.planning/research/STAGING-DECISIONS.md` (settled decisions; v0
 
 - [x] **TABS-01**: Pane has two tabs: **Staged** and **Timers**; Timers shows every regular timed task exactly as in v0.2 (cards, Start, Pause all, Resume all, Stop all)
 - [x] **TABS-02**: Pane remembers the last-active tab across restarts
-- [ ] **TABS-03**: Tab labels show counts (e.g. "Staged 4 · Timers 1"), and the Timers tab is visibly highlighted while any regular timer runs
-- [ ] **TABS-04**: Timers-tab cards for staged tasks show a small staged marker
+- [x] **TABS-03**: Tab labels show counts (e.g. "Staged 4 · Timers 1"), and the Timers tab is visibly highlighted while any regular timer runs
+- [x] **TABS-04**: Timers-tab cards for staged tasks show a small staged marker
 
 ### Setup
 
@@ -37,9 +37,9 @@ Design sources: `.planning/research/STAGING-DECISIONS.md` (settled decisions; v0
 
 ### Ordering
 
-- [ ] **ORDER-01**: User can reorder the Staged tab by drag and by ArrowUp/Down, and the order persists across restarts
-- [ ] **ORDER-02**: Staged and Timers orders are independent — reordering one never changes the other
-- [ ] **ORDER-03**: Staged order follows task renames, and deleted tasks drop out
+- [x] **ORDER-01**: User can reorder the Staged tab by drag and by ArrowUp/Down, and the order persists across restarts
+- [x] **ORDER-02**: Staged and Timers orders are independent — reordering one never changes the other
+- [x] **ORDER-03**: Staged order follows task renames, and deleted tasks drop out
 - [ ] **ORDER-04**: On mobile, ▲▼ buttons let the user reorder cards on both tabs
 
 ### Completion & Done Today
@@ -91,8 +91,8 @@ Which phases cover which requirements. Updated during roadmap creation.
 |-------------|-------|--------|
 | TABS-01 | Phase 5 | Complete |
 | TABS-02 | Phase 5 | Complete |
-| TABS-03 | Phase 6 | Pending |
-| TABS-04 | Phase 6 | Pending |
+| TABS-03 | Phase 6 | Complete |
+| TABS-04 | Phase 6 | Complete |
 | SETUP-01 | Phase 4 | Complete |
 | SETUP-02 | Phase 6 | Complete |
 | SETUP-03 | Phase 6 | Complete |
@@ -105,9 +105,9 @@ Which phases cover which requirements. Updated during roadmap creation.
 | SCARD-02 | Phase 6 | Complete |
 | SCARD-03 | Phase 6 | Complete |
 | SCARD-04 | Phase 6 | Complete |
-| ORDER-01 | Phase 6 | Pending |
-| ORDER-02 | Phase 6 | Pending |
-| ORDER-03 | Phase 6 | Pending |
+| ORDER-01 | Phase 6 | Complete |
+| ORDER-02 | Phase 6 | Complete |
+| ORDER-03 | Phase 6 | Complete |
 | ORDER-04 | Phase 7 | Pending |
 | DONE-01 | Phase 7 | Pending |
 | CTRL-13 | Phase 7 | Pending |
