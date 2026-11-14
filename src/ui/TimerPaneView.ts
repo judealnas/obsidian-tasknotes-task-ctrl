@@ -49,6 +49,7 @@ let nextPaneId = 0;
 
 interface TabElements {
 	button: HTMLButtonElement;
+	count: HTMLElement;
 	panel: HTMLElement;
 	heading: HTMLElement;
 	body: HTMLElement;
@@ -133,6 +134,8 @@ export class TimerPaneView extends ItemView {
 		const strip = root.createDiv({ cls: "tntp-tabs", attr: { role: "tablist", "aria-label": "Task views" } });
 		const stagedButton = strip.createEl("button", { text: "Staged", cls: "tntp-tabs__tab" });
 		const timersButton = strip.createEl("button", { text: "Timers", cls: "tntp-tabs__tab" });
+		const stagedCount = stagedButton.createSpan({ cls: "tntp-tabs__count", text: " 0" });
+		const timersCount = timersButton.createSpan({ cls: "tntp-tabs__count", text: " 0" });
 		const stagedPanel = root.createDiv({ cls: ["tntp-panel", "tntp-panel--staged"] });
 		const timersPanel = root.createDiv({ cls: ["tntp-panel", "tntp-panel--timers"] });
 		const stage = stagedPanel.createDiv({ cls: "tntp-header" }).createEl("button", { text: "Stage", cls: "tntp-stage" });
@@ -190,8 +193,8 @@ export class TimerPaneView extends ItemView {
 		this.registerDomEvent(retry, "click", () => gateway.probe());
 
 		this.els = { root, start, pauseAll, resumeAll, stopAll, pomodoroNote, cards, heading, body, meta, tabs: {
-			staged: { button: stagedButton, panel: stagedPanel, heading: stagedHeading, body: stagedBody, meta: stagedMeta, stage, retry: stagedRetry },
-			timers: { button: timersButton, panel: timersPanel, heading, body, meta },
+			staged: { button: stagedButton, count: stagedCount, panel: stagedPanel, heading: stagedHeading, body: stagedBody, meta: stagedMeta, stage, retry: stagedRetry },
+			timers: { button: timersButton, count: timersCount, panel: timersPanel, heading, body, meta },
 		} };
 		for (const tab of ["staged", "timers"] as const) {
 			const { button, panel } = this.els.tabs[tab];
@@ -353,8 +356,13 @@ export class TimerPaneView extends ItemView {
 		setTooltip(els.stopAll, busy ? "A timer action is in progress" : !header.readable ? "Cannot verify Pomodoro ownership" : nothingToStop ? "No timers to stop" : "Stop all timers and clear paused ones");
 		for (const candidate of PANE_STATES) els.root.toggleClass(`tntp-pane--${candidate}`, candidate === state);
 		els.root.toggleClass("tntp-pane--pomodoro-unknown", this.services.gateway.getState().kind === "ready" && !header.readable);
-		this.cards?.reconcile(timers);
 		const staging = this.services.staging?.getSnapshot();
+		const stagedPaths = new Set(connected ? staging?.items.map(item => item.taskPath) : []);
+		this.cards?.reconcile(timers.map(timer => ({ ...timer, stagedMarker: stagedPaths.has(normalizeTimerPath(timer.taskPath)) })));
+		const runningCount = connected ? header.eligibleCount : 0;
+		setTextIfChanged(els.tabs.staged.count, ` ${stagedPaths.size}`);
+		setTextIfChanged(els.tabs.timers.count, ` ${runningCount}`);
+		els.tabs.timers.count.toggleClass("tntp-tabs__count--running", runningCount > 0);
 		if (els.tabs.staged.stage) {
 			els.tabs.staged.stage.disabled = !connected || !staging?.canStage || !this.services.stagingController || busy;
 			setTooltip(els.tabs.staged.stage, busy ? "A task action is in progress" : staging?.canStage ? "Stage tasks for today" : "Check the staged field setup below");

@@ -41,9 +41,9 @@ export function setup(initial: OpenTimer[] = [timer()], cardOrder = new CardOrde
 	let busy = false;
 	const controller = { stop: vi.fn(() => Promise.resolve()), pause: vi.fn(() => Promise.resolve()), resume: vi.fn(() => Promise.resolve()), stopPaused: vi.fn(() => Promise.resolve()), complete: vi.fn(() => Promise.resolve()), start: vi.fn(), pauseAll: vi.fn(), resumeAll: vi.fn(), stopAll: vi.fn(), completionAvailable: vi.fn(() => Promise.resolve(true)), isBusy: () => busy, subscribeBusy: (fn: () => void) => { busyListeners.add(fn); return () => busyListeners.delete(fn); } };
 	const store = { getSnapshot: () => snapshot, getHeaderState: () => ({ readable: true, eligibleCount: 1, pausedCount: 1 }), subscribe: (fn: () => void) => { listeners.add(fn); return () => listeners.delete(fn); }, requestRefresh: vi.fn() };
-	const staging = new StagingStore({ gateway, schedule: (fn, ms) => { const timers = { setTimeout, clearTimeout }; const id = timers.setTimeout(fn, ms); return () => timers.clearTimeout(id); }, log: vi.fn() });
-	const stagingController = new StagingController({ gateway, staging, store: { refreshNow: () => Promise.resolve() }, queue: new WriteQueue(), timerBusy: controller.isBusy, settingsReady: () => Promise.resolve(), getSettings: () => ({ rolloverHour: 4, completionStatus: null }), newCorrelationId: () => "test", log: vi.fn() });
 	const stagedOrder = new StagedOrderStore({ log: vi.fn() }); stagedOrder.load([]);
+	const staging = new StagingStore({ gateway, order: stagedOrder, schedule: (fn, ms) => { const timers = { setTimeout, clearTimeout }; const id = timers.setTimeout(fn, ms); return () => timers.clearTimeout(id); }, log: vi.fn() });
+	const stagingController = new StagingController({ gateway, staging, store: { refreshNow: () => Promise.resolve() }, queue: new WriteQueue(), timerBusy: controller.isBusy, settingsReady: () => Promise.resolve(), getSettings: () => ({ rolloverHour: 4, completionStatus: null }), newCorrelationId: () => "test", log: vi.fn() });
 	const view = new TimerPaneView({} as WorkspaceLeaf, { gateway, controller, store, cardOrder, stagedOrder, staging: withStaging ? staging : undefined, stagingController: withStaging ? stagingController : undefined } as unknown as TimerPaneServices);
 	view.register(() => staging.dispose());
 	const root = view.contentEl as unknown as Element;
@@ -114,6 +114,33 @@ test("both tab labels always encode numeric zero counts", async () => {
 	await s.view.onOpen(); await s.staging.refreshNow(); await flush();
 	expect(s.root.querySelectorAll(".tntp-tabs__tab").map(tab => tab.textContent).join(",")).toBe("Staged 0,Timers 0");
 	await s.view.onClose(); s.view.unload();
+});
+
+test("shared counts, running accent, markers and orders never navigate independent leaves", async () => {
+	const s = setup([timer(), timer({ taskPath: "C.md", title: "C", state: "paused", sessionKey: "c", segmentStartMs: null })], undefined, true);
+	let running = 1; s.store.getHeaderState = () => ({ readable: true, eligibleCount: running, pausedCount: 1 });
+	let tasks = ["A", "B"].map(name => ({ path: `${name}.md`, title: name, status: "open", archived: false, staged: "2026-11-12" }));
+	s.gateway.listTasks = () => Promise.resolve(tasks);
+	const other = new TimerPaneView({} as WorkspaceLeaf, { gateway: s.gateway, store: s.store, controller: s.controller, cardOrder: s.cardOrder, stagedOrder: s.stagedOrder, staging: s.staging, stagingController: s.stagingController } as unknown as TimerPaneServices);
+	await s.view.setState({ tab: "staged" }, { history: false }); await s.view.onOpen(); await other.onOpen(); await s.staging.refreshNow(); await flush();
+	const second = other.contentEl as unknown as Element;
+	const tabs = s.root.querySelectorAll(".tntp-tabs__tab"); const staged = s.root.querySelector(".tntp-panel--staged")!; const timers = s.root.querySelector(".tntp-panel--timers")!;
+	expect(tabs.map(tab => tab.textContent)).toEqual(["Staged 2", "Timers 1"]);
+	expect(tabs[0]!.classes.has("tntp-tabs__tab--active")).toBe(true); expect(tabs[1]!.classes.has("tntp-tabs__tab--active")).toBe(false);
+	expect(tabs[0]!.querySelector(".tntp-tabs__count")!.classes.has("tntp-tabs__count--running")).toBe(false); expect(tabs[1]!.querySelector(".tntp-tabs__count")!.classes.has("tntp-tabs__count--running")).toBe(true);
+	const timedCard = timers.querySelector(".tntp-card")!; const timedTitle = timedCard.querySelector(".tntp-title")!;
+	expect(timedCard.querySelector(".tntp-staged-metadata")!.textContent).toBe("Staged"); expect(staged.querySelector(".tntp-card")).not.toBe(timedCard);
+	const handle = staged.querySelector(".tntp-handle")!; handle.focus(); event(handle, "keydown", { key: "ArrowDown" });
+	expect(staged.querySelectorAll(".tntp-title").map(el => el.textContent)).toEqual(["B", "Task A"]);
+	expect(second.querySelector(".tntp-panel--staged")!.querySelectorAll(".tntp-title").map(el => el.textContent)).toEqual(["B", "Task A"]);
+	s.cardOrder.set(["c", "a"]); expect(s.stagedOrder.get()).toEqual(["B.md", "A.md"]);
+	const payload = transfer(); event(handle, "dragstart", { dataTransfer: payload }); event(timers.querySelector(".tntp-card")!, "drop", { dataTransfer: payload }); expect(s.stagedOrder.get()).toEqual(["B.md", "A.md"]);
+	event(staged.querySelector(".tntp-card")!, "drop", { dataTransfer: payload, clientY: 0 }); expect(s.stagedOrder.get()).toEqual(["A.md", "B.md"]); expect(s.cardOrder.get()).toEqual(["c", "a"]);
+	running = 0; s.set([timer({ state: "paused", segmentStartMs: null })]); await flush(); expect(tabs[1]!.textContent).toBe("Timers 0"); expect(tabs[1]!.querySelector(".tntp-tabs__count")!.classes.has("tntp-tabs__count--running")).toBe(false);
+	tasks = tasks.filter(task => task.path === "B.md"); s.gateway.emitData(); await vi.advanceTimersByTimeAsync(200); await flush();
+	expect(tabs[0]!.textContent).toBe("Staged 1"); expect(timers.querySelector(".tntp-title")).toBe(timedTitle); expect(timedCard.querySelector(".tntp-staged-metadata")!.textContent).toBe("");
+	expect(s.view.getState().tab).toBe("staged"); expect(other.getState().tab).toBe("timers"); expect(workspace.requestSaveLayout).not.toHaveBeenCalled();
+	await s.view.onClose(); s.view.unload(); await other.onClose(); other.unload();
 });
 
 test("staging setup corrections, default and unsupported states preserve cards and Timers", async () => {
@@ -310,7 +337,7 @@ test("links unique leaf tabs and supports automatic wrapped keyboard activation"
 test("switches stable panels with independent actions and empty states", async () => {
 	const s = setup(); await s.view.onOpen(); await flush();
 	const tabs = s.root.querySelectorAll(".tntp-tabs__tab");
-	expect(tabs.map(tab => tab.textContent).join(",")).toBe("Staged,Timers");
+	expect(tabs.map(tab => tab.textContent).join(",")).toBe("Staged 0,Timers 1");
 	const panels = s.root.querySelectorAll(".tntp-panel");
 	const card = s.root.querySelector(".tntp-card");
 	expect(panels[0]!.getAttribute("hidden")).toBe("");

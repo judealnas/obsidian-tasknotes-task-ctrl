@@ -41,6 +41,8 @@
 	border-bottom-color: var(--interactive-accent);
 }
 
+.tntp-tabs__count--running { color: var(--text-accent); }
+
 .tntp-tabs__tab:focus-visible,
 .tntp-panel:focus-visible {
 	outline: var(--border-width) solid var(--background-modifier-border-focus);
