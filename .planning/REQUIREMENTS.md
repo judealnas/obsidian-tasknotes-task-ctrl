@@ -17,20 +17,20 @@ Design sources: `.planning/research/STAGING-DECISIONS.md` (settled decisions; v0
 ### Setup
 
 - [x] **SETUP-01**: User can set the rollover hour (default 4 AM, 0–23) in the existing settings tab; saving any one setting never resets another. The staged field key is fixed as `staged` (not configurable; Phase 4 discussion)
-- [ ] **SETUP-02**: If the `staged` key isn't registered as a TaskNotes **date** user field (checked via `catalog.userFields()`), the Staged tab shows a setup notice explaining how to register it (type date, no default value) and Stage is disabled; no write is attempted
-- [ ] **SETUP-03**: If TaskNotes lacks the staging APIs (older than 4.13.0 or missing capability), the Staged tab explains why and the Timers tab keeps working as before
+- [x] **SETUP-02**: If the `staged` key isn't registered as a TaskNotes **date** user field (checked via `catalog.userFields()`), the Staged tab shows a setup notice explaining how to register it (type date, no default value) and Stage is disabled; no write is attempted
+- [x] **SETUP-03**: If TaskNotes lacks the staging APIs (older than 4.13.0 or missing capability), the Staged tab explains why and the Timers tab keeps working as before
 
 ### Staging
 
 - [ ] **STAGE-01**: User can stage a task from a picker listing tasks that are not done, not archived, and not already staged; staging writes `staged: <staging day>` via `api.tasks.update`
-- [ ] **STAGE-02**: Tasks staged outside the pane (hand edit, other device) appear on the Staged tab, appended at the bottom of the order
+- [x] **STAGE-02**: Tasks staged outside the pane (hand edit, other device) appear on the Staged tab, appended at the bottom of the order
 - [ ] **STAGE-03**: ✕ unstages a task by writing an empty (`null`) `staged` value; if the task's regular timer is running it is stopped, and if paused its pause is cleared; a Pomodoro-owned timer is left untouched
-- [ ] **STAGE-04**: Missing, empty/null, or invalid `staged` values count as not staged; a future date stays hidden until that day
-- [ ] **STAGE-05**: Each staged card shows how many days the task has been staged (since its `staged` date)
+- [x] **STAGE-04**: Missing, empty/null, or invalid `staged` values count as not staged; a future date stays hidden until that day
+- [x] **STAGE-05**: Each staged card shows how many days the task has been staged (since its `staged` date)
 
 ### Staged Cards
 
-- [ ] **SCARD-01**: An idle staged card offers start, ✓ complete, and ✕ unstage; clicking the title opens the note and right-click opens TaskNotes' task menu
+- [x] **SCARD-01**: An idle staged card offers start, ✓ complete, and ✕ unstage; clicking the title opens the note and right-click opens TaskNotes' task menu
 - [ ] **SCARD-02**: A running staged card shows the live session and total time, with pause, stop, ✓ and ✕
 - [ ] **SCARD-03**: A paused staged card shows the frozen session, with resume, ✓ and ✕
 - [ ] **SCARD-04**: A staged task being timed by Pomodoro appears idle, and start is refused with the existing "being timed by Pomodoro" notice
@@ -94,14 +94,14 @@ Which phases cover which requirements. Updated during roadmap creation.
 | TABS-03 | Phase 6 | Pending |
 | TABS-04 | Phase 6 | Pending |
 | SETUP-01 | Phase 4 | Complete |
-| SETUP-02 | Phase 6 | Pending |
-| SETUP-03 | Phase 6 | Pending |
+| SETUP-02 | Phase 6 | Complete |
+| SETUP-03 | Phase 6 | Complete |
 | STAGE-01 | Phase 6 | Pending |
-| STAGE-02 | Phase 6 | Pending |
+| STAGE-02 | Phase 6 | Complete |
 | STAGE-03 | Phase 6 | Pending |
-| STAGE-04 | Phase 6 | Pending |
-| STAGE-05 | Phase 6 | Pending |
-| SCARD-01 | Phase 6 | Pending |
+| STAGE-04 | Phase 6 | Complete |
+| STAGE-05 | Phase 6 | Complete |
+| SCARD-01 | Phase 6 | Complete |
 | SCARD-02 | Phase 6 | Pending |
 | SCARD-03 | Phase 6 | Pending |
 | SCARD-04 | Phase 6 | Pending |

@@ -31,7 +31,7 @@
     {
       "number": "6",
       "name": "Staged Tab Core",
-      "status": "pending"
+      "status": "in_progress"
     },
     {
       "number": "7",
@@ -40,9 +40,9 @@
     }
   ],
   "next": {
-    "command": "/gsd:execute-phase 6",
-    "label": "Execute Phase 6",
-    "reason": "Phase 6 planned: four sequential waves; 8 of 12 milestone plans complete"
+    "command": "/gsd:progress --next",
+    "label": "Advance to the next step",
+    "reason": "Phase 06 of 4 · 75% · executing"
   },
-  "updated_at": "2026-11-14T06:19:01.057Z"
+  "updated_at": "2026-11-14T21:16:06.657Z"
 }
