@@ -52,7 +52,7 @@ test("Stage selection keeps the native public modal path open and preserves its 
  const gateway = createFakeGateway(); let current = { ...task, staged: null as string | null };
  gateway.listTasks = () => Promise.resolve([current]); gateway.getTask = () => Promise.resolve(current);
  gateway.setUserFields([{ id: "s", key: "staged", type: "date", displayName: "Staged" }]);
- const original = gateway.updateTask; gateway.updateTask = async (path, patch, context) => { await original(path, patch, context); current = { ...current, staged: patch.staged as string }; };
+ const original = gateway.updateTask.bind(gateway); gateway.updateTask = async (path, patch, context) => { await original(path, patch, context); current = { ...current, staged: patch.staged as string }; };
  const staging = new StagingStore({ gateway, log: vi.fn(), schedule: () => () => undefined, now: () => new Date(2026, 10, 14, 12).getTime() });
  const controller = new StagingController({ gateway, staging, store: { refreshNow: () => Promise.resolve() }, queue: new WriteQueue(), timerBusy: () => false, getSettings: () => ({ rolloverHour: 4, completionStatus: null }), settingsReady: () => Promise.resolve(), now: () => new Date(2026, 10, 14, 12).getTime(), newCorrelationId: () => "test", log: vi.fn() });
  const closed = vi.fn(); const start = vi.fn();

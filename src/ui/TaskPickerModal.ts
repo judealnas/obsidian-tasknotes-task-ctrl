@@ -73,7 +73,7 @@ export class TaskPickerModal extends SuggestModal<TaskInfo> {
   } catch (error) {
    if (!this.opened || generation !== this.opening) return;
    if (this.options.mode === "stage") {
-    if (this.inlineError) this.inlineError.setText("Couldn't load tasks. Close this picker and try Stage again.");
+    if (this.inlineError) this.inlineError.setText("Couldn't load tasks. Close this picker and try stage again.");
     return;
    }
    try {

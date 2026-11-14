@@ -21,7 +21,7 @@ export function commandFixture() {
 
 test("a task staged during the final registration check is not overwritten", async () => {
 	const s = commandFixture();
-	const original = s.gateway.userFields; let reads = 0;
+	const original = s.gateway.userFields.bind(s.gateway); let reads = 0;
 	s.gateway.userFields = () => { if (++reads === 2) s.change({ staged: "2026-12-31" }); return original(); };
 	const outcome = await s.controller.stage(s.target);
 	expect(s.gateway.updateCalls.length).toBe(0);
@@ -50,7 +50,7 @@ test.each(["getTask", "userFields", "statuses"] as const)("a rejected %s check d
 test("duplicate pending calls make one update and timer work on the shared queue stays serialized", async () => {
 	const s = commandFixture(); let release!: () => void; const order: string[] = [];
 	const timer = s.queue.run(() => new Promise<void>(resolve => { order.push("timer"); release = resolve; })); await Promise.resolve();
-	const original = s.gateway.updateTask; s.gateway.updateTask = async (...args) => { order.push("stage"); await original(...args); };
+	const original = s.gateway.updateTask.bind(s.gateway); s.gateway.updateTask = async (...args) => { order.push("stage"); await original(...args); };
 	const first = s.controller.stage(s.target); expect((await s.controller.stage(s.target)).kind).toBe("busy"); expect(s.gateway.updateCalls.length).toBe(0);
 	release(); await timer; expect((await first).kind).toBe("staged"); expect(order).toEqual(["timer", "stage"]); expect(s.gateway.updateCalls).toHaveLength(1); s.staging.dispose();
 });
@@ -60,7 +60,7 @@ test("field-write success remains successful after refresh or order-save failure
 	const result = await controller.stage(s.target); expect(result.kind).toBe("staged"); expect(result.warning).toContain("staged"); expect(s.gateway.updateCalls).toHaveLength(1); expect(controller.isBusy()).toBe(false); s.staging.dispose();
 });
 test("a retired read generation blocks a stage before its write", async () => {
-	const s = commandFixture(); const read = s.gateway.userFields; let calls = 0;
+	const s = commandFixture(); const read = s.gateway.userFields.bind(s.gateway); let calls = 0;
 	s.gateway.userFields = () => { if (++calls === 2) s.gateway.setState({ kind: "missing" }); return read(); };
 	expect((await s.controller.stage(s.target)).kind).toBe("blocked"); expect(s.gateway.updateCalls.length).toBe(0); s.staging.dispose();
 });
