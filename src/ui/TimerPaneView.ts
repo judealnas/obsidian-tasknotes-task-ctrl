@@ -14,6 +14,7 @@ import { TaskCard, type TaskCardModel } from "./TaskCard";
 import type { StagingStore } from "../state/StagingStore";
 import type { StagingController } from "../state/StagingController";
 import { displayTitle, taskDisplayKey } from "../model/timeMath";
+import { normalizeTimerPath } from "../model/pomodoroOwnership";
 import { CardList } from "./CardList";
 import {
 	derivePaneState,
@@ -138,7 +139,7 @@ export class TimerPaneView extends ItemView {
 		const stagedList = stagedPanel.createDiv({ cls: "tntp-cards" });
 		this.stagedCards = new CardList(stagedList, {
 			key: timer => timer.taskPath,
-			create: (parent, timer) => new TaskCard(parent, timer, { app: this.app, gateway, controller: this.services.controller }),
+			create: (parent, timer) => new TaskCard(parent, timer, { app: this.app, gateway, controller: this.services.controller, isBusy: () => this.isBusy() }),
 			update: (card, timer) => card.update(timer, false),
 			dispose: card => card.dispose(),
 			commitOrder: () => {},
@@ -172,7 +173,7 @@ export class TimerPaneView extends ItemView {
 		const cards = timersPanel.createDiv({ cls: "tntp-cards" });
 		this.cards = new CardList(cards, {
 			key: timer => timer.sessionKey,
-			create: (parent, timer) => new TaskCard(parent, timer, { app: this.app, gateway, controller: this.services.controller }),
+			create: (parent, timer) => new TaskCard(parent, timer, { app: this.app, gateway, controller: this.services.controller, isBusy: () => this.isBusy() }),
 			update: (card, timer) => card.update(timer, this.completionReady),
 			dispose: card => card.dispose(),
 			commitOrder: order => this.services.cardOrder.set(order),
@@ -303,13 +304,15 @@ export class TimerPaneView extends ItemView {
 
 	private openPicker(): void {
   const { gateway, controller } = this.services;
-  if (this.picker || controller.isBusy() || !gateway.startAvailability().available) return;
+  if (this.picker || this.isBusy() || !gateway.startAvailability().available) return;
   const modal = new TaskPickerModal(this.app, { mode: "start", gateway, controller, onClose: () => {
    if (this.picker === modal) this.picker = null;
   } });
   this.picker = modal;
   modal.open();
  }
+
+	private isBusy(): boolean { return this.services.controller.isBusy() || !!this.services.stagingController?.isBusy(); }
 
 	private openStagePicker(): void {
 		const { gateway, staging, stagingController } = this.services;
@@ -332,7 +335,7 @@ export class TimerPaneView extends ItemView {
 		const { state, timers } = this.currentTimers();
 		const connected = state === "running" || state === "idle";
 		const gate = this.services.gateway.startAvailability();
-		els.start.disabled = !connected || !gate.available || this.services.controller.isBusy();
+		els.start.disabled = !connected || !gate.available || this.isBusy();
 		setTooltip(els.start, gate.reason);
 		const header = this.services.store.getHeaderState();
 		const busy = this.services.controller.isBusy() || !!this.services.stagingController?.isBusy();
@@ -352,7 +355,12 @@ export class TimerPaneView extends ItemView {
 			els.tabs.staged.stage.disabled = !connected || !staging?.canStage || !this.services.stagingController || busy;
 			setTooltip(els.tabs.staged.stage, busy ? "A task action is in progress" : staging?.canStage ? "Stage tasks for today" : "Check the staged field setup below");
 		}
-		this.stagedCards?.reconcile(connected ? (staging?.items ?? []).map(item => ({ state: "idle" as const, taskPath: item.taskPath, title: displayTitle(item.task.title, item.taskPath), displayKey: taskDisplayKey(item.task), stagedCard: true, stagedMetadata: item.metadata })) : []);
+		const stagedModels: TaskCardModel[] = connected ? (staging?.items ?? []).map(item => {
+			const matches = timers.filter(timer => normalizeTimerPath(timer.taskPath) === item.taskPath);
+			const timed = matches.find(timer => timer.state === "running") ?? matches[0];
+			return { ...(timed ?? { state: "idle" as const, taskPath: item.taskPath, title: displayTitle(item.task.title, item.taskPath), displayKey: taskDisplayKey(item.task) }), stagedCard: true, stagedMetadata: item.metadata };
+		}) : [];
+		this.stagedCards?.reconcile(stagedModels);
 		const staged = els.tabs.staged;
 		if (connected) {
 			setTextIfChanged(staged.heading, "Nothing staged for today");

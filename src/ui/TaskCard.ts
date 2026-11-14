@@ -16,6 +16,8 @@ export interface TaskCardOptions {
  app: App;
  gateway: TimerPaneServices["gateway"];
  controller: TimerPaneServices["controller"];
+ isBusy?: () => boolean;
+ unstage?: (target: { taskPath: string; title: string }) => Promise<unknown>;
 }
 const STOP_LABEL = "Stop timer";
 const STOPPING_LABEL = "Stopping…";
@@ -49,6 +51,7 @@ interface CardElements {
 	stop: HTMLButtonElement;
 	stopLabel: HTMLElement;
 	complete: HTMLButtonElement;
+	unstage: HTMLButtonElement;
 }
 
 
@@ -78,6 +81,7 @@ export class TaskCard extends Component {
  private stopping = new Set<string>();
  private titleOwners = new Set<Component>();
  private get app(): App { return this.options.app; }
+ private isBusy(): boolean { return this.options.isBusy?.() ?? this.options.controller.isBusy(); }
  constructor(parent: HTMLElement, timer: TaskCardModel, private readonly options: TaskCardOptions) {
   super();
   this.load();
@@ -95,8 +99,10 @@ export class TaskCard extends Component {
   setTextIfChanged(card.titleLabel, `Open ${timer.title}`);
   setTextIfChanged(card.metadata, timer.stagedMetadata ?? (timer.stagedMarker ? "Staged" : ""));
   card.card.toggleClass("tntp-card--idle", timer.state === "idle");
+  card.card.toggleClass("tntp-card--staged", !!timer.stagedCard);
   this.updatePauseResume(card);
-  const busy = this.options.controller.isBusy();
+  const busy = this.isBusy();
+  card.unstage.disabled = busy || !this.options.unstage;
   card.complete.disabled = busy || !completionReady || !!timer.stagedCard || timer.state === "idle";
   setTooltip(card.complete, timer.stagedCard ? "Staged task completion will be available in a later update" : busy ? "A timer action is in progress" : completionReady ? "Complete this task and stop its timer" : "No completed status is available from TaskNotes");
   if (!this.stopping.has(cardKey(timer))) {
@@ -162,7 +168,7 @@ export class TaskCard extends Component {
 		// The target is read from the card at click time, so a refresh cannot redirect the write.
 		pauseResume.addEventListener("click", () => {
 			const current = (this.disposed ? undefined : this.elements);
-			if (!current || pauseResume.disabled || this.options.controller.isBusy()) return;
+			if (!current || pauseResume.disabled || this.isBusy()) return;
 			const model = current.timer;
 			const { taskPath, title } = model;
 			if (model.state === "idle") void this.options.controller.start({ taskPath, title });
@@ -176,9 +182,16 @@ export class TaskCard extends Component {
 		const complete = actions.createEl("button", { cls: "tntp-complete", text: "Complete" });
 		complete.addEventListener("click", () => {
 			const current = (this.disposed ? undefined : this.elements);
-			if (!current || complete.disabled || this.options.controller.isBusy() || current.timer.state === "idle" || current.timer.stagedCard) return;
+			if (!current || complete.disabled || this.isBusy() || current.timer.state === "idle" || current.timer.stagedCard) return;
 			const { taskPath, startTime, title } = current.timer;
 			void this.options.controller.complete({ taskPath, startTime, title });
+		});
+		const unstage = card.createEl("button", { cls: "tntp-unstage", text: "✕" });
+		setTooltip(unstage, "Unstage task");
+		unstage.addEventListener("click", () => {
+			if (this.disposed || unstage.disabled || this.isBusy() || !this.elements.timer.stagedCard) return;
+			const { taskPath, title } = this.elements.timer;
+			void this.options.unstage?.({ taskPath, title });
 		});
 
 		return {
@@ -202,6 +215,7 @@ export class TaskCard extends Component {
 			stopLabel,
 			complete,
 			metadata,
+			unstage,
 		};
 	}
 
@@ -376,7 +390,7 @@ export class TaskCard extends Component {
 	 */
 	private async stopTask(key: string): Promise<void> {
 		const card = (this.disposed ? undefined : this.elements);
-		if (this.options.controller.isBusy() || this.stopping.has(key) || !card) return;
+		if (this.isBusy() || this.stopping.has(key) || !card) return;
 		if (card.timer.state === "idle") return;
 		const { taskPath, startTime, title, state } = card.timer;
 		this.stopping.add(key);
@@ -409,7 +423,7 @@ export class TaskCard extends Component {
 			card.pauseResume.toggleClass("mod-cta", paused || idle);
 			card.stop.toggleClass("mod-cta", !paused);
 		}
-		const busy = this.options.controller.isBusy();
+		const busy = this.isBusy();
 		card.pauseResume.disabled = busy;
 		setTooltip(card.pauseResume, busy ? "A timer action is in progress" : idle ? "Start this task" : paused ? "Resume this timer" : "Pause this timer");
 	}

@@ -124,16 +124,20 @@ test("a real staged card joins running and paused timer sessions without replaci
 	const store = new TimerStore({ gateway, pauses, log: vi.fn(), schedule });
 	const staging = new StagingStore({ gateway, schedule, log: vi.fn() });
 	const notify = vi.fn(); const controller = new TimerController({ gateway, store, pauses, queue: new WriteQueue(), log: vi.fn(), notify, newCorrelationId: () => "test" });
+	const complete = vi.spyOn(controller, "complete");
 	const view = new TimerPaneView({} as WorkspaceLeaf, { gateway, store, staging, controller, cardOrder: new CardOrderStore({ log: vi.fn() }) });
 	await view.onOpen(); await Promise.all([store.refreshNow(), staging.refreshNow()]); await flush();
 	const panel = (view.contentEl as unknown as Element).querySelector(".tntp-panel--staged")!;
 	const card = panel.querySelector(".tntp-card")!; const title = card.querySelector(".tntp-title")!;
 	const action = card.querySelector(".tntp-pause-resume")!; action.focus();
+	event(card.querySelector(".tntp-complete")!, "click");
 	event(action, "click"); for (let i = 0; i < 8; i++) await flush();
 	expect(card.querySelector(".tntp-pause-resume__label")!.textContent).toBe("Pause");
+	event(card.querySelector(".tntp-complete")!, "click");
 	await vi.advanceTimersByTimeAsync(2000); expect(card.querySelector(".tntp-clock")!.textContent).toBe("0:00:02");
 	event(action, "click"); for (let i = 0; i < 8; i++) await flush();
 	expect(card.querySelector(".tntp-pause-resume__label")!.textContent).toBe("Resume");
+	event(card.querySelector(".tntp-complete")!, "click");
 	await vi.advanceTimersByTimeAsync(3000); expect(card.querySelector(".tntp-clock")!.textContent).toBe("0:00:02");
 	event(action, "click"); for (let i = 0; i < 8; i++) await flush();
 	await vi.advanceTimersByTimeAsync(1000); expect(card.querySelector(".tntp-clock")!.textContent).toBe("0:00:03");
@@ -142,6 +146,11 @@ test("a real staged card joins running and paused timer sessions without replaci
 	event(card.querySelector(".tntp-stop")!, "click"); for (let i = 0; i < 8; i++) await flush();
 	expect(card.querySelector(".tntp-pause-resume__label")!.textContent).toBe("Start");
 	expect(panel.querySelector(".tntp-card")).toBe(card);
+	const owned: ActiveTimeEntry = { taskPath: task.path, task, entry: { startTime: new Date().toISOString() }, index: 0 };
+	gateway.setActive([owned]); gateway.setOwnership({ readable: true, owner: { taskPath: task.path, startTime: owned.entry.startTime } });
+	await store.refreshNow(); await flush(); expect(card.querySelector(".tntp-pause-resume__label")!.textContent).toBe("Start");
+	const starts = gateway.startCalls.length; event(action, "click"); for (let i = 0; i < 8; i++) await flush();
+	expect(gateway.startCalls).toHaveLength(starts); expect(notify).toHaveBeenLastCalledWith("Work is being timed by Pomodoro."); expect(complete).not.toHaveBeenCalled();
 	await view.onClose(); view.unload(); staging.dispose(); store.dispose();
 });
 

@@ -57,6 +57,19 @@
 .tntp-card--idle .tntp-stop,
 .tntp-staged-metadata:empty { display: none; }
 .tntp-staged-metadata { margin-block: var(--size-4-1); }
+.tntp-card:not(.tntp-card--staged) .tntp-unstage,
+.tntp-card--staged.tntp-card--paused .tntp-stop { display: none; }
+.tntp-card--staged .tntp-handle { inset-inline-end: calc(var(--size-4-6) + var(--size-4-3)); }
+.tntp-card--staged .tntp-title { padding-inline-end: calc(var(--size-4-6) * 2); }
+.tntp-unstage {
+	position: absolute;
+	inset-block-start: var(--size-4-2);
+	inset-inline-end: var(--size-4-2);
+	color: var(--text-muted);
+	background: transparent;
+	box-shadow: none;
+	border: 0;
+}
 
 /* D-15: the Pomodoro line shows only while ownership is unreadable and TaskNotes is ready. */
 .tntp-pane:not(.tntp-pane--pomodoro-unknown) .tntp-pomodoro-note {
