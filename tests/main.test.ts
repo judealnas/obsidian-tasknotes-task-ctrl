@@ -6,6 +6,7 @@ import type { PauseStore } from "../src/state/PauseStore";
 import type { TimerPaneSettingTab } from "../src/ui/TimerPaneSettingTab";
 import type { TimerPaneSettings } from "../src/settings";
 import type { App, PluginManifest } from "obsidian";
+import type { StagedOrderStore } from "../src/state/StagedOrderStore";
 
 vi.mock("obsidian", () => import("./fakes/fakeObsidian"));
 // Captures the TimerStore main.ts builds, with its deps, so tests can reach fileCheck and requestRefresh.
@@ -192,6 +193,27 @@ test("fileCheck is null before layout ready and backed by vault.getFileByPath af
 
 type OrderStore = { get(): readonly string[]; set(order: string[]): void };
 const orderOf = (plugin: unknown) => (plugin as { cardOrder: OrderStore }).cardOrder;
+const stagedOrderOf = (plugin: unknown) => (plugin as { stagedOrder: StagedOrderStore }).stagedOrder;
+
+test("Staged ordering round-trips through the production writer and preserves every other key", async () => {
+	host.data = { completionStatus: "x", rolloverHour: 6, pauseRecordsVersion: 1, pauseRecords: [PAUSED], cardOrder: ["timerA", "timerB"], stagedOrder: ["A.md", "B.md"], unknownKey: { keep: true } };
+	const plugin = new TaskNotesTimerPanePlugin({} as App, {} as PluginManifest); plugin.onload(); await flush();
+	stagedOrderOf(plugin).set(["B.md", "A.md"]); orderOf(plugin).set(["timerB", "timerA"]);
+	await saveSettingsOf(host.tabs[0])({ rolloverHour: 7, completionStatus: "done" }); await flush();
+	const written = host.saved[host.saved.length - 1];
+	expect(written).toEqual({ completionStatus: "done", rolloverHour: 7, pauseRecordsVersion: 1, pauseRecords: [PAUSED], cardOrder: ["timerB", "timerA"], stagedOrder: ["B.md", "A.md"], unknownKey: { keep: true } });
+	host.data = written; const restarted = new TaskNotesTimerPanePlugin({} as App, {} as PluginManifest); restarted.onload(); await flush();
+	expect(stagedOrderOf(restarted).get()).toEqual(["B.md", "A.md"]);
+	stagedOrderOf(restarted).set([]); await flush(); expect(host.saved[host.saved.length - 1]).not.toHaveProperty("stagedOrder");
+});
+
+test("a failed Staged order save does not poison the single writer's next save", async () => {
+	const plugin = new TaskNotesTimerPanePlugin({} as App, {} as PluginManifest); plugin.onload(); await flush();
+	const log = vi.spyOn(console, "error").mockImplementation(() => undefined);
+	host.failSave = true; stagedOrderOf(plugin).set(["B.md"]); await flush(); host.failSave = false;
+	await saveSettingsOf(host.tabs[0])({ rolloverHour: 4, completionStatus: "done" });
+	expect(host.saved[host.saved.length - 1]).toMatchObject({ stagedOrder: ["B.md"], completionStatus: "done" }); log.mockRestore();
+});
 
 test("a stored card order loads and a settings save keeps it", async () => {
 	host.data = { cardOrder: ["a", "b"], extraKey: 1 };

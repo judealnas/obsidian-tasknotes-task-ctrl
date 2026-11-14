@@ -4,6 +4,13 @@ import type { TaskInfo } from "../tasknotes/runtime-api.types";
 
 export interface StagedItem { task: TaskInfo; taskPath: string; date: string; age: number; metadata: string; }
 
+/** Known paths first, new tasks at the bottom; equal ranks preserve incoming order. */
+export function orderStaged<T extends { taskPath: string }>(items: readonly T[], saved: readonly string[]): T[] {
+	const ranks = new Map<string, number>();
+	for (const path of saved) if (!ranks.has(path)) ranks.set(path, ranks.size);
+	return [...items].sort((a, b) => (ranks.get(a.taskPath) ?? ranks.size) - (ranks.get(b.taskPath) ?? ranks.size));
+}
+
 /** Explicit null/empty/invalid top-level values override a stale nested value. */
 export function readStaged(task: TaskInfo): unknown {
 	const fields = task as TaskInfo & { staged?: unknown; customProperties?: Record<string, unknown> };

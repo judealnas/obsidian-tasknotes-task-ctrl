@@ -25,6 +25,7 @@ import { TimerController } from "../src/state/TimerController";
 import { PauseStore } from "../src/state/PauseStore";
 import { WriteQueue } from "../src/state/WriteQueue";
 import { StagingController } from "../src/state/StagingController";
+import { StagedOrderStore } from "../src/state/StagedOrderStore";
 import type { ActiveTimeEntry, TaskInfo } from "../src/tasknotes/runtime-api.types";
 import { createFakeGateway } from "./fakes/fakeGateway";
 import { Element, event, flush, resetViewHost, viewHost, transfer, hostDocument, hostWindow, HostEvent, workspace } from "./fakes/viewHost";
@@ -42,10 +43,11 @@ export function setup(initial: OpenTimer[] = [timer()], cardOrder = new CardOrde
 	const store = { getSnapshot: () => snapshot, getHeaderState: () => ({ readable: true, eligibleCount: 1, pausedCount: 1 }), subscribe: (fn: () => void) => { listeners.add(fn); return () => listeners.delete(fn); }, requestRefresh: vi.fn() };
 	const staging = new StagingStore({ gateway, schedule: (fn, ms) => { const timers = { setTimeout, clearTimeout }; const id = timers.setTimeout(fn, ms); return () => timers.clearTimeout(id); }, log: vi.fn() });
 	const stagingController = new StagingController({ gateway, staging, store: { refreshNow: () => Promise.resolve() }, queue: new WriteQueue(), timerBusy: controller.isBusy, settingsReady: () => Promise.resolve(), getSettings: () => ({ rolloverHour: 4, completionStatus: null }), newCorrelationId: () => "test", log: vi.fn() });
-	const view = new TimerPaneView({} as WorkspaceLeaf, { gateway, controller, store, cardOrder, staging: withStaging ? staging : undefined, stagingController: withStaging ? stagingController : undefined } as unknown as TimerPaneServices);
+	const stagedOrder = new StagedOrderStore({ log: vi.fn() }); stagedOrder.load([]);
+	const view = new TimerPaneView({} as WorkspaceLeaf, { gateway, controller, store, cardOrder, stagedOrder, staging: withStaging ? staging : undefined, stagingController: withStaging ? stagingController : undefined } as unknown as TimerPaneServices);
 	view.register(() => staging.dispose());
 	const root = view.contentEl as unknown as Element;
-	return { view, root, gateway, controller, cardOrder, store, staging, stagingController,
+	return { view, root, gateway, controller, cardOrder, stagedOrder, store, staging, stagingController,
 		set(timers: OpenTimer[] | null) { snapshot = timers === null ? null : { primary: timers[0] ?? null, others: timers.slice(1) }; listeners.forEach(fn => fn()); },
 		busy(value: boolean) { busy = value; busyListeners.forEach(fn => fn()); },
 	};
@@ -97,7 +99,7 @@ test("the separate Unstage control is immediately usable on a staged idle task",
 });
 
 test("ArrowDown reorders only the Staged list and preserves handle focus", async () => {
-	const s = setup([timer()], undefined, true);
+	const s = setup([timer({ taskPath: "Timer.md" })], undefined, true);
 	s.gateway.listTasks = () => Promise.resolve(["A", "B"].map(name => ({ path: `${name}.md`, title: name, status: "open", archived: false, staged: "2026-11-12" })));
 	await s.view.onOpen(); await s.staging.refreshNow(); await flush();
 	const panel = s.root.querySelector(".tntp-panel--staged")!;

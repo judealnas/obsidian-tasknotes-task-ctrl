@@ -15,6 +15,8 @@ import type { StagingStore } from "../state/StagingStore";
 import type { StagingController } from "../state/StagingController";
 import { displayTitle, taskDisplayKey } from "../model/timeMath";
 import { normalizeTimerPath } from "../model/pomodoroOwnership";
+import { orderStaged } from "../model/staging";
+import type { StagedOrderStore } from "../state/StagedOrderStore";
 import { CardList } from "./CardList";
 import {
 	derivePaneState,
@@ -38,6 +40,7 @@ export interface TimerPaneServices {
 	controller: Pick<TimerController, "stop" | "start" | "stopAll" | "complete" | "pause" | "resume" | "stopPaused" | "pauseAll" | "resumeAll" | "completionAvailable" | "isBusy" | "subscribeBusy">;
 	staging?: StagingStore;
 	stagingController?: StagingController;
+	stagedOrder?: StagedOrderStore;
 }
 
 const PANE_STATES: readonly PaneState[] = ["running", "idle", "loading", "missing", "incompatible"];
@@ -142,7 +145,7 @@ export class TimerPaneView extends ItemView {
 			create: (parent, timer) => new TaskCard(parent, timer, { app: this.app, gateway, controller: this.services.controller, isBusy: () => this.isBusy(), unstage: this.services.stagingController ? target => this.services.stagingController!.unstage(target) : undefined }),
 			update: (card, timer) => card.update(timer, false),
 			dispose: card => card.dispose(),
-			commitOrder: () => {},
+			commitOrder: order => this.services.stagedOrder?.reorder(order),
 		});
 		const stagedMessage = stagedPanel.createDiv({ cls: "tntp-message", attr: { "aria-live": "polite" } });
 		const stagedHeading = stagedMessage.createDiv({ cls: "tntp-message__heading" });
@@ -211,6 +214,7 @@ export class TimerPaneView extends ItemView {
 		this.register(this.services.controller.subscribeBusy(() => this.render()));
 		// Keeps two open panes in the same order.
 		this.register(this.services.cardOrder.subscribe(() => this.render()));
+		if (this.services.stagedOrder) this.register(this.services.stagedOrder.subscribe(() => this.render()));
 		this.registerInterval(window.setInterval(() => this.tick(), 1000));
 		// The pane's own document and window, so this also works in a pop-out window.
 		// Electron may suspend timers in the background or during OS sleep: tick at once
@@ -355,7 +359,7 @@ export class TimerPaneView extends ItemView {
 			els.tabs.staged.stage.disabled = !connected || !staging?.canStage || !this.services.stagingController || busy;
 			setTooltip(els.tabs.staged.stage, busy ? "A task action is in progress" : staging?.canStage ? "Stage tasks for today" : "Check the staged field setup below");
 		}
-		const stagedModels: TaskCardModel[] = connected ? (staging?.items ?? []).map(item => {
+		const stagedModels: TaskCardModel[] = connected ? orderStaged(staging?.items ?? [], this.services.stagedOrder?.get() ?? []).map(item => {
 			const matches = timers.filter(timer => normalizeTimerPath(timer.taskPath) === item.taskPath);
 			const timed = matches.find(timer => timer.state === "running") ?? matches[0];
 			return { ...(timed ?? { state: "idle" as const, taskPath: item.taskPath, title: displayTitle(item.task.title, item.taskPath), displayKey: taskDisplayKey(item.task) }), stagedCard: true, stagedMetadata: item.metadata };
