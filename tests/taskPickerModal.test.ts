@@ -51,7 +51,7 @@ test("Stage selection keeps the native public modal path open and preserves its 
  const modal = new TaskPickerModal({} as App, options as unknown as TaskPickerOptions);
  modal.onOpen(); await flush(); modal.inputEl.value = "Task";
  modal.selectSuggestion(task, {} as KeyboardEvent); await flush();
- expect(closed).not.toHaveBeenCalled();
+ expect(closed.mock.calls.length).toBe(0);
  expect(modal.inputEl.value).toBe("Task");
  expect(modal.getSuggestions("")).toEqual([]);
  expect(start).not.toHaveBeenCalled();
