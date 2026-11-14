@@ -24,16 +24,16 @@ Design sources: `.planning/research/STAGING-DECISIONS.md` (settled decisions; v0
 
 - [x] **STAGE-01**: User can stage a task from a picker listing tasks that are not done, not archived, and not already staged; staging writes `staged: <staging day>` via `api.tasks.update`
 - [x] **STAGE-02**: Tasks staged outside the pane (hand edit, other device) appear on the Staged tab, appended at the bottom of the order
-- [ ] **STAGE-03**: ✕ unstages a task by writing an empty (`null`) `staged` value; if the task's regular timer is running it is stopped, and if paused its pause is cleared; a Pomodoro-owned timer is left untouched
+- [x] **STAGE-03**: ✕ unstages a task by writing an empty (`null`) `staged` value; if the task's regular timer is running it is stopped, and if paused its pause is cleared; a Pomodoro-owned timer is left untouched
 - [x] **STAGE-04**: Missing, empty/null, or invalid `staged` values count as not staged; a future date stays hidden until that day
 - [x] **STAGE-05**: Each staged card shows how many days the task has been staged (since its `staged` date)
 
 ### Staged Cards
 
 - [x] **SCARD-01**: An idle staged card offers start, ✓ complete, and ✕ unstage; clicking the title opens the note and right-click opens TaskNotes' task menu
-- [ ] **SCARD-02**: A running staged card shows the live session and total time, with pause, stop, ✓ and ✕
-- [ ] **SCARD-03**: A paused staged card shows the frozen session, with resume, ✓ and ✕
-- [ ] **SCARD-04**: A staged task being timed by Pomodoro appears idle, and start is refused with the existing "being timed by Pomodoro" notice
+- [x] **SCARD-02**: A running staged card shows the live session and total time, with pause, stop, ✓ and ✕
+- [x] **SCARD-03**: A paused staged card shows the frozen session, with resume, ✓ and ✕
+- [x] **SCARD-04**: A staged task being timed by Pomodoro appears idle, and start is refused with the existing "being timed by Pomodoro" notice
 
 ### Ordering
 
@@ -98,13 +98,13 @@ Which phases cover which requirements. Updated during roadmap creation.
 | SETUP-03 | Phase 6 | Complete |
 | STAGE-01 | Phase 6 | Complete |
 | STAGE-02 | Phase 6 | Complete |
-| STAGE-03 | Phase 6 | Pending |
+| STAGE-03 | Phase 6 | Complete |
 | STAGE-04 | Phase 6 | Complete |
 | STAGE-05 | Phase 6 | Complete |
 | SCARD-01 | Phase 6 | Complete |
-| SCARD-02 | Phase 6 | Pending |
-| SCARD-03 | Phase 6 | Pending |
-| SCARD-04 | Phase 6 | Pending |
+| SCARD-02 | Phase 6 | Complete |
+| SCARD-03 | Phase 6 | Complete |
+| SCARD-04 | Phase 6 | Complete |
 | ORDER-01 | Phase 6 | Pending |
 | ORDER-02 | Phase 6 | Pending |
 | ORDER-03 | Phase 6 | Pending |
