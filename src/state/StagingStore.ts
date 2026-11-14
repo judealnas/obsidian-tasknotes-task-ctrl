@@ -82,6 +82,7 @@ export class StagingStore {
 	refreshNow(): Promise<void> {
 		this.cancel?.(); this.cancel = null;
 		if (this.disposed) return Promise.resolve();
+		if (this.inFlight) this.generation++;
 		this.snapshot = { ...this.snapshot, canStage: false, field: { kind: "unknown" }, authoritativePaths: null };
 		this.notify();
 		if (this.inFlight) { this.dirty = true; return this.inFlight; }
