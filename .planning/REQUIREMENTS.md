@@ -22,7 +22,7 @@ Design sources: `.planning/research/STAGING-DECISIONS.md` (settled decisions; v0
 
 ### Staging
 
-- [ ] **STAGE-01**: User can stage a task from a picker listing tasks that are not done, not archived, and not already staged; staging writes `staged: <staging day>` via `api.tasks.update`
+- [x] **STAGE-01**: User can stage a task from a picker listing tasks that are not done, not archived, and not already staged; staging writes `staged: <staging day>` via `api.tasks.update`
 - [x] **STAGE-02**: Tasks staged outside the pane (hand edit, other device) appear on the Staged tab, appended at the bottom of the order
 - [ ] **STAGE-03**: ✕ unstages a task by writing an empty (`null`) `staged` value; if the task's regular timer is running it is stopped, and if paused its pause is cleared; a Pomodoro-owned timer is left untouched
 - [x] **STAGE-04**: Missing, empty/null, or invalid `staged` values count as not staged; a future date stays hidden until that day
@@ -96,7 +96,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 | SETUP-01 | Phase 4 | Complete |
 | SETUP-02 | Phase 6 | Complete |
 | SETUP-03 | Phase 6 | Complete |
-| STAGE-01 | Phase 6 | Pending |
+| STAGE-01 | Phase 6 | Complete |
 | STAGE-02 | Phase 6 | Complete |
 | STAGE-03 | Phase 6 | Pending |
 | STAGE-04 | Phase 6 | Complete |
