@@ -1,14 +1,14 @@
 ---
-status: partial
+status: complete
 phase: 05-two-tab-shell
 source: [05-01-SUMMARY.md, 05-02-SUMMARY.md, 05-03-SUMMARY.md]
 started: 2026-11-14T03:44:36.382Z
-updated: 2026-11-14T04:01:41.481Z
+updated: 2026-11-14T04:02:57.600Z
 ---
 
 ## Current Test
 
-[testing paused — physical Windows sleep/wake remains unverified]
+[testing complete]
 
 ## Tests
 
@@ -40,9 +40,11 @@ evidence: 05-CDP-UAT-evidence.jsonl case valid-native-keyboard-complete; trusted
 
 ### 5. Physical OS sleep/wake and unattended reconnect
 expected: Both tabs recover after OS sleep and TaskNotes reload without changing selection or needing explicit retry.
-result: blocked
-blocked_by: physical-device
-reason: Physical Windows sleep is unavailable through CDP and was not performed on the user computer. Both tabs passed real renderer suspension/resume (4.5 seconds frozen, accurate clocks and refresh) and unattended real TaskNotes disable/re-enable (about 1.2 seconds). These observations are preserved without claiming physical OS sleep.
+result: pass
+source: user acceptance
+reported: "mark it as passed"
+disposition: User accepted the sleep/wake check after reviewing its expected behavior and the passing CDP suspension/recovery and unattended reconnect evidence.
+limitation: Actual Windows sleep was not exercised. Both tabs passed native renderer suspension/resume (4.5 seconds frozen, accurate clocks and refresh) and unattended TaskNotes disable/re-enable (about 1.2 seconds).
 evidence: 05-CDP-UAT-evidence.jsonl cases native-renderer-suspend-timers, native-renderer-suspend-staged, unattended-reload-timers, unattended-reload-staged
 
 ### 6. Review the retained TABS-02 assumption
@@ -105,11 +107,11 @@ evidence: 05-03-native-evidence.jsonl#native-restart; current cold launch restor
 ## Summary
 
 total: 13
-passed: 12
+passed: 13
 issues: 0
 pending: 0
 skipped: 0
-blocked: 1
+blocked: 0
 
 ## Gaps
 
@@ -138,3 +140,7 @@ Both disposable task timers were stopped. Original card order, original two tab 
 
 Final regression: npm run check passed build/typecheck, zero-warning lint, and all 568 tests across 20 files. The temporary CDP driver is archived as 05-cdp-client.mjs.txt for review; it is not application source. No current implementation gap was found. The earlier sandbox-only build failure and temporary-driver lint failure were corrected in the verification environment before this successful run.
 
+
+## Final acceptance
+
+The user explicitly accepted the remaining sleep/wake check: "mark it as passed". All 13 UAT rows now pass, with actual Windows sleep retained as an evidence limitation rather than claimed as observed. Earlier two-blocker notes describe historical session progress. This acceptance does not itself regenerate or approve the separate stale phase verification report.
