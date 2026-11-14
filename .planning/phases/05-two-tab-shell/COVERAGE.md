@@ -66,4 +66,4 @@ Estimates use calibration factor 1, sample count 0 and derived confidence low. N
 
 ## UAT review disposition
 
-The earlier unclassified TABS-02 flag is resolved. After reviewing the concrete passing restoration checks, the user stated: "2. sounds like everything passed". This is an explicit user disposition, recorded in 05-UAT.md test 6; the earlier unresolved counts above describe the original planning probe. Current disposition: 4 explicit resolved, 0 unresolved, 0 unclassified. Physical Windows sleep/wake remains separately unverified in UAT test 5.
+The earlier unclassified TABS-02 flag is resolved. After reviewing the concrete passing restoration checks, the user stated: "2. sounds like everything passed". This is an explicit user disposition, recorded in 05-UAT.md test 6; the earlier unresolved counts above describe the original planning probe. Current disposition: 4 explicit resolved, 0 unresolved, 0 unclassified. UAT test 5 was subsequently marked passed by explicit user acceptance; actual Windows sleep remains an unexercised evidence limitation.
