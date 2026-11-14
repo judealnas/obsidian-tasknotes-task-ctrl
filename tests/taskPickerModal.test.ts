@@ -3,6 +3,9 @@ import type { App } from "obsidian";
 import { createFakeGateway } from "./fakes/fakeGateway";
 const host = vi.hoisted(() => ({ loaded: 0, unloaded: 0, notices: 0, throwNotice: false, renders: [] as Array<() => void> }));
 class Element {
+ value = "";
+ focusCalls = 0;
+ focus(): void { this.focusCalls++; }
  textContent = "";
  children: Element[] = [];
  attrs = new Map<string, string>();
@@ -27,6 +30,7 @@ vi.mock("obsidian", () => ({
  Notice: class { constructor() { host.notices++; if (host.throwNotice) throw new Error("Notice failed"); } },
  SuggestModal: class {
   inputEl = new Element();
+  contentEl = new Element();
   app: App;
   constructor(app: App) { this.app = app; }
   setPlaceholder(): void {}
@@ -36,9 +40,23 @@ vi.mock("obsidian", () => ({
   selectSuggestion(task: unknown): void { this.close(); (this as unknown as { onChooseSuggestion(t: unknown): void }).onChooseSuggestion(task); }
  }
 }));
-import { TaskPickerModal } from "../src/ui/TaskPickerModal";
+import { TaskPickerModal, type TaskPickerOptions } from "../src/ui/TaskPickerModal";
 const task = { title: "Task", path: "Task.md", status: "open", archived: false, due: "2026-10-15" };
 const flush = async () => { await Promise.resolve(); await Promise.resolve(); await Promise.resolve(); };
+
+test("Stage selection keeps the native public modal path open and preserves its newest query", async () => {
+ const gateway = createFakeGateway(); gateway.listTasks = () => Promise.resolve([task]);
+ const closed = vi.fn(); const start = vi.fn();
+ const options = { mode: "stage", gateway, controller: { start, isBusy: () => false, stage: () => Promise.resolve({ kind: "staged" }) }, onClose: closed };
+ const modal = new TaskPickerModal({} as App, options as unknown as TaskPickerOptions);
+ modal.onOpen(); await flush(); modal.inputEl.value = "Task";
+ modal.selectSuggestion(task, {} as KeyboardEvent); await flush();
+ expect(closed).not.toHaveBeenCalled();
+ expect(modal.inputEl.value).toBe("Task");
+ expect(modal.getSuggestions("")).toEqual([]);
+ expect(start).not.toHaveBeenCalled();
+ modal.onClose();
+});
 describe("task picker lifecycle", () => {
  beforeEach(() => { host.loaded = 0; host.unloaded = 0; host.notices = 0; host.throwNotice = false; host.renders = []; vi.stubGlobal("createDiv", () => new Element()); });
  function setup() {
