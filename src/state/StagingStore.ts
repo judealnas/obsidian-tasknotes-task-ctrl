@@ -1,11 +1,12 @@
 import { normalizeTimerPath } from "../model/pomodoroOwnership";
-import { fieldStatus, STAGED_FIELD_KEY, type FieldStatus } from "../model/stagedField";
+import { fieldStatus, type FieldStatus } from "../model/stagedField";
+import { deriveStaged, type StagedItem } from "../model/staging";
 import { stagingDay } from "../model/stagingDay";
 import type { TaskInfo } from "../tasknotes/runtime-api.types";
 import type { Schedule, TaskNotesGateway } from "../tasknotes/TaskNotesBridge";
 import { REFRESH_DEBOUNCE_MS } from "./TimerStore";
 
-export interface StagedItem { task: TaskInfo; taskPath: string; date: string; age: number; metadata: string; }
+export type { StagedItem } from "../model/staging";
 export interface StagingSnapshot {
 	items: readonly StagedItem[];
 	loaded: boolean;
@@ -23,38 +24,6 @@ export interface StagingStoreDeps {
 	getRolloverHour?: () => number;
 	now?: () => number;
 	ready?: () => Promise<void>;
-}
-
-function readStaged(task: TaskInfo): unknown {
-	const fields = task as TaskInfo & { staged?: unknown; customProperties?: Record<string, unknown> };
-	return Object.hasOwn(fields, STAGED_FIELD_KEY) ? fields.staged : fields.customProperties?.[STAGED_FIELD_KEY];
-}
-function parseStagedValue(value: unknown): string | null {
-	if (typeof value !== "string" || !/^\d{4}-\d{2}-\d{2}$/.test(value)) return null;
-	const [year, month, day] = value.split("-").map(Number) as [number, number, number];
-	const leap = year % 4 === 0 && (year % 100 !== 0 || year % 400 === 0);
-	const limit = [31, leap ? 29 : 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31][month - 1] ?? 0;
-	return month >= 1 && month <= 12 && day >= 1 && day <= limit ? value : null;
-}
-function ordinal(date: string): number {
-	const [year, month, day] = date.split("-").map(Number) as [number, number, number];
-	const d = new Date(0); d.setUTCFullYear(year, month - 1, day); d.setUTCHours(0, 0, 0, 0);
-	return d.getTime() / 86400000;
-}
-function deriveStaged(tasks: readonly TaskInfo[], completed: ReadonlySet<string>, today: string): StagedItem[] {
-	const result = new Map<string, StagedItem>();
-	for (const task of tasks) {
-		if (typeof task?.path !== "string") continue;
-		const taskPath = normalizeTimerPath(task.path);
-		const date = parseStagedValue(readStaged(task));
-		if (!taskPath || !date || date > today || task.archived || completed.has(task.status) || result.has(taskPath)) continue;
-		const age = ordinal(today) - ordinal(date);
-		const [year, month, day] = date.split("-").map(Number) as [number, number, number];
-		const display = new Date(0); display.setFullYear(year, month - 1, day); display.setHours(12, 0, 0, 0);
-		const formatted = display.toLocaleDateString(undefined, { month: "short", day: "numeric" });
-		result.set(taskPath, { task, taskPath, date, age, metadata: `${formatted} · ${age === 0 ? "today" : age === 1 ? "1 day ago" : `${age} days ago`}` });
-	}
-	return [...result.values()];
 }
 
 /** Shared read-only projection. Failed reads retain cards and revoke write readiness. */
@@ -87,6 +56,9 @@ export class StagingStore {
 	resync(): void { if (this.deps.gateway.getState().kind === "ready") void this.refreshNow(); }
 	refreshNow(): Promise<void> {
 		this.cancel?.(); this.cancel = null;
+		if (this.disposed) return Promise.resolve();
+		this.snapshot = { ...this.snapshot, canStage: false, field: { kind: "unknown" }, authoritativePaths: null };
+		this.notify();
 		if (this.inFlight) { this.dirty = true; return this.inFlight; }
 		const run = this.refreshLoop().finally(() => { if (this.inFlight === run) this.inFlight = null; });
 		this.inFlight = run; return run;
