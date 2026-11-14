@@ -127,7 +127,7 @@ Plans:
      - If the key isn't registered as a TaskNotes date field, the Staged tab shows how to register it (type date, no default value), Stage is disabled, and nothing is written.
      - If TaskNotes lacks the staging APIs, the Staged tab explains why while Timers keeps working.
 
-**Plans**: 4/5 plans executed; UAT gap fix ready
+**Plans**: 5/5 plans executed; corrected control appearance UAT pending
 
 Plans:
 **Wave 1**
@@ -141,7 +141,7 @@ Plans:
 
 **Wave 4** *(blocked on Wave 3 completion)*
 - [x] 06-04-PLAN.md — Independent persisted order, counts, running cue and markers
-- [ ] 06-05-PLAN.md — Separate overlapping Unstage/reorder controls and verify native geometry (G-06-6)
+- [x] 06-05-PLAN.md — Separate overlapping Unstage/reorder controls and verify native geometry (G-06-6)
 
 **UI hint**: yes
 **Notes**:
@@ -194,7 +194,7 @@ Phases execute in numeric order: 4 → 5 → 6 → 7 (Phases 4 and 5 are indepen
 | 3. Pause & Resume | v0.2 | 4/4 | Complete | 2026-10-16 |
 | 4. Staging Foundations | v0.3 | 5/5 | Complete    | 2026-11-13 |
 | 5. Two-Tab Shell | v0.3 | 3/3 | Complete    | 2026-11-13 |
-| 6. Staged Tab Core | v0.3 | 4/5 | UAT gap fix ready | - |
+| 6. Staged Tab Core | v0.3 | 5/5 | Corrected appearance UAT pending | - |
 | 7. Complete, Roll Over & Release 0.3.0 | v0.3 | 0/? | Not started | - |
 
 ## Backlog
@@ -206,4 +206,3 @@ Phases execute in numeric order: 4 → 5 → 6 → 7 (Phases 4 and 5 are indepen
 **Deferred at:** 2026-11-13 during /gsd-verify-work 4 session completion
 **Follow-ups:**
 - [ ] Test 6: Pausing a task that is already completed drops its card: pauseLedger reconcile rule 4 (Phase 3 D-12 'completed elsewhere') deletes paused records for any completed-type status, even if completed before the pause. Make rule 4 drop only records completed after pausedAt (or block pause / hide completed tasks in the picker), plus a regression test. Pre-existing since v0.2. Debug: .planning/debug/pause-removes-card.md (deferred 2026-11-13)
-

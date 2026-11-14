@@ -1,14 +1,19 @@
 ---
-status: diagnosed
+status: testing
 phase: 06-staged-tab-core
 source: [06-VERIFICATION.md]
 started: "2026-11-14T22:00:00Z"
-updated: 2026-11-14T22:17:14Z
+updated: 2026-11-14T22:24:29Z
 ---
 
 ## Current Test
 
-[testing complete]
+number: 7
+name: Corrected Unstage and reorder controls
+expected: |
+  Open the corrected native screenshot: .planning/phases/06-staged-tab-core/06-controls-review.png
+  The X button and reorder grip should now appear separately, with a clear gap. Confirm the corrected appearance is acceptable.
+awaiting: user response
 
 ## Tests
 
@@ -43,12 +48,16 @@ result: issue
 reported: 'wording and appearance looks good. However, the "X" button overlaps with what appears to be the handle for re-organizing cards.'
 severity: cosmetic
 
+### 7. Corrected Unstage and reorder controls
+expected: The corrected screenshot shows the X button and reorder handle as distinct controls with a clear gap.
+result: [pending]
+
 ## Summary
 
-total: 6
+total: 7
 passed: 5
 issues: 1
-pending: 0
+pending: 1
 skipped: 0
 blocked: 0
 
@@ -56,7 +65,9 @@ blocked: 0
 
 - gap_id: G-06-6
   truth: "The Unstage button and reorder handle have non-overlapping visible and clickable areas."
-  status: failed
+  status: resolved
+  resolved_by: 06-05-PLAN.md
+  resolved_at: 2026-11-14
   reason: 'User reported: wording and appearance looks good. However, the "X" button overlaps with what appears to be the handle for re-organizing cards.'
   severity: cosmetic
   test: 6
@@ -80,3 +91,7 @@ blocked: 0
 - Source enforcement descriptor omissions remain documented in 06-VERIFICATION.md; these passes record observed runtime behavior, not descriptor completeness or user approval.
 
 
+
+## Gap fix execution — 2026-11-14
+
+06-05 implemented G-06-6. Native checks passed 225 assertions across 36 layouts with a 4px gap throughout; the existing 17 native checks also passed. Build/lint/650 tests passed. Corrected screenshot: 06-controls-review.png. Historical test 6 remains an issue record with verified plan/SUMMARY resolution; test 7 awaits user visual acceptance.

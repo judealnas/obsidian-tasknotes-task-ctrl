@@ -5,16 +5,16 @@ milestone_name: Staging Tasks
 current_phase: 06
 current_phase_name: Staged Tab Core
 status: verifying
-stopped_at: Phase 6 UAT 5 passed, 1 cosmetic issue diagnosed; 06-05 gap fix plan ready
-last_updated: "2026-11-14T22:17:14Z"
+stopped_at: Phase 6 gap fix 06-05 complete; corrected control appearance awaits UAT test 7
+last_updated: "2026-11-14T22:24:52Z"
 last_activity: 2026-11-14
-last_activity_desc: Phase 6 UAT diagnosed control overlap; gap plan 06-05 ready
+last_activity_desc: Control overlap fixed; 225 native layout assertions, 17 live regressions and 650 tests pass
 state_head: 3e055538a24d8f8e06e9b95f09a69d09ab6dd0ef
 progress:
   total_phases: 4
   completed_phases: 2
   total_plans: 13
-  completed_plans: 12
+  completed_plans: 13
   percent: 50
 ---
 
@@ -29,13 +29,13 @@ See: .planning/PROJECT.md (updated 2026-11-13)
 
 ## Current Position
 
-Phase: 06 (Staged Tab Core) — UAT GAP FIX READY
-Plan: 4 of 5
-Status: Original implementation complete; 5 UAT passes, 1 cosmetic gap; 06-05 ready
+Phase: 06 (Staged Tab Core) — CORRECTED APPEARANCE REVIEW PENDING
+Plan: 5 of 5
+Status: All five plans complete; control overlap fixed and natively verified; UAT test 7 pending
 Note: Phase 4 complete: UAT 6/6, VERIFICATION passed, SECURITY 19/19 closed. 04-01 spike cleanup done (`staged:` null line confirmed, `spikedefault` removed).
-Last activity: 2026-11-14 — Original four plans complete. UAT 5 passed, 1 cosmetic control-overlap issue diagnosed from native geometry; 06-05 gap plan checked inline and ready.
+Last activity: 2026-11-14 — 06-05 committed; explicit Unstage sizing produces 4px control gap across 36 native layouts (225 assertions). Existing 17 live assertions and all 650 tests pass. Corrected screenshot awaits user acceptance.
 
-Progress (v0.3): [█████░░░░░] 50% accepted (2/4 phases). Planned work: 12/13 current plans complete; Phase 6 awaits control-overlap fix and follow-up UAT before acceptance. Phase 7 has not started.
+Progress (v0.3): [█████░░░░░] 50% accepted (2/4 phases). Planned work: 13/13 current plans complete; Phase 6 awaits corrected appearance UAT before acceptance. Phase 7 has not started.
 
 ## Performance Metrics
 
@@ -195,5 +195,3 @@ Resume file: None
 - Next: $gsd-execute-phase 6 — run the four sequential Staged Tab Core plans.
 - Implementation is committed on agent-phase-05-discuss (renamed from gsd/phase-05-discuss for the executor worktree commit guard).
 - Merge gsd/phase-04-plan when ready
-
-

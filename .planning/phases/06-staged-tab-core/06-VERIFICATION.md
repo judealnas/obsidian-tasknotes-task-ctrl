@@ -2,21 +2,13 @@
 phase: 06-staged-tab-core
 verified: "2026-11-14"
 status: human_needed
-score: "16/16 requirements supported by automated evidence; 5 prohibition reviews pending"
-covered_files: [".planning/phases/06-staged-tab-core/06-01-PLAN.md",".planning/phases/06-staged-tab-core/06-01-SUMMARY.md",".planning/phases/06-staged-tab-core/06-02-PLAN.md",".planning/phases/06-staged-tab-core/06-02-SUMMARY.md",".planning/phases/06-staged-tab-core/06-03-PLAN.md",".planning/phases/06-staged-tab-core/06-03-SUMMARY.md",".planning/phases/06-staged-tab-core/06-04-PLAN.md",".planning/phases/06-staged-tab-core/06-04-SUMMARY.md","package-lock.json","package.json","src/main.ts","src/model/cardOrder.ts","src/model/errors.ts","src/model/pauseLedger.ts","src/model/pomodoroOwnership.ts","src/model/stagedField.ts","src/model/staging.ts","src/model/stagingDay.ts","src/model/taskLink.ts","src/model/taskPicker.ts","src/model/timeMath.ts","src/settings.ts","src/state/CardOrderStore.ts","src/state/PauseStore.ts","src/state/StagedOrderStore.ts","src/state/StagingController.ts","src/state/StagingStore.ts","src/state/TimerController.ts","src/state/TimerStore.ts","src/state/WriteQueue.ts","src/tasknotes/TaskNotesBridge.ts","src/tasknotes/runtime-api.types.ts","src/ui/CardList.ts","src/ui/TaskCard.ts","src/ui/TaskPickerModal.ts","src/ui/TimerPaneSettingTab.ts","src/ui/TimerPaneView.ts","styles.css","tests/bridge.test.ts","tests/cardList.test.ts","tests/cardOrder.test.ts","tests/cardOrderStore.test.ts","tests/contract.test.ts","tests/controller.test.ts","tests/fakes/fakeGateway.ts","tests/fakes/fakeObsidian.ts","tests/fakes/fakeTaskNotes.ts","tests/fakes/viewHost.ts","tests/main.test.ts","tests/pauseLedger.test.ts","tests/pauseResume.test.ts","tests/pauseStore.test.ts","tests/readPath.test.ts","tests/settings.test.ts","tests/stagedField.test.ts","tests/stagedOrderStore.test.ts","tests/staging.test.ts","tests/stagingController.test.ts","tests/stagingDay.test.ts","tests/stagingStore.test.ts","tests/store.test.ts","tests/taskCard.test.ts","tests/taskLink.test.ts","tests/taskPicker.test.ts","tests/taskPickerModal.test.ts","tests/timerPaneView.test.ts"]
-covered_digest: v3:sha256:e10036b66b037e3ac4463598cbc98b09a94b187fc9f0db33d4d7eba9a0e3f666
+score: "16/16 requirements supported; G-06-6 fixed and natively verified; corrected appearance review pending"
+covered_files: [".planning/phases/06-staged-tab-core/06-01-PLAN.md",".planning/phases/06-staged-tab-core/06-01-SUMMARY.md",".planning/phases/06-staged-tab-core/06-02-PLAN.md",".planning/phases/06-staged-tab-core/06-02-SUMMARY.md",".planning/phases/06-staged-tab-core/06-03-PLAN.md",".planning/phases/06-staged-tab-core/06-03-SUMMARY.md",".planning/phases/06-staged-tab-core/06-04-PLAN.md",".planning/phases/06-staged-tab-core/06-04-SUMMARY.md",".planning/phases/06-staged-tab-core/06-05-PLAN.md",".planning/phases/06-staged-tab-core/06-05-SUMMARY.md",".planning/phases/06-staged-tab-core/06-layout-check.txt","package-lock.json","package.json","src/main.ts","src/model/cardOrder.ts","src/model/errors.ts","src/model/pauseLedger.ts","src/model/pomodoroOwnership.ts","src/model/stagedField.ts","src/model/staging.ts","src/model/stagingDay.ts","src/model/taskLink.ts","src/model/taskPicker.ts","src/model/timeMath.ts","src/settings.ts","src/state/CardOrderStore.ts","src/state/PauseStore.ts","src/state/StagedOrderStore.ts","src/state/StagingController.ts","src/state/StagingStore.ts","src/state/TimerController.ts","src/state/TimerStore.ts","src/state/WriteQueue.ts","src/tasknotes/TaskNotesBridge.ts","src/tasknotes/runtime-api.types.ts","src/ui/CardList.ts","src/ui/TaskCard.ts","src/ui/TaskPickerModal.ts","src/ui/TimerPaneSettingTab.ts","src/ui/TimerPaneView.ts","styles.css","tests/bridge.test.ts","tests/cardList.test.ts","tests/cardOrder.test.ts","tests/cardOrderStore.test.ts","tests/contract.test.ts","tests/controller.test.ts","tests/fakes/fakeGateway.ts","tests/fakes/fakeObsidian.ts","tests/fakes/fakeTaskNotes.ts","tests/fakes/viewHost.ts","tests/main.test.ts","tests/pauseLedger.test.ts","tests/pauseResume.test.ts","tests/pauseStore.test.ts","tests/readPath.test.ts","tests/settings.test.ts","tests/stagedField.test.ts","tests/stagedOrderStore.test.ts","tests/staging.test.ts","tests/stagingController.test.ts","tests/stagingDay.test.ts","tests/stagingStore.test.ts","tests/store.test.ts","tests/taskCard.test.ts","tests/taskLink.test.ts","tests/taskPicker.test.ts","tests/taskPickerModal.test.ts","tests/timerPaneView.test.ts"]
+covered_digest: v3:sha256:17ae3de38c1b0081ea0265c64c9a7bac17f9939275ca4cb8ca30a450d9e738e9
 behavior_unverified: 0
 human_verification:
-  - test: "Stage must not implicitly start timing"
-    expected: "Review the native no-timer result and confirm Stage only adds membership. Descriptor-less test enforcement remains flagged."
-  - test: "Unstage must not control active Pomodoro timing"
-    expected: "Confirm exact Pomodoro-owned timing remains untouched when unstaging its task. Automated takeover/ownership cases pass; actual native Pomodoro interaction remains unobserved."
-  - test: "Staged Complete must not complete a recurring series"
-    expected: "Confirm the disabled staged Complete control is correct for Phase 6. Handler zero-call tests pass in every staged state; descriptor-less enforcement remains flagged."
-  - test: "Background changes must not change the selected tab"
-    expected: "Review the passing two-leaf tests/native observation and confirm independent tab choice. Descriptor-less enforcement remains flagged."
-  - test: "Age metadata must use neutral visual framing"
-    expected: "Review the muted date/age presentation and confirm it has no punitive wording or styling. Human judgment is required."
+  - test: "Corrected Unstage and reorder controls"
+    expected: "Review 06-controls-review.png and confirm the corrected spacing is acceptable. Native geometry and hit testing pass."
 gaps: []
 decision_coverage:
   honored: 16
@@ -71,3 +63,18 @@ The four test-tier prohibitions have passing behavior tests (and native support 
 Native outside-click closing, actual Pomodoro ownership interaction, native chip/menu gestures, and a full application restart with staged fixtures were not claimed as observed. Automated tests cover their relevant logic where applicable. TaskNotes path-only stop retains its documented external replacement race after the last safety read; the queue does not make external actors transactional.
 
 Phase 7 completion, Done today, daily rollover/mobile controls and release work remain outside this phase.
+
+## Gap fix re-verification — 2026-11-14
+
+Plan 06-05 is implemented. The original four-plan verification above is historical; the five original UAT items are now passed (four native automated checks and the user's explicit neutral-age acceptance). G-06-6 was reported during that review and is now mechanically resolved by 06-05-PLAN.md and 06-05-SUMMARY.md. Only corrected-control visual acceptance remains pending in UAT test 7.
+
+The sole product change is explicit .tntp-unstage geometry in styles.css: 24px width/height from theme variables, zero padding/minimum sizing, border-box and centered contents. Source inspection confirms unchanged handlers, writes, persistence, title metadata and timer/Pomodoro paths. Current native geometry verifies the existing title reservation remains sufficient.
+
+- Full npm run check passed: build, zero-warning lint, 650 tests in 24 files, including prior-phase suites.
+- Native 06-layout-check.txt: 225 assertions across 36 width/title/state/direction configurations. Gap min=max=4px; buttons 24px wide. Both centers hit the intended control, focus styling remained visible, and text fragments cleared controls. Keyboard reorder retained focus; idle Unstage left the other fixture present; Timers retained its handle.
+- Existing 06-native-check.txt: all 17 assertions passed again.
+- Corrected screenshot inspected by the parent: 06-controls-review.png. User review is pending.
+- Build bf86008+dirty from this worktree; main.js hash prefix 9fd9432d5f62; TaskNotes 4.18.2 / API v1. CSS-only fix leaves main.js unchanged.
+- No fixture tasks or active timers remained; isolated UAT instance stopped. Schema drift check for phase 6 passed. Codebase drift skipped because STRUCTURE.md is absent. Existing security report still has zero open threats; this CSS-only fix introduces no new trust boundary.
+
+Verification ran inline under the skill's single-agent fallback with the verifier/code-review capabilities disabled. This is parent source/runtime re-verification, not an independent review. The browser-MCP-only DOM hook could not look; the repository-approved CDP fallback supplied the native evidence separately. Broader historical inspection limits above remain unchanged.
