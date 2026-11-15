@@ -8,10 +8,18 @@ import type { TimerPaneSettings } from "../src/settings";
 import type { App, PluginManifest } from "obsidian";
 import type { StagedOrderStore } from "../src/state/StagedOrderStore";
 import type { CompletionStore } from "../src/state/CompletionStore";
+import type { StagingStore, StagingStoreDeps } from "../src/state/StagingStore";
 
 vi.mock("obsidian", () => import("./fakes/fakeObsidian"));
 // Captures the TimerStore main.ts builds, with its deps, so tests can reach fileCheck and requestRefresh.
 const captured = vi.hoisted(() => ({ stores: [] as Array<{ deps: unknown; store: unknown }> }));
+const capturedStaging = vi.hoisted(() => ({ stores: [] as Array<StagingStore> }));
+vi.mock("../src/state/StagingStore", async (importOriginal) => {
+ const actual = await importOriginal<typeof import("../src/state/StagingStore")>();
+ return { ...actual, StagingStore: class extends actual.StagingStore {
+  constructor(deps: StagingStoreDeps) { super(deps); capturedStaging.stores.push(this); }
+ } };
+});
 vi.mock("../src/state/TimerStore", async (importOriginal) => {
 	const actual = await importOriginal<typeof import("../src/state/TimerStore")>();
 	class CapturingTimerStore extends actual.TimerStore {
@@ -25,6 +33,27 @@ vi.mock("../src/state/TimerStore", async (importOriginal) => {
 beforeEach(() => { resetHost(); captured.stores = []; vi.useFakeTimers(); vi.stubGlobal("window", { setTimeout, clearTimeout, setInterval }); });
 afterEach(() => { vi.useRealTimers(); vi.unstubAllGlobals(); });
 const flush = async () => { for (let i = 0; i < 12; i++) await Promise.resolve(); };
+
+test("no-pane safety resync and saved rollover-hour changes rederive cached tasks even offline", async () => {
+ vi.setSystemTime(new Date(2026, 10, 14, 3, 59, 59));
+ const plugin = new TaskNotesTimerPanePlugin({} as App, {} as PluginManifest); plugin.onload(); await flush();
+ const staging = capturedStaging.stores[capturedStaging.stores.length - 1]!;
+ const gateway = (staging as unknown as { deps: StagingStoreDeps }).deps.gateway;
+ vi.spyOn(gateway, "getState").mockReturnValue({ kind: "ready" });
+ vi.spyOn(gateway, "stagingAvailability").mockReturnValue({ available: true, reason: "" });
+ const list = vi.spyOn(gateway, "listTasks").mockResolvedValue([{ path: "A.md", title: "A", status: "open", archived: false, ...{ staged: "2026-11-12" } }]);
+ vi.spyOn(gateway, "statuses").mockResolvedValue([{ value: "done", label: "Done", isCompleted: true }]);
+ vi.spyOn(gateway, "userFields").mockResolvedValue([{ id: "s", key: "staged", displayName: "Staged", type: "date" }]);
+ await staging.refreshNow(); expect(staging.getSnapshot().items[0]?.age).toBe(1);
+ list.mockRejectedValue(new Error("offline"));
+ await vi.advanceTimersByTimeAsync(30_000); await flush();
+ expect(staging.getSnapshot().items[0]?.age).toBe(2);
+ await saveSettingsOf(host.tabs[0])({ completionStatus: null, rolloverHour: 6 });
+ expect(staging.getSnapshot().items[0]?.age).toBe(1);
+ await saveSettingsOf(host.tabs[0])({ completionStatus: null, rolloverHour: 4 });
+ expect(staging.getSnapshot().items[0]?.age).toBe(2);
+ staging.dispose();
+});
 
 test("completion history survives production saves, reloads and unrelated settings changes", async () => {
  const record = { attemptId: "one", sourcePath: "Tasks/a.md", requestDay: "2026-11-14", requestedAt: 123, beforeEvidence: { status: "open", staged: null, title: "A", completedStatus: "done" }, phase: "pending" as const, pendingCleanupPaths: [] };

@@ -3,6 +3,7 @@ import { StagingStore, type StagingStoreDeps } from "../src/state/StagingStore";
 import { StagedOrderStore } from "../src/state/StagedOrderStore";
 import { createFakeGateway } from "./fakes/fakeGateway";
 import type { TaskInfo } from "../src/tasknotes/runtime-api.types";
+import { CompletionStore } from "../src/state/CompletionStore";
 
 export const stagedTask = (patch: Partial<TaskInfo> & { staged?: unknown } = {}): TaskInfo => ({ path: "A.md", title: "Task A", archived: false, status: "open", staged: "2026-11-12", ...patch });
 export function stagingFixture(extra: Partial<StagingStoreDeps> = {}) {
@@ -14,6 +15,52 @@ export function stagingFixture(extra: Partial<StagingStoreDeps> = {}) {
 }
 beforeEach(() => vi.useFakeTimers());
 afterEach(() => { vi.clearAllTimers(); vi.useRealTimers(); });
+
+test("a completion saved during a task read invalidates that read before observing reopen", async () => {
+ const completions = new CompletionStore({ persist: () => Promise.resolve() }); completions.load({});
+ const s = stagingFixture({ completions });
+ s.gateway.statuses = () => Promise.resolve([{ value: "done", label: "Done", isCompleted: true }]);
+ await s.store.refreshNow();
+ let release!: (tasks: TaskInfo[]) => void; let reads = 0;
+ s.gateway.listTasks = () => ++reads === 1 ? new Promise(resolve => { release = resolve; }) : Promise.resolve([{ ...stagedTask(), status: "done" }]);
+ const read = s.store.refreshNow(); for (let i = 0; i < 5; i++) await Promise.resolve();
+ await completions.saveRecord({ attemptId: "one", sourcePath: "A.md", completedPath: "A.md", requestDay: "2026-11-14", requestedAt: 10, completedAt: 10, beforeEvidence: { status: "open", staged: "2026-11-12", title: "A", completedStatus: "done" }, phase: "confirmed", pendingCleanupPaths: [] });
+ release([stagedTask()]); await read;
+ expect(reads).toBe(2); expect(completions.getDoneToday("2026-11-14")[0]?.completedAt).toBe(10);
+ s.store.dispose();
+});
+
+test("cached rename and successful Unstage survive day changes while offline", async () => {
+ let now = new Date(2026, 10, 14, 12).getTime();
+ const s = stagingFixture({ now: () => now }); await s.store.refreshNow();
+ s.store.renamePath("A.md", "Renamed.md"); now += 86_400_000; s.store.checkDay();
+ expect(s.store.getSnapshot().items[0]?.taskPath).toBe("Renamed.md");
+ s.store.removeItem("Renamed.md"); now += 86_400_000; s.store.checkDay();
+ expect(s.store.getSnapshot().items).toEqual([]); s.store.dispose();
+});
+
+test("cached rollover uses the exact boundary and changed hours even when reads fail", async () => {
+ let now = new Date(2026, 10, 14, 3, 59, 59, 999).getTime(); let hour = 4;
+ const { store, gateway } = stagingFixture({ now: () => now, getRolloverHour: () => hour }); await store.refreshNow();
+ expect(store.getSnapshot().items[0]?.age).toBe(1);
+ const reads = vi.spyOn(gateway, "listTasks");
+ const before = reads.mock.calls.length; reads.mockRejectedValue(new Error("offline"));
+ now++; expect(store.checkDay(now)).toBe(true); expect(store.getSnapshot().items[0]?.age).toBe(2);
+ expect(store.checkDay(now)).toBe(false); expect(reads.mock.calls.length).toBe(before);
+ hour = 6; expect(store.checkDay(now)).toBe(true); expect(store.getSnapshot().items[0]?.age).toBe(1);
+ now = new Date(2026, 10, 18, 12).getTime(); store.checkDay(now); expect(store.getSnapshot().items[0]?.age).toBe(6);
+ expect(gateway.updateCalls).toEqual([]); expect(gateway.stopCalls).toEqual([]); store.dispose();
+});
+
+test("a prior-day read cannot publish after rollover and the retry uses the new day", async () => {
+ let now = new Date(2026, 10, 14, 12).getTime();
+ const { store, gateway } = stagingFixture({ now: () => now }); await store.refreshNow();
+ let release!: (tasks: TaskInfo[]) => void; let calls = 0;
+ gateway.listTasks = () => ++calls === 1 ? new Promise(resolve => { release = resolve; }) : Promise.resolve([stagedTask()]);
+ const refresh = store.refreshNow(); for (let i = 0; i < 5; i++) await Promise.resolve();
+ now = new Date(2026, 10, 17, 12).getTime(); store.checkDay(now); release([stagedTask()]); await refresh;
+ expect(calls).toBe(2); expect(store.getSnapshot().items[0]?.age).toBe(5); store.dispose();
+});
 
 test("an in-flight refresh revokes registration readiness until its fresh check finishes", async () => {
 	const { store, gateway } = stagingFixture(); await store.refreshNow();
