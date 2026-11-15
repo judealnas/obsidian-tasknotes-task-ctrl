@@ -61,7 +61,7 @@ Differences from TaskNotes' own displays, all expected:
 3. Enter `judealnas/obsidian-tasknotes-timer-pane` and add the plugin.
 4. Enable "TaskNotes Task Control" in Settings → Community plugins.
 
-BRAT installs the latest GitHub release and can check for updates.
+BRAT can install a specific release or track the latest available version, including prereleases. Select `0.3.0-beta.1` to test the staging beta, or pin `0.2.0` to stay on stable. See the [beta release notes](docs/releases/0.3.0-beta.1.md) for outstanding acceptance checks.
 
 ## Manual install
 
@@ -113,3 +113,5 @@ The instance listens for DevTools connections on port 9333. That port is localho
 
 1. `npm version patch` (or `minor` / `major`) bumps `package.json`, `manifest.json` and `versions.json`, commits, and tags the version without a `v` prefix.
 2. `git push --follow-tags` pushes the commit and tag. The release workflow runs `npm run check`, confirms the tag matches `manifest.json`, and publishes a GitHub release with `main.js`, `manifest.json` and `styles.css`.
+
+For a beta, use a version such as `0.3.0-beta.1` consistently in package/lock/manifest metadata and a matching tag without a `v` prefix. Tags containing a hyphen are published as GitHub prereleases and do not replace GitHub's Latest release. Release notes come from `docs/releases/<tag>.md` when present. BRAT's latest tracking may still select prereleases. Beta publication does not close outstanding stable-release acceptance checks.
