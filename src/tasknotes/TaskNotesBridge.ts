@@ -88,6 +88,7 @@ export interface TaskNotesGateway {
 	 */
 	toggleCompleteInstance(path: string, date: string, context: TaskNotesMutationContext): Promise<TaskInfo>;
  materializeOccurrence?(path: string, date: string, context: TaskNotesMutationContext): Promise<TaskInfo>;
+ materializationAvailability?(): { available: boolean; reason: string };
 	start(path: string, options: Record<string, never>, context: TaskNotesMutationContext): Promise<void>;
 	/** Stops the task's open entry through TaskNotes' own api.time.stop; resolves the task as TaskNotes saved it. */
 	stop(taskPath: string, context: TaskNotesMutationContext): Promise<TaskInfo>;
@@ -361,6 +362,13 @@ export class TaskNotesBridge implements TaskNotesGateway {
   const api = this.featureApi("recurring.materialize", "recurring.materializeOccurrence", api => typeof api.recurring?.materializeOccurrence === "function");
   if (this.olderThanStagingFloor()) throw new Error("TaskNotes 4.13.0 or newer is needed for materialization");
   return this.completionResult(api, await api.recurring!.materializeOccurrence!(path, date, context));
+ }
+ materializationAvailability(): { available: boolean; reason: string } {
+  try {
+   if (this.olderThanStagingFloor()) return { available: false, reason: "TaskNotes 4.13.0 or newer is needed for materialization" };
+   this.featureApi("recurring.materialize", "recurring.materializeOccurrence", api => typeof api.recurring?.materializeOccurrence === "function");
+   return { available: true, reason: "Occurrence materialization is available" };
+  } catch { return { available: false, reason: "TaskNotes occurrence materialization is unavailable" }; }
  }
  private completionResult(api: TaskNotesRuntimeApiV1, result: TaskInfo): TaskInfo {
   if (this.connectedApi() !== api) throw new Error("TaskNotes changed during completion");

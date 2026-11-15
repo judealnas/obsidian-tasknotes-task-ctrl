@@ -7,13 +7,13 @@ export class CompletionStore {
  constructor(private readonly deps: { persist: () => Promise<void>; capacity?: number }) {}
  load(data: unknown): void { this.state = loadCompletionRecords(data); this.emit(); }
  records(): CompletionAttempt[] { return structuredClone(this.state.records); }
- available(): boolean { return !this.state.quarantine && (this.state.records.length < (this.deps.capacity ?? 1000) || this.state.records.some(r => r.phase === "confirmed")); }
+ available(): boolean { return !this.state.quarantine && (this.state.records.length < (this.deps.capacity ?? 1000) || this.state.records.some(r => r.phase === "confirmed" && !r.replayProtected)); }
  async saveRecord(record: CompletionAttempt): Promise<void> {
   if (this.state.quarantine) throw new Error("Completion history needs attention");
   const records = this.state.records.filter(r => r.attemptId !== record.attemptId);
   const capacity = this.deps.capacity ?? 1000;
   while (records.length >= capacity) {
-   const index = records.findIndex(r => r.phase === "confirmed");
+   const index = records.findIndex(r => r.phase === "confirmed" && !r.replayProtected);
    if (index < 0) throw new Error("Completion safety history is full");
    records.splice(index, 1);
   }

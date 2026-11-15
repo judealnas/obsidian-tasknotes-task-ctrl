@@ -12,6 +12,7 @@ const expression = String.raw`(async () => {
  const ctx = { source: "timer-pane-phase7-contract", reason: "disposable native fixture probe", correlationId: run };
  const result = { run, at: new Date().toISOString(), version: app.plugins.getPlugin("tasknotes").manifest.version, apiVersion: api.apiVersion,
   capabilities: api.capabilities, recurringMethods: Object.keys(api.recurring), cases: [], fixturePaths: [] };
+ window.__phase7ContractEvidence = result;
  const wait = ms => new Promise(resolve => setTimeout(resolve, ms));
  const snapshot = async path => {
   const file = app.vault.getAbstractFileByPath(path);
@@ -26,6 +27,7 @@ const expression = String.raw`(async () => {
   return task;
  };
  const step = async (name, action) => {
+  result.currentStep = name;
   try { result.cases.push({ name, ...(await action()) }); }
   catch (error) { result.cases.push({ name, error: String(error), code: error?.code }); }
  };
@@ -119,12 +121,69 @@ const expression = String.raw`(async () => {
   const outcome = await view.services.controller.complete({ taskPath: t.path, title: t.title });
   return { before, outcome, after: await snapshot(t.path), busyAfter: view.services.controller.isBusy() };
  });
+ for (const policy of ["virtual", "on_completion", "existing", "existing-next"]) await step("coordinator-" + policy + "-and-repeat", async () => {
+  const t = await create("coordinator-" + policy, policy === "on_completion" || policy === "existing-next" ? { occurrence_materialization: "on_completion" } : {});
+  if (policy === "existing") await api.recurring.materializeOccurrence(t.path, "2026-11-14", ctx);
+  if (policy === "existing-next") { const next = await api.recurring.materializeOccurrence(t.path, "2026-11-16", ctx); await api.tasks.update(next.path, { staged: "2026-11-17" }, ctx); }
+  await api.time.start(t.path, {}, ctx);
+  const view = app.workspace.getLeavesOfType("tasknotes-timer-pane")[0]?.view;
+  const before = await snapshot(t.path);
+  const outcome = await view.services.controller.complete({ taskPath: t.path, title: t.title });
+  const after = await snapshot(t.path);
+  const second = await view.services.controller.complete({ taskPath: t.path, title: t.title });
+  const records = app.plugins.getPlugin("tasknotes-timer-pane").completions.records().filter(r => r.sourcePath === t.path);
+  const related = (await ownTasks()).filter(task => task.path === t.path || task.recurrence_parent === "[[" + t.path.replace(/\.md$/, "") + "]]");
+  return { policy, before, outcome, after, second, afterRepeat: await snapshot(t.path), records, related: await Promise.all(related.map(t => snapshot(t.path))) };
+ });
+ await step("coordinator-pomodoro-refusal", async () => {
+  const original = await api.pomodoro.status();
+  if (original.isRunning || original.currentSession) return { skipped: "Existing Pomodoro state was left untouched" };
+  const t = await create("protected-pomodoro");
+  try {
+   await api.pomodoro.start({ taskPath: t.path, duration: 25 }, ctx); await wait(250);
+   const before = { task: await snapshot(t.path), pomodoro: await api.pomodoro.status() };
+   const view = app.workspace.getLeavesOfType("tasknotes-timer-pane")[0]?.view;
+   const outcome = await view.services.controller.complete({ taskPath: t.path, title: t.title });
+   return { expectedOutcome: "unavailable", before, outcome, after: { task: await snapshot(t.path), pomodoro: await api.pomodoro.status() } };
+  } finally {
+   const current = await api.pomodoro.status();
+   if (current.currentSession?.taskPath === t.path) await api.pomodoro.stop(ctx);
+   if ((await api.time.active()).some(e => e.taskPath === t.path)) await api.time.stop(t.path, ctx);
+  }
+ });
+ await step("coordinator-restart-refusal", async () => {
+  const first = result.cases.find(c => c.name === "coordinator-virtual-and-repeat");
+  const path = first.records[0].sourcePath;
+  const before = await snapshot(path);
+  const oldPlugin = app.plugins.getPlugin("tasknotes-timer-pane");
+  result.currentStep = "restart:disable";
+  void app.plugins.disablePlugin("tasknotes-timer-pane");
+  for (let i = 0; i < 50 && app.plugins.getPlugin("tasknotes-timer-pane"); i++) await wait(100);
+  if (app.plugins.getPlugin("tasknotes-timer-pane")) throw new Error("Plugin did not unload");
+  result.currentStep = "restart:enable";
+  void app.plugins.enablePlugin("tasknotes-timer-pane");
+  for (let i = 0; i < 50 && (!app.plugins.getPlugin("tasknotes-timer-pane") || app.plugins.getPlugin("tasknotes-timer-pane") === oldPlugin); i++) await wait(100);
+  if (!app.plugins.getPlugin("tasknotes-timer-pane") || app.plugins.getPlugin("tasknotes-timer-pane") === oldPlugin) throw new Error("Fresh plugin did not load");
+  result.currentStep = "restart:settings";
+  await app.plugins.getPlugin("tasknotes-timer-pane").settingsReady;
+  result.currentStep = "restart:view";
+  await app.commands.executeCommandById("tasknotes-timer-pane:open-timer-pane"); await wait(500);
+  const plugin = app.plugins.getPlugin("tasknotes-timer-pane");
+  const view = app.workspace.getLeavesOfType("tasknotes-timer-pane").map(l => l.view).find(v => v.services?.completion && v.services.gateway.completionAvailable());
+  if (!view) throw new Error("A fresh connected pane did not restore after reload");
+  view.services.gateway.probe(); await wait(500);
+  result.currentStep = "restart:complete";
+  const outcome = await view.services.controller.complete({ taskPath: path, title: "Restart replay check" });
+  return { expectedOutcome: "unavailable", freshPlugin: plugin !== oldPlugin, before, outcome, after: await snapshot(path), restoredRecords: plugin.completions.records().filter(r => r.sourcePath === path) };
+ });
  result.fixtures = await Promise.all((await ownTasks()).map(t => snapshot(t.path)));
  return result;
 })()`;
 const response = spawnSync(process.execPath, [cdp, "eval", "--expr", expression], { encoding: "utf8", timeout: 90_000, maxBuffer: 8 * 1024 * 1024 });
 if (response.status !== 0) throw new Error(response.stderr || response.stdout || "CDP contract probe failed");
 const result = JSON.parse(response.stdout);
-const output = new URL("../../.planning/phases/07-complete-roll-over-release-0-3-0/07-contract-native.json", import.meta.url);
+const output = new URL("../../.planning/phases/07-complete-roll-over-release-0-3-0/" + (process.argv.includes("--auto-stop-off") ? "07-contract-native-autostop-off.json" : "07-contract-native.json"), import.meta.url);
 writeFileSync(output, JSON.stringify(result, null, 2) + "\n");
-console.log(JSON.stringify({ run: result.run, version: result.version, cases: result.cases.map(c => ({ name: c.name, error: c.error })), output: fileURLToPath(output) }, null, 2));
+const failures = result.cases.filter(c => c.error || (!c.skipped && (c.name.startsWith("coordinator-") || c.name === "ordinary-card-controller-callback") && c.outcome !== (c.expectedOutcome ?? "completed")) || (c.name.endsWith("-and-repeat") && c.name.startsWith("coordinator-") && c.second !== "unavailable"));
+console.log(JSON.stringify({ run: result.run, version: result.version, cases: result.cases.map(c => ({ name: c.name, error: c.error, outcome: c.outcome, second: c.second })), failures: failures.map(c => c.name), output: fileURLToPath(output) }, null, 2));
+if (failures.length) process.exitCode = 1;

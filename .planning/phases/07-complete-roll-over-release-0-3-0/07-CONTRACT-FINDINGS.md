@@ -4,7 +4,7 @@
 
 Observed TaskNotes **4.18.2**, Runtime API **1**, in the guarded dev-vault UAT sandbox. Ready provenance: checkout `e0e29e3+dirty`, deployed main.js hash `cd5beaa1eefe`. The later bridge changes were unit-tested separately; they were not silently claimed deployed for these observations.
 
-Reproducible runner: `node scripts/uat/phase7-contract.mjs` after `npm run uat:start`. Stop with `npm run uat:stop`. Latest raw evidence: `07-contract-native.json`, run **P7-contract-1794714060307**, captured **2026-11-15T03:41:00.307Z** (local November 14, 22:41 EST). The runner uses public TaskNotes operations and public Obsidian vault reads. It creates uniquely named disposable fixture notes and leaves them for inspection. No existing tasks or TaskNotes settings were edited. A fixture Pomodoro started only after verifying no current Pomodoro; the fixture-owned Pomodoro and residual fixture time entry were stopped in finally.
+Reproducible runner: `node scripts/uat/phase7-contract.mjs` after `npm run uat:start`. Stop with `npm run uat:stop`. Latest raw evidence: `07-contract-native.json`, run **P7-contract-1794715327261**, captured **2026-11-15T04:02:07.261Z** (local November 14, 23:02 EST), **16 cases, zero runner failures**. Final deployment provenance: `cf75215+dirty`, main.js **01a83d61ab55**. The runner uses public TaskNotes operations and public Obsidian vault reads. It creates uniquely named disposable fixture notes and leaves them for inspection. A fixture Pomodoro starts only after verifying no current Pomodoro; the fixture-owned Pomodoro and residual fixture time entry are stopped in finally.
 
 ## Public contract (documentation/source, distinct from native observations)
 
@@ -33,7 +33,13 @@ All observations below have exact task paths, request dates, returned TaskInfo a
 
 The date basis is demonstrably local: native `completedDate` is November 14 while the capture's UTC calendar date is November 15. Crossing the configured rollover boundary during an in-flight completion remains untested.
 
-The automatic-materialization case observed a new current occurrence but did **not** establish creation/cleanup behavior for a new future occurrence. Auto-stop **off** was not exercised: changing the existing TaskNotes setting was deliberately avoided. These are outstanding evidence items, not passed branches. Only installed 4.18.2 was exercised; no minimum-version claim is made.
+Final coordinator observations establish automatic creation of current November 14 and next November 16 occurrence notes, with inherited staging cleared on both and on the source. A separate final coordinator case preserves a pre-existing next occurrence's explicit November 17 staging. Ordinary and all four recurring coordinator cases complete successfully, while a repeated request returns unavailable without changing recurrence history. A fresh plugin instance after actual disable/enable loads the persisted guard and refuses replay. The active-Pomodoro coordinator case returns unavailable and preserves the exact open time entry and countdown; this contrasts with the direct upstream API side effect above.
+
+Auto-stop **off** was also exercised: `07-contract-native-autostop-off.json`, run **P7-contract-1794714653876**, thirteen successful cases. Only the guarded **dev-vault** setting was temporarily changed while Obsidian was stopped. The exact original settings bytes were backed up to the temporary directory and restored in finally after the sandbox stopped; SHA-256 equality was verified (`True`) before restarting with the original true setting. No Personal Vault or ordinary Obsidian instance was involved. Only installed 4.18.2 was exercised; no minimum-version claim is made.
+
+Two repeated stress runs exceeded the runner's 90-second limit. Step diagnostics showed slow progress with accumulated staged fixture notes, not a confirmed product deadlock. Unchanged TaskCard renders were found to repeat availability reads, so they now reuse results until task/state/busy/readiness changes. A focused regression asserts this. 118 generated fixture files were reversibly moved to `dev-vault/.phase7-fixture-backup` while the sandbox was stopped. The final 16-case run succeeded after both changes; their individual timing contributions were not isolated. Reload checks use bounded observation of a genuinely fresh plugin instance and require a live connected restored pane.
+
+Local rollover-spanning completion is covered by an injected-clock integration test that keeps the original requestDay/requestedAt after 4 AM. This is simulated clock evidence; physical overnight/sleep observation remains Plan 07-05.
 
 ## Decision checkpoint before 07-02 task 2
 
@@ -42,7 +48,7 @@ The public date argument does not mean one uniform off-schedule occurrence acros
 1. Follow TaskNotes' resolved occurrence, retaining separate request/resolved/actual identity and durable replay protection.
 2. Disable completion when the staging day is outside the recurrence schedule. This narrows supported behavior and requires a documented requirement/plan decision; no partial RRULE resolver or forced materialization will be invented.
 
-No answer has yet been received. Existing plan 07-02 task 1 explicitly requires stopping before expansion when required occurrence targeting lacks an established safe public path. Recurring/materialized completion therefore remains disabled, and Plans 07-03 through 07-06 remain dependent on this checkpoint. Permanent disabling is not fulfillment of CTRL-13.
+**Resolved by the user in this execution session:** follow TaskNotes' resolved occurrence with protection against repeated completion. Virtual recurrence keeps the explicit captured staging-day request; an on_completion policy uses the public materialization path with authoritative returned occurrence identity. Request/resolved dates may differ. Do not force ordinary virtual series into materialized notes. This resolves the targeting-policy checkpoint; remaining native evidence and failure checks are still required before closing 07-02.
 
 ## Bridge validation
 

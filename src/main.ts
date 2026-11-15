@@ -132,6 +132,7 @@ export default class TaskNotesTimerPanePlugin extends Plugin {
    getRecords: () => completions.records(), storageAvailable: () => completions.available(),
    saveRecord: record => completions.saveRecord(record),
    otherBusy: () => stagingController.isBusy(), clearPause: path => pauses.remove(path),
+   resolveLink: (reference, sourcePath) => this.app.metadataCache.getFirstLinkpathDest(reference.replace(/^\[\[|\]\]$/g, "").split("|")[0]!.split("#")[0]!, sourcePath)?.path ?? null,
    refresh: async () => { await Promise.all([store.refreshNow(), staging.refreshNow()]); } });
   controller.setCompletionHandler(target => completion.complete({ sourcePath: target.taskPath, title: target.title,
    entry: target.startTime ? { taskPath: target.taskPath, startTime: target.startTime } : undefined }));

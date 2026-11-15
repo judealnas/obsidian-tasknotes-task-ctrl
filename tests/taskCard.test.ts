@@ -36,6 +36,16 @@ test("coordinated completion supports staged idle/running/paused targets and exp
  expect(s.el.querySelector(".tntp-complete")!.getAttribute("aria-label")).toBe("Previous completion needs checking");
  s.card.dispose();
 });
+test("unchanged card renders reuse availability instead of multiplying catalog reads", async () => {
+ const availability = vi.fn(() => Promise.resolve({ available: true, reason: "Available" }));
+ const s = setup(undefined, { availability } as unknown as TimerPaneServices["completion"]);
+ await flush();
+ for (let i = 0; i < 10; i++) s.card.update(model, true);
+ await flush(); expect(availability).toHaveBeenCalledTimes(1);
+ s.busy(true); await flush(); expect(availability).toHaveBeenCalledTimes(1);
+ s.busy(false); await flush(); expect(availability).toHaveBeenCalledTimes(2);
+ s.card.dispose();
+});
 
 test("staged completion never dispatches, and separate Unstage reads the newest model", () => {
 	const unstage = vi.fn(() => Promise.resolve()); const s = setup(unstage);

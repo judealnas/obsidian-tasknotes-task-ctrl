@@ -11,7 +11,9 @@ export interface CompletionAttempt {
  resolvedDate?: string;
  completedPath?: string;
  completedAt?: number;
- beforeEvidence: { status: string; staged: string | null; title: string; completedStatus: string };
+ beforeEvidence: { status: string; staged: string | null; title: string; completedStatus: string; recurrence?: string; completedDates?: string[]; parentPath?: string; existingPaths?: string[] };
+ cleanupEvidence?: Array<{ path: string; staged: string }>;
+ replayProtected?: boolean;
  phase: CompletionPhase;
  pendingCleanupPaths: string[];
 }
@@ -30,8 +32,15 @@ function valid(value: unknown): value is CompletionAttempt {
  if (value.resolvedDate !== undefined && !parseStagedValue(value.resolvedDate)) return false;
  if (value.completedPath !== undefined && !path(value.completedPath)) return false;
  if (value.completedAt !== undefined && (typeof value.completedAt !== "number" || !Number.isFinite(value.completedAt))) return false;
+ if (value.replayProtected !== undefined && typeof value.replayProtected !== "boolean") return false;
+ if (b.recurrence !== undefined && typeof b.recurrence !== "string") return false;
+ if (b.parentPath !== undefined && !path(b.parentPath)) return false;
+ if (b.completedDates !== undefined && (!Array.isArray(b.completedDates) || !b.completedDates.every(date => parseStagedValue(date)))) return false;
+ if (b.existingPaths !== undefined && (!Array.isArray(b.existingPaths) || !b.existingPaths.every(path))) return false;
+ const cleanup = value.cleanupEvidence;
+ if (cleanup !== undefined && (!Array.isArray(cleanup) || !cleanup.every(e => object(e) && path(e.path) && parseStagedValue(e.staged)))) return false;
  if ((value.phase === "confirmed" || value.phase === "cleanup-pending") && (!value.completedPath || value.completedAt === undefined)) return false;
- return Array.isArray(value.pendingCleanupPaths) && value.pendingCleanupPaths.every(p => path(p) && (p === value.sourcePath || p === value.completedPath)) && new Set(value.pendingCleanupPaths).size === value.pendingCleanupPaths.length;
+ return Array.isArray(value.pendingCleanupPaths) && value.pendingCleanupPaths.every(p => path(p) && (p === value.sourcePath || p === value.completedPath || (Array.isArray(cleanup) && cleanup.some(e => object(e) && e.path === p)))) && new Set(value.pendingCleanupPaths).size === value.pendingCleanupPaths.length;
 }
 /** Unreadable safety state is retained byte-for-value for the single persistence owner. */
 export function loadCompletionRecords(data: unknown): LoadedCompletions {

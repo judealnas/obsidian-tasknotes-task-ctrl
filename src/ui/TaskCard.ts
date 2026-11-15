@@ -80,6 +80,8 @@ export class TaskCard extends Component {
  private disposed = false;
  private completionReady = false;
  private availabilityGeneration = 0;
+ private availabilityKey: string | null = null;
+ private availabilityResult: { available: boolean; reason: string } | null = null;
  private stopping = new Set<string>();
  private titleOwners = new Set<Component>();
  private get app(): App { return this.options.app; }
@@ -108,13 +110,19 @@ export class TaskCard extends Component {
   card.complete.disabled = busy || !completionReady || !!timer.stagedCard || timer.state === "idle";
   setTooltip(card.complete, timer.stagedCard ? "Staged task completion will be available in a later update" : busy ? "A timer action is in progress" : completionReady ? "Complete this task and stop its timer" : "No completed status is available from TaskNotes");
   if (this.options.completion) {
-   const generation = ++this.availabilityGeneration;
-   card.complete.disabled = true;
-   void this.options.completion.availability({ sourcePath: timer.taskPath, title: timer.title }).then(result => {
-    if (this.disposed || generation !== this.availabilityGeneration) return;
-    card.complete.disabled = this.isBusy() || !result.available;
-    setTooltip(card.complete, this.isBusy() ? "A task action is in progress" : result.reason);
-   });
+   const key = [timer.taskPath, timer.displayKey, timer.state, completionReady, busy].join("\0");
+   if (key !== this.availabilityKey) {
+    this.availabilityKey = key; this.availabilityResult = null;
+    const generation = ++this.availabilityGeneration;
+    if (!busy) void this.options.completion.availability({ sourcePath: timer.taskPath, title: timer.title }).then(result => {
+     if (this.disposed || generation !== this.availabilityGeneration) return;
+     this.availabilityResult = result;
+     card.complete.disabled = this.isBusy() || !result.available;
+     setTooltip(card.complete, this.isBusy() ? "A task action is in progress" : result.reason);
+    });
+   }
+   card.complete.disabled = busy || !this.availabilityResult?.available;
+   setTooltip(card.complete, busy ? "A task action is in progress" : this.availabilityResult?.reason ?? "Checking completion availability");
   }
   if (!this.stopping.has(cardKey(timer))) {
    card.stop.disabled = busy;

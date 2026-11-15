@@ -25,3 +25,10 @@ test("returned records cannot mutate protection and initialized empty history re
  const store = new CompletionStore({ persist: () => Promise.resolve() }); store.load({ completionRecordsVersion: 1, completionRecords: [] });
  expect(store.serialize()).toEqual({ completionRecordsVersion: 1, completionRecords: [] });
 });
+test("confirmed recurring replay protection is never evicted at capacity", async () => {
+ const store = new CompletionStore({ persist: () => Promise.resolve(), capacity: 1 }); store.load({});
+ await store.saveRecord({ ...record, phase: "confirmed", completedPath: record.sourcePath, completedAt: 123, replayProtected: true });
+ expect(store.available()).toBe(false);
+ await expect(store.saveRecord({ ...record, attemptId: "two", sourcePath: "b.md" })).rejects.toThrow();
+ expect(store.records()[0]?.attemptId).toBe("one");
+});

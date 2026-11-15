@@ -42,6 +42,10 @@ The roadmap requires recurring-completion research before planning. Run `$gsd-pl
 - **D-16:** Derive staged age from the actual staging dates, so it reflects all elapsed days after sleep across multiple staging days.
 
 ### the agent's Discretion
+### Execution decision (2026-11-14)
+- **D-17:** For off-schedule recurring completion, follow TaskNotes' resolved occurrence, with durable protection against repeated completion. Keep the requested staging day, resolved occurrence date and actual note path distinct. User selected this after the native probe showed virtual/materialized differences.
+
+### the agent's Discretion
 No explicit “you decide” choices were made. The planner may choose implementation structure and concise screen-reader announcement wording while preserving these decisions and existing UI conventions.
 
 </decisions>
