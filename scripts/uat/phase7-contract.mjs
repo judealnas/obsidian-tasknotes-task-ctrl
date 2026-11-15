@@ -8,6 +8,7 @@ const cdp = fileURLToPath(new URL("./cdp.mjs", import.meta.url));
 const expression = String.raw`(async () => {
  const api = app.plugins.getPlugin("tasknotes").api;
  await api.lifecycle.ready();
+ if (${process.argv.includes("--auto-stop-off")} && api.settings.snapshot().autoStopTimeTrackingOnComplete !== false) throw new Error("--auto-stop-off requires autoStopTimeTrackingOnComplete=false; the flag does not change TaskNotes settings");
  const run = "P7-contract-" + Date.now();
  const ctx = { source: "timer-pane-phase7-contract", reason: "disposable native fixture probe", correlationId: run };
  const result = { run, at: new Date().toISOString(), version: app.plugins.getPlugin("tasknotes").manifest.version, apiVersion: api.apiVersion,

@@ -1,0 +1,3360 @@
+{
+  "run": "P7-contract-1794725143104",
+  "at": "2026-11-15T06:45:43.104Z",
+  "version": "4.18.2",
+  "apiVersion": 1,
+  "capabilities": [
+    "model.read",
+    "model.validate",
+    "catalog.read",
+    "extensions.read",
+    "extensions.register",
+    "tasks.read",
+    "tasks.write",
+    "tasks.delete",
+    "tasks.move",
+    "tasks.events",
+    "relationships.read",
+    "events.list",
+    "time.read",
+    "time.write",
+    "time.summary",
+    "pomodoro.read",
+    "pomodoro.write",
+    "pomodoro.events",
+    "recurring.write",
+    "recurring.materialize",
+    "recurring.events",
+    "settings.snapshot",
+    "bases.write",
+    "nlp.parse",
+    "ui.task-menu",
+    "query.tasks",
+    "query.validate",
+    "query.explain",
+    "query.filter-options",
+    "stats.tasks",
+    "system.health",
+    "lifecycle.events",
+    "errors.typed"
+  ],
+  "recurringMethods": [
+    "toggleCompleteInstance",
+    "toggleSkippedInstance",
+    "materializeOccurrence"
+  ],
+  "cases": [
+    {
+      "name": "virtual-exact-and-repeat",
+      "requestedDate": "2026-11-09",
+      "before": {
+        "task": {
+          "path": "TaskNotes/Tasks/P7-contract-1794725143104-exact.md",
+          "title": "P7-contract-1794725143104-exact",
+          "status": "open",
+          "priority": "normal",
+          "scheduled": "2026-11-09",
+          "recurrence": "DTSTART:20261109;FREQ=WEEKLY;BYDAY=MO",
+          "dateCreated": "2026-11-15T01:45:43.104-05:00",
+          "dateModified": "2026-11-15T01:45:43.183-05:00",
+          "tags": [
+            "task"
+          ],
+          "archived": false,
+          "staged": "2026-11-14",
+          "customProperties": {
+            "staged": "2026-11-14"
+          },
+          "id": "TaskNotes/Tasks/P7-contract-1794725143104-exact.md",
+          "contexts": [],
+          "projects": [],
+          "totalTrackedTime": 0,
+          "isBlocked": false,
+          "isBlocking": false
+        },
+        "raw": "---\nstatus: open\npriority: normal\nscheduled: 2026-11-09\nrecurrence: DTSTART:20261109;FREQ=WEEKLY;BYDAY=MO\ndateCreated: 2026-11-15T01:45:43.104-05:00\ndateModified: 2026-11-15T01:45:43.183-05:00\ntags:\n  - task\nstaged: 2026-11-14\n---\n\n"
+      },
+      "returned": {
+        "path": "TaskNotes/Tasks/P7-contract-1794725143104-exact.md",
+        "title": "P7-contract-1794725143104-exact",
+        "status": "open",
+        "priority": "normal",
+        "scheduled": "2026-11-16",
+        "recurrence": "DTSTART:20261109;FREQ=WEEKLY;BYDAY=MO",
+        "dateCreated": "2026-11-15T01:45:43.104-05:00",
+        "dateModified": "2026-11-15T01:45:43.465-05:00",
+        "tags": [
+          "task"
+        ],
+        "archived": false,
+        "staged": "2026-11-14",
+        "customProperties": {
+          "staged": "2026-11-14"
+        },
+        "id": "TaskNotes/Tasks/P7-contract-1794725143104-exact.md",
+        "contexts": [],
+        "projects": [],
+        "totalTrackedTime": 0,
+        "isBlocked": false,
+        "isBlocking": false,
+        "complete_instances": [
+          "2026-11-09"
+        ],
+        "skipped_instances": []
+      },
+      "after": {
+        "task": {
+          "path": "TaskNotes/Tasks/P7-contract-1794725143104-exact.md",
+          "title": "P7-contract-1794725143104-exact",
+          "status": "open",
+          "priority": "normal",
+          "scheduled": "2026-11-16",
+          "recurrence": "DTSTART:20261109;FREQ=WEEKLY;BYDAY=MO",
+          "dateCreated": "2026-11-15T01:45:43.104-05:00",
+          "dateModified": "2026-11-15T01:45:43.465-05:00",
+          "tags": [
+            "task"
+          ],
+          "archived": false,
+          "staged": "2026-11-14",
+          "customProperties": {
+            "staged": "2026-11-14"
+          },
+          "id": "TaskNotes/Tasks/P7-contract-1794725143104-exact.md",
+          "contexts": [],
+          "projects": [],
+          "totalTrackedTime": 0,
+          "isBlocked": false,
+          "isBlocking": false,
+          "complete_instances": [
+            "2026-11-09"
+          ],
+          "skipped_instances": []
+        },
+        "raw": "---\nstatus: open\npriority: normal\nscheduled: 2026-11-16\nrecurrence: DTSTART:20261109;FREQ=WEEKLY;BYDAY=MO\ndateCreated: 2026-11-15T01:45:43.104-05:00\ndateModified: 2026-11-15T01:45:43.465-05:00\ntags:\n  - task\nstaged: 2026-11-14\ncomplete_instances:\n  - 2026-11-09\nskipped_instances: []\n---\n\n"
+      },
+      "repeatedReturn": {
+        "path": "TaskNotes/Tasks/P7-contract-1794725143104-exact.md",
+        "title": "P7-contract-1794725143104-exact",
+        "status": "open",
+        "priority": "normal",
+        "scheduled": "2026-11-16",
+        "recurrence": "DTSTART:20261109;FREQ=WEEKLY;BYDAY=MO",
+        "dateCreated": "2026-11-15T01:45:43.104-05:00",
+        "dateModified": "2026-11-15T01:45:43.478-05:00",
+        "complete_instances": [],
+        "skipped_instances": [],
+        "tags": [
+          "task"
+        ],
+        "archived": false,
+        "staged": "2026-11-14",
+        "customProperties": {
+          "staged": "2026-11-14"
+        },
+        "id": "TaskNotes/Tasks/P7-contract-1794725143104-exact.md",
+        "contexts": [],
+        "projects": [],
+        "totalTrackedTime": 0,
+        "isBlocked": false,
+        "isBlocking": false
+      },
+      "afterRepeat": {
+        "task": {
+          "path": "TaskNotes/Tasks/P7-contract-1794725143104-exact.md",
+          "title": "P7-contract-1794725143104-exact",
+          "status": "open",
+          "priority": "normal",
+          "scheduled": "2026-11-16",
+          "recurrence": "DTSTART:20261109;FREQ=WEEKLY;BYDAY=MO",
+          "dateCreated": "2026-11-15T01:45:43.104-05:00",
+          "dateModified": "2026-11-15T01:45:43.478-05:00",
+          "complete_instances": [],
+          "skipped_instances": [],
+          "tags": [
+            "task"
+          ],
+          "archived": false,
+          "staged": "2026-11-14",
+          "customProperties": {
+            "staged": "2026-11-14"
+          },
+          "id": "TaskNotes/Tasks/P7-contract-1794725143104-exact.md",
+          "contexts": [],
+          "projects": [],
+          "totalTrackedTime": 0,
+          "isBlocked": false,
+          "isBlocking": false
+        },
+        "raw": "---\nstatus: open\npriority: normal\nscheduled: 2026-11-16\nrecurrence: DTSTART:20261109;FREQ=WEEKLY;BYDAY=MO\ndateCreated: 2026-11-15T01:45:43.104-05:00\ndateModified: 2026-11-15T01:45:43.478-05:00\ntags:\n  - task\nstaged: 2026-11-14\ncomplete_instances: []\nskipped_instances: []\n---\n\n"
+      }
+    },
+    {
+      "name": "virtual-off-schedule-and-repeat",
+      "requestedDate": "2026-11-14",
+      "before": {
+        "task": {
+          "path": "TaskNotes/Tasks/P7-contract-1794725143104-off-schedule.md",
+          "title": "P7-contract-1794725143104-off-schedule",
+          "status": "open",
+          "priority": "normal",
+          "scheduled": "2026-11-09",
+          "recurrence": "DTSTART:20261109;FREQ=WEEKLY;BYDAY=MO",
+          "dateCreated": "2026-11-15T01:45:43.489-05:00",
+          "dateModified": "2026-11-15T01:45:43.548-05:00",
+          "tags": [
+            "task"
+          ],
+          "archived": false,
+          "staged": "2026-11-14",
+          "customProperties": {
+            "staged": "2026-11-14"
+          },
+          "id": "TaskNotes/Tasks/P7-contract-1794725143104-off-schedule.md",
+          "contexts": [],
+          "projects": [],
+          "totalTrackedTime": 0,
+          "isBlocked": false,
+          "isBlocking": false
+        },
+        "raw": "---\nstatus: open\npriority: normal\nscheduled: 2026-11-09\nrecurrence: DTSTART:20261109;FREQ=WEEKLY;BYDAY=MO\ndateCreated: 2026-11-15T01:45:43.489-05:00\ndateModified: 2026-11-15T01:45:43.548-05:00\ntags:\n  - task\nstaged: 2026-11-14\n---\n\n"
+      },
+      "returned": {
+        "path": "TaskNotes/Tasks/P7-contract-1794725143104-off-schedule.md",
+        "title": "P7-contract-1794725143104-off-schedule",
+        "status": "open",
+        "priority": "normal",
+        "scheduled": "2026-11-16",
+        "recurrence": "DTSTART:20261109;FREQ=WEEKLY;BYDAY=MO",
+        "dateCreated": "2026-11-15T01:45:43.489-05:00",
+        "dateModified": "2026-11-15T01:45:43.827-05:00",
+        "tags": [
+          "task"
+        ],
+        "archived": false,
+        "staged": "2026-11-14",
+        "customProperties": {
+          "staged": "2026-11-14"
+        },
+        "id": "TaskNotes/Tasks/P7-contract-1794725143104-off-schedule.md",
+        "contexts": [],
+        "projects": [],
+        "totalTrackedTime": 0,
+        "isBlocked": false,
+        "isBlocking": false,
+        "complete_instances": [
+          "2026-11-09"
+        ],
+        "skipped_instances": []
+      },
+      "after": {
+        "task": {
+          "path": "TaskNotes/Tasks/P7-contract-1794725143104-off-schedule.md",
+          "title": "P7-contract-1794725143104-off-schedule",
+          "status": "open",
+          "priority": "normal",
+          "scheduled": "2026-11-16",
+          "recurrence": "DTSTART:20261109;FREQ=WEEKLY;BYDAY=MO",
+          "dateCreated": "2026-11-15T01:45:43.489-05:00",
+          "dateModified": "2026-11-15T01:45:43.827-05:00",
+          "tags": [
+            "task"
+          ],
+          "archived": false,
+          "staged": "2026-11-14",
+          "customProperties": {
+            "staged": "2026-11-14"
+          },
+          "id": "TaskNotes/Tasks/P7-contract-1794725143104-off-schedule.md",
+          "contexts": [],
+          "projects": [],
+          "totalTrackedTime": 0,
+          "isBlocked": false,
+          "isBlocking": false,
+          "complete_instances": [
+            "2026-11-09"
+          ],
+          "skipped_instances": []
+        },
+        "raw": "---\nstatus: open\npriority: normal\nscheduled: 2026-11-16\nrecurrence: DTSTART:20261109;FREQ=WEEKLY;BYDAY=MO\ndateCreated: 2026-11-15T01:45:43.489-05:00\ndateModified: 2026-11-15T01:45:43.827-05:00\ntags:\n  - task\nstaged: 2026-11-14\ncomplete_instances:\n  - 2026-11-09\nskipped_instances: []\n---\n\n"
+      },
+      "repeatedReturn": {
+        "path": "TaskNotes/Tasks/P7-contract-1794725143104-off-schedule.md",
+        "title": "P7-contract-1794725143104-off-schedule",
+        "status": "open",
+        "priority": "normal",
+        "scheduled": "2026-11-23",
+        "recurrence": "DTSTART:20261109;FREQ=WEEKLY;BYDAY=MO",
+        "dateCreated": "2026-11-15T01:45:43.489-05:00",
+        "dateModified": "2026-11-15T01:45:43.839-05:00",
+        "complete_instances": [
+          "2026-11-09",
+          "2026-11-16"
+        ],
+        "skipped_instances": [],
+        "tags": [
+          "task"
+        ],
+        "archived": false,
+        "staged": "2026-11-14",
+        "customProperties": {
+          "staged": "2026-11-14"
+        },
+        "id": "TaskNotes/Tasks/P7-contract-1794725143104-off-schedule.md",
+        "contexts": [],
+        "projects": [],
+        "totalTrackedTime": 0,
+        "isBlocked": false,
+        "isBlocking": false
+      },
+      "afterRepeat": {
+        "task": {
+          "path": "TaskNotes/Tasks/P7-contract-1794725143104-off-schedule.md",
+          "title": "P7-contract-1794725143104-off-schedule",
+          "status": "open",
+          "priority": "normal",
+          "scheduled": "2026-11-23",
+          "recurrence": "DTSTART:20261109;FREQ=WEEKLY;BYDAY=MO",
+          "dateCreated": "2026-11-15T01:45:43.489-05:00",
+          "dateModified": "2026-11-15T01:45:43.839-05:00",
+          "complete_instances": [
+            "2026-11-09",
+            "2026-11-16"
+          ],
+          "skipped_instances": [],
+          "tags": [
+            "task"
+          ],
+          "archived": false,
+          "staged": "2026-11-14",
+          "customProperties": {
+            "staged": "2026-11-14"
+          },
+          "id": "TaskNotes/Tasks/P7-contract-1794725143104-off-schedule.md",
+          "contexts": [],
+          "projects": [],
+          "totalTrackedTime": 0,
+          "isBlocked": false,
+          "isBlocking": false
+        },
+        "raw": "---\nstatus: open\npriority: normal\nscheduled: 2026-11-23\nrecurrence: DTSTART:20261109;FREQ=WEEKLY;BYDAY=MO\ndateCreated: 2026-11-15T01:45:43.489-05:00\ndateModified: 2026-11-15T01:45:43.839-05:00\ntags:\n  - task\nstaged: 2026-11-14\ncomplete_instances:\n  - 2026-11-09\n  - 2026-11-16\nskipped_instances: []\n---\n\n"
+      }
+    },
+    {
+      "name": "completion-anchor",
+      "before": {
+        "task": {
+          "path": "TaskNotes/Tasks/P7-contract-1794725143104-completion-anchor.md",
+          "title": "P7-contract-1794725143104-completion-anchor",
+          "status": "open",
+          "priority": "normal",
+          "scheduled": "2026-11-09",
+          "recurrence": "DTSTART:20261109;FREQ=DAILY;INTERVAL=2",
+          "recurrence_anchor": "completion",
+          "dateCreated": "2026-11-15T01:45:43.871-05:00",
+          "dateModified": "2026-11-15T01:45:43.938-05:00",
+          "tags": [
+            "task"
+          ],
+          "archived": false,
+          "staged": "2026-11-14",
+          "customProperties": {
+            "staged": "2026-11-14"
+          },
+          "id": "TaskNotes/Tasks/P7-contract-1794725143104-completion-anchor.md",
+          "contexts": [],
+          "projects": [],
+          "totalTrackedTime": 0,
+          "isBlocked": false,
+          "isBlocking": false
+        },
+        "raw": "---\nstatus: open\npriority: normal\nscheduled: 2026-11-09\nrecurrence: DTSTART:20261109;FREQ=DAILY;INTERVAL=2\nrecurrence_anchor: completion\ndateCreated: 2026-11-15T01:45:43.871-05:00\ndateModified: 2026-11-15T01:45:43.938-05:00\ntags:\n  - task\nstaged: 2026-11-14\n---\n\n"
+      },
+      "returned": {
+        "path": "TaskNotes/Tasks/P7-contract-1794725143104-completion-anchor.md",
+        "title": "P7-contract-1794725143104-completion-anchor",
+        "status": "open",
+        "priority": "normal",
+        "scheduled": "2026-11-16",
+        "recurrence": "DTSTART:20261114;FREQ=DAILY;INTERVAL=2",
+        "recurrence_anchor": "completion",
+        "dateCreated": "2026-11-15T01:45:43.871-05:00",
+        "dateModified": "2026-11-15T01:45:44.267-05:00",
+        "tags": [
+          "task"
+        ],
+        "archived": false,
+        "staged": "2026-11-14",
+        "customProperties": {
+          "staged": "2026-11-14"
+        },
+        "id": "TaskNotes/Tasks/P7-contract-1794725143104-completion-anchor.md",
+        "contexts": [],
+        "projects": [],
+        "totalTrackedTime": 0,
+        "isBlocked": false,
+        "isBlocking": false,
+        "complete_instances": [
+          "2026-11-14"
+        ],
+        "skipped_instances": []
+      },
+      "after": {
+        "task": {
+          "path": "TaskNotes/Tasks/P7-contract-1794725143104-completion-anchor.md",
+          "title": "P7-contract-1794725143104-completion-anchor",
+          "status": "open",
+          "priority": "normal",
+          "scheduled": "2026-11-16",
+          "recurrence": "DTSTART:20261114;FREQ=DAILY;INTERVAL=2",
+          "recurrence_anchor": "completion",
+          "dateCreated": "2026-11-15T01:45:43.871-05:00",
+          "dateModified": "2026-11-15T01:45:44.267-05:00",
+          "tags": [
+            "task"
+          ],
+          "archived": false,
+          "staged": "2026-11-14",
+          "customProperties": {
+            "staged": "2026-11-14"
+          },
+          "id": "TaskNotes/Tasks/P7-contract-1794725143104-completion-anchor.md",
+          "contexts": [],
+          "projects": [],
+          "totalTrackedTime": 0,
+          "isBlocked": false,
+          "isBlocking": false,
+          "complete_instances": [
+            "2026-11-14"
+          ],
+          "skipped_instances": []
+        },
+        "raw": "---\nstatus: open\npriority: normal\nscheduled: 2026-11-16\nrecurrence: DTSTART:20261114;FREQ=DAILY;INTERVAL=2\nrecurrence_anchor: completion\ndateCreated: 2026-11-15T01:45:43.871-05:00\ndateModified: 2026-11-15T01:45:44.267-05:00\ntags:\n  - task\nstaged: 2026-11-14\ncomplete_instances:\n  - 2026-11-14\nskipped_instances: []\n---\n\n"
+      }
+    },
+    {
+      "name": "existing-materialized-undone-and-done",
+      "materialized": {
+        "title": "P7-contract-1794725143104-existing",
+        "status": "open",
+        "priority": "normal",
+        "scheduled": "2026-11-09",
+        "dateCreated": "2026-11-15T01:45:44.604-05:00",
+        "dateModified": "2026-11-15T01:45:44.604-05:00",
+        "recurrence_parent": "[[TaskNotes/Tasks/P7-contract-1794725143104-existing]]",
+        "occurrence_date": "2026-11-09",
+        "customProperties": {
+          "staged": "2026-11-14"
+        },
+        "tags": [
+          "task"
+        ],
+        "staged": "2026-11-14",
+        "path": "TaskNotes/Tasks/P7-contract-1794725143104-existing-2.md",
+        "archived": false,
+        "details": ""
+      },
+      "before": {
+        "parent": {
+          "task": {
+            "path": "TaskNotes/Tasks/P7-contract-1794725143104-existing.md",
+            "title": "P7-contract-1794725143104-existing",
+            "status": "open",
+            "priority": "normal",
+            "scheduled": "2026-11-09",
+            "recurrence": "DTSTART:20261109;FREQ=WEEKLY;BYDAY=MO",
+            "dateCreated": "2026-11-15T01:45:44.279-05:00",
+            "dateModified": "2026-11-15T01:45:44.346-05:00",
+            "occurrence_materialization": "manual",
+            "tags": [
+              "task"
+            ],
+            "archived": false,
+            "staged": "2026-11-14",
+            "customProperties": {
+              "staged": "2026-11-14"
+            },
+            "id": "TaskNotes/Tasks/P7-contract-1794725143104-existing.md",
+            "contexts": [],
+            "projects": [],
+            "totalTrackedTime": 0,
+            "isBlocked": false,
+            "isBlocking": false
+          },
+          "raw": "---\nstatus: open\npriority: normal\nscheduled: 2026-11-09\nrecurrence: DTSTART:20261109;FREQ=WEEKLY;BYDAY=MO\noccurrence_materialization: manual\ndateCreated: 2026-11-15T01:45:44.279-05:00\ndateModified: 2026-11-15T01:45:44.346-05:00\ntags:\n  - task\nstaged: 2026-11-14\n---\n\n"
+        },
+        "occurrence": {
+          "task": {
+            "path": "TaskNotes/Tasks/P7-contract-1794725143104-existing-2.md",
+            "title": "P7-contract-1794725143104-existing",
+            "status": "open",
+            "priority": "normal",
+            "scheduled": "2026-11-09",
+            "dateCreated": "2026-11-15T01:45:44.604-05:00",
+            "dateModified": "2026-11-15T01:45:44.604-05:00",
+            "recurrence_parent": "[[TaskNotes/Tasks/P7-contract-1794725143104-existing]]",
+            "occurrence_date": "2026-11-09",
+            "tags": [
+              "task"
+            ],
+            "archived": false,
+            "staged": "2026-11-14",
+            "customProperties": {
+              "staged": "2026-11-14"
+            },
+            "id": "TaskNotes/Tasks/P7-contract-1794725143104-existing-2.md",
+            "contexts": [],
+            "projects": [],
+            "totalTrackedTime": 0,
+            "isBlocked": false,
+            "isBlocking": false
+          },
+          "raw": "---\ntitle: P7-contract-1794725143104-existing\nstatus: open\npriority: normal\nscheduled: 2026-11-09\nrecurrence_parent: \"[[TaskNotes/Tasks/P7-contract-1794725143104-existing]]\"\noccurrence_date: 2026-11-09\ndateCreated: 2026-11-15T01:45:44.604-05:00\ndateModified: 2026-11-15T01:45:44.604-05:00\ntags:\n  - task\nstaged: 2026-11-14\n---\n\n"
+        }
+      },
+      "returned": {
+        "path": "TaskNotes/Tasks/P7-contract-1794725143104-existing-2.md",
+        "title": "P7-contract-1794725143104-existing",
+        "status": "done",
+        "priority": "normal",
+        "scheduled": "2026-11-09",
+        "dateCreated": "2026-11-15T01:45:44.604-05:00",
+        "dateModified": "2026-11-15T01:45:45.055-05:00",
+        "recurrence_parent": "[[TaskNotes/Tasks/P7-contract-1794725143104-existing]]",
+        "occurrence_date": "2026-11-09",
+        "tags": [
+          "task"
+        ],
+        "archived": false,
+        "staged": "2026-11-14",
+        "customProperties": {
+          "staged": "2026-11-14"
+        },
+        "id": "TaskNotes/Tasks/P7-contract-1794725143104-existing-2.md",
+        "contexts": [],
+        "projects": [],
+        "totalTrackedTime": 0,
+        "isBlocked": false,
+        "isBlocking": false,
+        "completedDate": "2026-11-15"
+      },
+      "after": {
+        "parent": {
+          "task": {
+            "path": "TaskNotes/Tasks/P7-contract-1794725143104-existing.md",
+            "title": "P7-contract-1794725143104-existing",
+            "status": "open",
+            "priority": "normal",
+            "scheduled": "2026-11-16",
+            "recurrence": "DTSTART:20261109;FREQ=WEEKLY;BYDAY=MO",
+            "dateCreated": "2026-11-15T01:45:44.279-05:00",
+            "dateModified": "2026-11-15T01:45:45.066-05:00",
+            "complete_instances": [
+              "2026-11-09"
+            ],
+            "occurrence_materialization": "manual",
+            "tags": [
+              "task"
+            ],
+            "archived": false,
+            "staged": "2026-11-14",
+            "customProperties": {
+              "staged": "2026-11-14"
+            },
+            "id": "TaskNotes/Tasks/P7-contract-1794725143104-existing.md",
+            "contexts": [],
+            "projects": [],
+            "totalTrackedTime": 0,
+            "isBlocked": false,
+            "isBlocking": false
+          },
+          "raw": "---\nstatus: open\npriority: normal\nscheduled: 2026-11-16\nrecurrence: DTSTART:20261109;FREQ=WEEKLY;BYDAY=MO\noccurrence_materialization: manual\ndateCreated: 2026-11-15T01:45:44.279-05:00\ndateModified: 2026-11-15T01:45:45.066-05:00\ntags:\n  - task\nstaged: 2026-11-14\ncomplete_instances:\n  - 2026-11-09\n---\n\n"
+        },
+        "occurrence": {
+          "task": {
+            "path": "TaskNotes/Tasks/P7-contract-1794725143104-existing-2.md",
+            "title": "P7-contract-1794725143104-existing",
+            "status": "done",
+            "priority": "normal",
+            "scheduled": "2026-11-09",
+            "completedDate": "2026-11-15",
+            "dateCreated": "2026-11-15T01:45:44.604-05:00",
+            "dateModified": "2026-11-15T01:45:45.055-05:00",
+            "recurrence_parent": "[[TaskNotes/Tasks/P7-contract-1794725143104-existing]]",
+            "occurrence_date": "2026-11-09",
+            "tags": [
+              "task"
+            ],
+            "archived": false,
+            "staged": "2026-11-14",
+            "customProperties": {
+              "staged": "2026-11-14"
+            },
+            "id": "TaskNotes/Tasks/P7-contract-1794725143104-existing-2.md",
+            "contexts": [],
+            "projects": [],
+            "totalTrackedTime": 0,
+            "isBlocked": false,
+            "isBlocking": false
+          },
+          "raw": "---\ntitle: P7-contract-1794725143104-existing\nstatus: done\npriority: normal\nscheduled: 2026-11-09\nrecurrence_parent: \"[[TaskNotes/Tasks/P7-contract-1794725143104-existing]]\"\noccurrence_date: 2026-11-09\ndateCreated: 2026-11-15T01:45:44.604-05:00\ndateModified: 2026-11-15T01:45:45.055-05:00\ntags:\n  - task\nstaged: 2026-11-14\ncompletedDate: 2026-11-15\n---\n\n"
+        }
+      },
+      "repeatedReturn": {
+        "path": "TaskNotes/Tasks/P7-contract-1794725143104-existing-2.md",
+        "title": "P7-contract-1794725143104-existing",
+        "status": "open",
+        "priority": "normal",
+        "scheduled": "2026-11-09",
+        "dateCreated": "2026-11-15T01:45:44.604-05:00",
+        "dateModified": "2026-11-15T01:45:45.328-05:00",
+        "recurrence_parent": "[[TaskNotes/Tasks/P7-contract-1794725143104-existing]]",
+        "occurrence_date": "2026-11-09",
+        "tags": [
+          "task"
+        ],
+        "archived": false,
+        "staged": "2026-11-14",
+        "customProperties": {
+          "staged": "2026-11-14"
+        },
+        "id": "TaskNotes/Tasks/P7-contract-1794725143104-existing-2.md",
+        "contexts": [],
+        "projects": [],
+        "totalTrackedTime": 0,
+        "isBlocked": false,
+        "isBlocking": false
+      },
+      "afterRepeat": {
+        "parent": {
+          "task": {
+            "path": "TaskNotes/Tasks/P7-contract-1794725143104-existing.md",
+            "title": "P7-contract-1794725143104-existing",
+            "status": "open",
+            "priority": "normal",
+            "scheduled": "2026-11-16",
+            "recurrence": "DTSTART:20261109;FREQ=WEEKLY;BYDAY=MO",
+            "dateCreated": "2026-11-15T01:45:44.279-05:00",
+            "dateModified": "2026-11-15T01:45:45.341-05:00",
+            "complete_instances": [],
+            "occurrence_materialization": "manual",
+            "tags": [
+              "task"
+            ],
+            "archived": false,
+            "staged": "2026-11-14",
+            "customProperties": {
+              "staged": "2026-11-14"
+            },
+            "id": "TaskNotes/Tasks/P7-contract-1794725143104-existing.md",
+            "contexts": [],
+            "projects": [],
+            "totalTrackedTime": 0,
+            "isBlocked": false,
+            "isBlocking": false
+          },
+          "raw": "---\nstatus: open\npriority: normal\nscheduled: 2026-11-16\nrecurrence: DTSTART:20261109;FREQ=WEEKLY;BYDAY=MO\noccurrence_materialization: manual\ndateCreated: 2026-11-15T01:45:44.279-05:00\ndateModified: 2026-11-15T01:45:45.341-05:00\ntags:\n  - task\nstaged: 2026-11-14\n---\n\n"
+        },
+        "occurrence": {
+          "task": {
+            "path": "TaskNotes/Tasks/P7-contract-1794725143104-existing-2.md",
+            "title": "P7-contract-1794725143104-existing",
+            "status": "open",
+            "priority": "normal",
+            "scheduled": "2026-11-09",
+            "dateCreated": "2026-11-15T01:45:44.604-05:00",
+            "dateModified": "2026-11-15T01:45:45.328-05:00",
+            "recurrence_parent": "[[TaskNotes/Tasks/P7-contract-1794725143104-existing]]",
+            "occurrence_date": "2026-11-09",
+            "tags": [
+              "task"
+            ],
+            "archived": false,
+            "staged": "2026-11-14",
+            "customProperties": {
+              "staged": "2026-11-14"
+            },
+            "id": "TaskNotes/Tasks/P7-contract-1794725143104-existing-2.md",
+            "contexts": [],
+            "projects": [],
+            "totalTrackedTime": 0,
+            "isBlocked": false,
+            "isBlocking": false
+          },
+          "raw": "---\ntitle: P7-contract-1794725143104-existing\nstatus: open\npriority: normal\nscheduled: 2026-11-09\nrecurrence_parent: \"[[TaskNotes/Tasks/P7-contract-1794725143104-existing]]\"\noccurrence_date: 2026-11-09\ndateCreated: 2026-11-15T01:45:44.604-05:00\ndateModified: 2026-11-15T01:45:45.328-05:00\ntags:\n  - task\nstaged: 2026-11-14\n---\n\n"
+        }
+      }
+    },
+    {
+      "name": "automatic-materialization-new-next",
+      "before": {
+        "task": {
+          "path": "TaskNotes/Tasks/P7-contract-1794725143104-auto.md",
+          "title": "P7-contract-1794725143104-auto",
+          "status": "open",
+          "priority": "normal",
+          "scheduled": "2026-11-09",
+          "recurrence": "DTSTART:20261109;FREQ=WEEKLY;BYDAY=MO",
+          "dateCreated": "2026-11-15T01:45:45.355-05:00",
+          "dateModified": "2026-11-15T01:45:45.496-05:00",
+          "occurrence_materialization": "on_completion",
+          "tags": [
+            "task"
+          ],
+          "archived": false,
+          "staged": "2026-11-14",
+          "customProperties": {
+            "staged": "2026-11-14"
+          },
+          "id": "TaskNotes/Tasks/P7-contract-1794725143104-auto.md",
+          "contexts": [],
+          "projects": [],
+          "totalTrackedTime": 0,
+          "isBlocked": false,
+          "isBlocking": false
+        },
+        "raw": "---\nstatus: open\npriority: normal\nscheduled: 2026-11-09\nrecurrence: DTSTART:20261109;FREQ=WEEKLY;BYDAY=MO\noccurrence_materialization: on_completion\ndateCreated: 2026-11-15T01:45:45.355-05:00\ndateModified: 2026-11-15T01:45:45.496-05:00\ntags:\n  - task\nstaged: 2026-11-14\n---\n\n"
+      },
+      "returned": {
+        "path": "TaskNotes/Tasks/P7-contract-1794725143104-auto-3.md",
+        "title": "P7-contract-1794725143104-auto",
+        "status": "done",
+        "priority": "normal",
+        "scheduled": "2026-11-14",
+        "dateCreated": "2026-11-15T01:45:45.764-05:00",
+        "dateModified": "2026-11-15T01:45:45.825-05:00",
+        "recurrence_parent": "[[TaskNotes/Tasks/P7-contract-1794725143104-auto]]",
+        "occurrence_date": "2026-11-14",
+        "tags": [
+          "task"
+        ],
+        "archived": false,
+        "staged": "2026-11-14",
+        "customProperties": {
+          "staged": "2026-11-14"
+        },
+        "id": "TaskNotes/Tasks/P7-contract-1794725143104-auto-3.md",
+        "contexts": [],
+        "projects": [],
+        "totalTrackedTime": 0,
+        "isBlocked": false,
+        "isBlocking": false,
+        "completedDate": "2026-11-15"
+      },
+      "after": {
+        "task": {
+          "path": "TaskNotes/Tasks/P7-contract-1794725143104-auto.md",
+          "title": "P7-contract-1794725143104-auto",
+          "status": "open",
+          "priority": "normal",
+          "scheduled": "2026-11-16",
+          "recurrence": "DTSTART:20261109;FREQ=WEEKLY;BYDAY=MO",
+          "dateCreated": "2026-11-15T01:45:45.355-05:00",
+          "dateModified": "2026-11-15T01:45:45.836-05:00",
+          "complete_instances": [
+            "2026-11-14"
+          ],
+          "occurrence_materialization": "on_completion",
+          "tags": [
+            "task"
+          ],
+          "archived": false,
+          "staged": "2026-11-14",
+          "customProperties": {
+            "staged": "2026-11-14"
+          },
+          "id": "TaskNotes/Tasks/P7-contract-1794725143104-auto.md",
+          "contexts": [],
+          "projects": [],
+          "totalTrackedTime": 0,
+          "isBlocked": false,
+          "isBlocking": false
+        },
+        "raw": "---\nstatus: open\npriority: normal\nscheduled: 2026-11-16\nrecurrence: DTSTART:20261109;FREQ=WEEKLY;BYDAY=MO\noccurrence_materialization: on_completion\ndateCreated: 2026-11-15T01:45:45.355-05:00\ndateModified: 2026-11-15T01:45:45.836-05:00\ntags:\n  - task\nstaged: 2026-11-14\ncomplete_instances:\n  - 2026-11-14\n---\n\n"
+      },
+      "created": [
+        {
+          "task": {
+            "path": "TaskNotes/Tasks/P7-contract-1794725143104-auto-3.md",
+            "title": "P7-contract-1794725143104-auto",
+            "status": "done",
+            "priority": "normal",
+            "scheduled": "2026-11-14",
+            "completedDate": "2026-11-15",
+            "dateCreated": "2026-11-15T01:45:45.764-05:00",
+            "dateModified": "2026-11-15T01:45:45.825-05:00",
+            "recurrence_parent": "[[TaskNotes/Tasks/P7-contract-1794725143104-auto]]",
+            "occurrence_date": "2026-11-14",
+            "tags": [
+              "task"
+            ],
+            "archived": false,
+            "staged": "2026-11-14",
+            "customProperties": {
+              "staged": "2026-11-14"
+            },
+            "id": "TaskNotes/Tasks/P7-contract-1794725143104-auto-3.md",
+            "contexts": [],
+            "projects": [],
+            "totalTrackedTime": 0,
+            "isBlocked": false,
+            "isBlocking": false
+          },
+          "raw": "---\ntitle: P7-contract-1794725143104-auto\nstatus: done\npriority: normal\nscheduled: 2026-11-14\nrecurrence_parent: \"[[TaskNotes/Tasks/P7-contract-1794725143104-auto]]\"\noccurrence_date: 2026-11-14\ndateCreated: 2026-11-15T01:45:45.764-05:00\ndateModified: 2026-11-15T01:45:45.825-05:00\ntags:\n  - task\nstaged: 2026-11-14\ncompletedDate: 2026-11-15\n---\n\n"
+        }
+      ]
+    },
+    {
+      "name": "automatic-materialization-existing-explicitly-staged-next",
+      "before": {
+        "parent": {
+          "task": {
+            "path": "TaskNotes/Tasks/P7-contract-1794725143104-existing-next.md",
+            "title": "P7-contract-1794725143104-existing-next",
+            "status": "open",
+            "priority": "normal",
+            "scheduled": "2026-11-09",
+            "recurrence": "DTSTART:20261109;FREQ=WEEKLY;BYDAY=MO",
+            "dateCreated": "2026-11-15T01:45:46.195-05:00",
+            "dateModified": "2026-11-15T01:45:46.318-05:00",
+            "occurrence_materialization": "on_completion",
+            "tags": [
+              "task"
+            ],
+            "archived": false,
+            "staged": "2026-11-14",
+            "customProperties": {
+              "staged": "2026-11-14"
+            },
+            "id": "TaskNotes/Tasks/P7-contract-1794725143104-existing-next.md",
+            "contexts": [],
+            "projects": [],
+            "totalTrackedTime": 0,
+            "isBlocked": false,
+            "isBlocking": false
+          },
+          "raw": "---\nstatus: open\npriority: normal\nscheduled: 2026-11-09\nrecurrence: DTSTART:20261109;FREQ=WEEKLY;BYDAY=MO\noccurrence_materialization: on_completion\ndateCreated: 2026-11-15T01:45:46.195-05:00\ndateModified: 2026-11-15T01:45:46.318-05:00\ntags:\n  - task\nstaged: 2026-11-14\n---\n\n"
+        },
+        "next": {
+          "task": {
+            "path": "TaskNotes/Tasks/P7-contract-1794725143104-existing-next-2.md",
+            "title": "P7-contract-1794725143104-existing-next",
+            "status": "open",
+            "priority": "normal",
+            "scheduled": "2026-11-16",
+            "dateCreated": "2026-11-15T01:45:46.257-05:00",
+            "dateModified": "2026-11-15T01:45:46.606-05:00",
+            "recurrence_parent": "[[TaskNotes/Tasks/P7-contract-1794725143104-existing-next]]",
+            "occurrence_date": "2026-11-16",
+            "tags": [
+              "task"
+            ],
+            "archived": false,
+            "staged": "2026-11-17",
+            "customProperties": {
+              "staged": "2026-11-17"
+            },
+            "id": "TaskNotes/Tasks/P7-contract-1794725143104-existing-next-2.md",
+            "contexts": [],
+            "projects": [],
+            "totalTrackedTime": 0,
+            "isBlocked": false,
+            "isBlocking": false
+          },
+          "raw": "---\ntitle: P7-contract-1794725143104-existing-next\nstatus: open\npriority: normal\nscheduled: 2026-11-16\nrecurrence_parent: \"[[TaskNotes/Tasks/P7-contract-1794725143104-existing-next]]\"\noccurrence_date: 2026-11-16\ndateCreated: 2026-11-15T01:45:46.257-05:00\ndateModified: 2026-11-15T01:45:46.606-05:00\ntags:\n  - task\nstaged: 2026-11-17\n---\n\n"
+        }
+      },
+      "returned": {
+        "path": "TaskNotes/Tasks/P7-contract-1794725143104-existing-next-3.md",
+        "title": "P7-contract-1794725143104-existing-next",
+        "status": "done",
+        "priority": "normal",
+        "scheduled": "2026-11-14",
+        "dateCreated": "2026-11-15T01:45:46.618-05:00",
+        "dateModified": "2026-11-15T01:45:46.681-05:00",
+        "recurrence_parent": "[[TaskNotes/Tasks/P7-contract-1794725143104-existing-next]]",
+        "occurrence_date": "2026-11-14",
+        "tags": [
+          "task"
+        ],
+        "archived": false,
+        "staged": "2026-11-14",
+        "customProperties": {
+          "staged": "2026-11-14"
+        },
+        "id": "TaskNotes/Tasks/P7-contract-1794725143104-existing-next-3.md",
+        "contexts": [],
+        "projects": [],
+        "totalTrackedTime": 0,
+        "isBlocked": false,
+        "isBlocking": false,
+        "completedDate": "2026-11-15"
+      },
+      "after": {
+        "parent": {
+          "task": {
+            "path": "TaskNotes/Tasks/P7-contract-1794725143104-existing-next.md",
+            "title": "P7-contract-1794725143104-existing-next",
+            "status": "open",
+            "priority": "normal",
+            "scheduled": "2026-11-16",
+            "recurrence": "DTSTART:20261109;FREQ=WEEKLY;BYDAY=MO",
+            "dateCreated": "2026-11-15T01:45:46.195-05:00",
+            "dateModified": "2026-11-15T01:45:46.695-05:00",
+            "complete_instances": [
+              "2026-11-14"
+            ],
+            "occurrence_materialization": "on_completion",
+            "tags": [
+              "task"
+            ],
+            "archived": false,
+            "staged": "2026-11-14",
+            "customProperties": {
+              "staged": "2026-11-14"
+            },
+            "id": "TaskNotes/Tasks/P7-contract-1794725143104-existing-next.md",
+            "contexts": [],
+            "projects": [],
+            "totalTrackedTime": 0,
+            "isBlocked": false,
+            "isBlocking": false
+          },
+          "raw": "---\nstatus: open\npriority: normal\nscheduled: 2026-11-16\nrecurrence: DTSTART:20261109;FREQ=WEEKLY;BYDAY=MO\noccurrence_materialization: on_completion\ndateCreated: 2026-11-15T01:45:46.195-05:00\ndateModified: 2026-11-15T01:45:46.695-05:00\ntags:\n  - task\nstaged: 2026-11-14\ncomplete_instances:\n  - 2026-11-14\n---\n\n"
+        },
+        "next": {
+          "task": {
+            "path": "TaskNotes/Tasks/P7-contract-1794725143104-existing-next-2.md",
+            "title": "P7-contract-1794725143104-existing-next",
+            "status": "open",
+            "priority": "normal",
+            "scheduled": "2026-11-16",
+            "dateCreated": "2026-11-15T01:45:46.257-05:00",
+            "dateModified": "2026-11-15T01:45:46.606-05:00",
+            "recurrence_parent": "[[TaskNotes/Tasks/P7-contract-1794725143104-existing-next]]",
+            "occurrence_date": "2026-11-16",
+            "tags": [
+              "task"
+            ],
+            "archived": false,
+            "staged": "2026-11-17",
+            "customProperties": {
+              "staged": "2026-11-17"
+            },
+            "id": "TaskNotes/Tasks/P7-contract-1794725143104-existing-next-2.md",
+            "contexts": [],
+            "projects": [],
+            "totalTrackedTime": 0,
+            "isBlocked": false,
+            "isBlocking": false
+          },
+          "raw": "---\ntitle: P7-contract-1794725143104-existing-next\nstatus: open\npriority: normal\nscheduled: 2026-11-16\nrecurrence_parent: \"[[TaskNotes/Tasks/P7-contract-1794725143104-existing-next]]\"\noccurrence_date: 2026-11-16\ndateCreated: 2026-11-15T01:45:46.257-05:00\ndateModified: 2026-11-15T01:45:46.606-05:00\ntags:\n  - task\nstaged: 2026-11-17\n---\n\n"
+        }
+      }
+    },
+    {
+      "name": "public-materialization-off-schedule-target",
+      "requestedDate": "2026-11-14",
+      "before": {
+        "task": {
+          "path": "TaskNotes/Tasks/P7-contract-1794725143104-off-schedule-materialize.md",
+          "title": "P7-contract-1794725143104-off-schedule-materialize",
+          "status": "open",
+          "priority": "normal",
+          "scheduled": "2026-11-09",
+          "recurrence": "DTSTART:20261109;FREQ=WEEKLY;BYDAY=MO",
+          "dateCreated": "2026-11-15T01:45:47.055-05:00",
+          "dateModified": "2026-11-15T01:45:47.117-05:00",
+          "occurrence_materialization": "manual",
+          "tags": [
+            "task"
+          ],
+          "archived": false,
+          "staged": "2026-11-14",
+          "customProperties": {
+            "staged": "2026-11-14"
+          },
+          "id": "TaskNotes/Tasks/P7-contract-1794725143104-off-schedule-materialize.md",
+          "contexts": [],
+          "projects": [],
+          "totalTrackedTime": 0,
+          "isBlocked": false,
+          "isBlocking": false
+        },
+        "raw": "---\nstatus: open\npriority: normal\nscheduled: 2026-11-09\nrecurrence: DTSTART:20261109;FREQ=WEEKLY;BYDAY=MO\noccurrence_materialization: manual\ndateCreated: 2026-11-15T01:45:47.055-05:00\ndateModified: 2026-11-15T01:45:47.117-05:00\ntags:\n  - task\nstaged: 2026-11-14\n---\n\n"
+      },
+      "returned": {
+        "title": "P7-contract-1794725143104-off-schedule-materialize",
+        "status": "open",
+        "priority": "normal",
+        "scheduled": "2026-11-14",
+        "dateCreated": "2026-11-15T01:45:47.400-05:00",
+        "dateModified": "2026-11-15T01:45:47.400-05:00",
+        "recurrence_parent": "[[TaskNotes/Tasks/P7-contract-1794725143104-off-schedule-materialize]]",
+        "occurrence_date": "2026-11-14",
+        "customProperties": {
+          "staged": "2026-11-14"
+        },
+        "tags": [
+          "task"
+        ],
+        "staged": "2026-11-14",
+        "path": "TaskNotes/Tasks/P7-contract-1794725143104-off-schedule-materialize-2.md",
+        "archived": false,
+        "details": ""
+      },
+      "after": {
+        "task": {
+          "path": "TaskNotes/Tasks/P7-contract-1794725143104-off-schedule-materialize.md",
+          "title": "P7-contract-1794725143104-off-schedule-materialize",
+          "status": "open",
+          "priority": "normal",
+          "scheduled": "2026-11-09",
+          "recurrence": "DTSTART:20261109;FREQ=WEEKLY;BYDAY=MO",
+          "dateCreated": "2026-11-15T01:45:47.055-05:00",
+          "dateModified": "2026-11-15T01:45:47.117-05:00",
+          "occurrence_materialization": "manual",
+          "tags": [
+            "task"
+          ],
+          "archived": false,
+          "staged": "2026-11-14",
+          "customProperties": {
+            "staged": "2026-11-14"
+          },
+          "id": "TaskNotes/Tasks/P7-contract-1794725143104-off-schedule-materialize.md",
+          "contexts": [],
+          "projects": [],
+          "totalTrackedTime": 0,
+          "isBlocked": false,
+          "isBlocking": false
+        },
+        "raw": "---\nstatus: open\npriority: normal\nscheduled: 2026-11-09\nrecurrence: DTSTART:20261109;FREQ=WEEKLY;BYDAY=MO\noccurrence_materialization: manual\ndateCreated: 2026-11-15T01:45:47.055-05:00\ndateModified: 2026-11-15T01:45:47.117-05:00\ntags:\n  - task\nstaged: 2026-11-14\n---\n\n"
+      },
+      "occurrence": {
+        "task": {
+          "path": "TaskNotes/Tasks/P7-contract-1794725143104-off-schedule-materialize-2.md",
+          "title": "P7-contract-1794725143104-off-schedule-materialize",
+          "status": "open",
+          "priority": "normal",
+          "scheduled": "2026-11-14",
+          "dateCreated": "2026-11-15T01:45:47.400-05:00",
+          "dateModified": "2026-11-15T01:45:47.400-05:00",
+          "recurrence_parent": "[[TaskNotes/Tasks/P7-contract-1794725143104-off-schedule-materialize]]",
+          "occurrence_date": "2026-11-14",
+          "tags": [
+            "task"
+          ],
+          "archived": false,
+          "staged": "2026-11-14",
+          "customProperties": {
+            "staged": "2026-11-14"
+          },
+          "id": "TaskNotes/Tasks/P7-contract-1794725143104-off-schedule-materialize-2.md",
+          "contexts": [],
+          "projects": [],
+          "totalTrackedTime": 0,
+          "isBlocked": false,
+          "isBlocking": false
+        },
+        "raw": "---\ntitle: P7-contract-1794725143104-off-schedule-materialize\nstatus: open\npriority: normal\nscheduled: 2026-11-14\nrecurrence_parent: \"[[TaskNotes/Tasks/P7-contract-1794725143104-off-schedule-materialize]]\"\noccurrence_date: 2026-11-14\ndateCreated: 2026-11-15T01:45:47.400-05:00\ndateModified: 2026-11-15T01:45:47.400-05:00\ntags:\n  - task\nstaged: 2026-11-14\n---\n\n"
+      }
+    },
+    {
+      "name": "regular-timing-public-completion-side-effect",
+      "before": {
+        "task": {
+          "path": "TaskNotes/Tasks/P7-contract-1794725143104-regular-timing.md",
+          "title": "P7-contract-1794725143104-regular-timing",
+          "status": "open",
+          "priority": "normal",
+          "scheduled": "2026-11-09",
+          "recurrence": "DTSTART:20261109;FREQ=WEEKLY;BYDAY=MO",
+          "dateCreated": "2026-11-15T01:45:47.461-05:00",
+          "dateModified": "2026-11-15T01:45:47.798-05:00",
+          "timeEntries": [
+            {
+              "startTime": "2026-11-15T06:45:47.798Z",
+              "description": "Work session"
+            }
+          ],
+          "tags": [
+            "task"
+          ],
+          "archived": false,
+          "staged": "2026-11-14",
+          "customProperties": {
+            "staged": "2026-11-14"
+          },
+          "id": "TaskNotes/Tasks/P7-contract-1794725143104-regular-timing.md"
+        },
+        "raw": "---\nstatus: open\npriority: normal\nscheduled: 2026-11-09\nrecurrence: DTSTART:20261109;FREQ=WEEKLY;BYDAY=MO\ndateCreated: 2026-11-15T01:45:47.461-05:00\ndateModified: 2026-11-15T01:45:47.798-05:00\ntags:\n  - task\nstaged: 2026-11-14\ntimeEntries:\n  - startTime: 2026-11-15T06:45:47.798Z\n    description: Work session\n---\n\n"
+      },
+      "returned": {
+        "path": "TaskNotes/Tasks/P7-contract-1794725143104-regular-timing.md",
+        "title": "P7-contract-1794725143104-regular-timing",
+        "status": "open",
+        "priority": "normal",
+        "scheduled": "2026-11-16",
+        "recurrence": "DTSTART:20261109;FREQ=WEEKLY;BYDAY=MO",
+        "dateCreated": "2026-11-15T01:45:47.461-05:00",
+        "dateModified": "2026-11-15T01:45:47.814-05:00",
+        "timeEntries": [
+          {
+            "startTime": "2026-11-15T06:45:47.798Z",
+            "description": "Work session"
+          }
+        ],
+        "tags": [
+          "task"
+        ],
+        "archived": false,
+        "staged": "2026-11-14",
+        "customProperties": {
+          "staged": "2026-11-14"
+        },
+        "id": "TaskNotes/Tasks/P7-contract-1794725143104-regular-timing.md",
+        "complete_instances": [
+          "2026-11-09"
+        ],
+        "skipped_instances": []
+      },
+      "after": {
+        "task": {
+          "path": "TaskNotes/Tasks/P7-contract-1794725143104-regular-timing.md",
+          "title": "P7-contract-1794725143104-regular-timing",
+          "status": "open",
+          "priority": "normal",
+          "scheduled": "2026-11-16",
+          "recurrence": "DTSTART:20261109;FREQ=WEEKLY;BYDAY=MO",
+          "dateCreated": "2026-11-15T01:45:47.461-05:00",
+          "dateModified": "2026-11-15T01:45:47.825-05:00",
+          "timeEntries": [
+            {
+              "startTime": "2026-11-15T06:45:47.798Z",
+              "description": "Work session",
+              "endTime": "2026-11-15T06:45:47.826Z"
+            }
+          ],
+          "complete_instances": [
+            "2026-11-09"
+          ],
+          "skipped_instances": [],
+          "tags": [
+            "task"
+          ],
+          "archived": false,
+          "staged": "2026-11-14",
+          "customProperties": {
+            "staged": "2026-11-14"
+          },
+          "id": "TaskNotes/Tasks/P7-contract-1794725143104-regular-timing.md",
+          "contexts": [],
+          "projects": [],
+          "totalTrackedTime": 0,
+          "isBlocked": false,
+          "isBlocking": false
+        },
+        "raw": "---\nstatus: open\npriority: normal\nscheduled: 2026-11-16\nrecurrence: DTSTART:20261109;FREQ=WEEKLY;BYDAY=MO\ndateCreated: 2026-11-15T01:45:47.461-05:00\ndateModified: 2026-11-15T01:45:47.825-05:00\ntags:\n  - task\nstaged: 2026-11-14\ntimeEntries:\n  - startTime: 2026-11-15T06:45:47.798Z\n    description: Work session\n    endTime: 2026-11-15T06:45:47.826Z\ncomplete_instances:\n  - 2026-11-09\nskipped_instances: []\n---\n\n"
+      },
+      "activeAfter": []
+    },
+    {
+      "name": "active-pomodoro-completion-side-effect",
+      "before": {
+        "task": {
+          "task": {
+            "path": "TaskNotes/Tasks/P7-contract-1794725143104-pomodoro.md",
+            "title": "P7-contract-1794725143104-pomodoro",
+            "status": "open",
+            "priority": "normal",
+            "scheduled": "2026-11-09",
+            "recurrence": "DTSTART:20261109;FREQ=WEEKLY;BYDAY=MO",
+            "dateCreated": "2026-11-15T01:45:48.329-05:00",
+            "dateModified": "2026-11-15T01:45:48.752-05:00",
+            "timeEntries": [
+              {
+                "startTime": "2026-11-15T06:45:48.752Z",
+                "description": "Work session"
+              }
+            ],
+            "tags": [
+              "task"
+            ],
+            "archived": false,
+            "staged": "2026-11-14",
+            "customProperties": {
+              "staged": "2026-11-14"
+            },
+            "id": "TaskNotes/Tasks/P7-contract-1794725143104-pomodoro.md",
+            "contexts": [],
+            "projects": [],
+            "totalTrackedTime": 0,
+            "isBlocked": false,
+            "isBlocking": false
+          },
+          "raw": "---\nstatus: open\npriority: normal\nscheduled: 2026-11-09\nrecurrence: DTSTART:20261109;FREQ=WEEKLY;BYDAY=MO\ndateCreated: 2026-11-15T01:45:48.329-05:00\ndateModified: 2026-11-15T01:45:48.752-05:00\ntags:\n  - task\nstaged: 2026-11-14\ntimeEntries:\n  - startTime: 2026-11-15T06:45:48.752Z\n    description: Work session\n---\n\n"
+        },
+        "pomodoro": {
+          "isRunning": true,
+          "timeRemaining": 1500,
+          "currentSession": {
+            "id": "1794725148706",
+            "taskPath": "TaskNotes/Tasks/P7-contract-1794725143104-pomodoro.md",
+            "startTime": "2026-11-15T01:45:48.706-05:00",
+            "plannedDuration": 25,
+            "type": "work",
+            "completed": false,
+            "activePeriods": [
+              {
+                "startTime": "2026-11-15T01:45:48.706-05:00"
+              }
+            ],
+            "timeTrackingStartTime": "2026-11-15T06:45:48.752Z"
+          }
+        },
+        "active": [
+          {
+            "taskPath": "TaskNotes/Tasks/P7-contract-1794725143104-pomodoro.md",
+            "task": {
+              "path": "TaskNotes/Tasks/P7-contract-1794725143104-pomodoro.md",
+              "title": "P7-contract-1794725143104-pomodoro",
+              "status": "open",
+              "priority": "normal",
+              "scheduled": "2026-11-09",
+              "recurrence": "DTSTART:20261109;FREQ=WEEKLY;BYDAY=MO",
+              "dateCreated": "2026-11-15T01:45:48.329-05:00",
+              "dateModified": "2026-11-15T01:45:48.752-05:00",
+              "timeEntries": [
+                {
+                  "startTime": "2026-11-15T06:45:48.752Z",
+                  "description": "Work session"
+                }
+              ],
+              "tags": [
+                "task"
+              ],
+              "archived": false,
+              "staged": "2026-11-14",
+              "customProperties": {
+                "staged": "2026-11-14"
+              },
+              "id": "TaskNotes/Tasks/P7-contract-1794725143104-pomodoro.md",
+              "contexts": [],
+              "projects": [],
+              "totalTrackedTime": 0,
+              "isBlocked": false,
+              "isBlocking": false
+            },
+            "entry": {
+              "startTime": "2026-11-15T06:45:48.752Z",
+              "description": "Work session"
+            },
+            "index": 0
+          }
+        ]
+      },
+      "returned": {
+        "path": "TaskNotes/Tasks/P7-contract-1794725143104-pomodoro.md",
+        "title": "P7-contract-1794725143104-pomodoro",
+        "status": "open",
+        "priority": "normal",
+        "scheduled": "2026-11-16",
+        "recurrence": "DTSTART:20261109;FREQ=WEEKLY;BYDAY=MO",
+        "dateCreated": "2026-11-15T01:45:48.329-05:00",
+        "dateModified": "2026-11-15T01:45:49.076-05:00",
+        "timeEntries": [
+          {
+            "startTime": "2026-11-15T06:45:48.752Z",
+            "description": "Work session"
+          }
+        ],
+        "tags": [
+          "task"
+        ],
+        "archived": false,
+        "staged": "2026-11-14",
+        "customProperties": {
+          "staged": "2026-11-14"
+        },
+        "id": "TaskNotes/Tasks/P7-contract-1794725143104-pomodoro.md",
+        "contexts": [],
+        "projects": [],
+        "totalTrackedTime": 0,
+        "isBlocked": false,
+        "isBlocking": false,
+        "complete_instances": [
+          "2026-11-09"
+        ],
+        "skipped_instances": []
+      },
+      "after": {
+        "task": {
+          "task": {
+            "path": "TaskNotes/Tasks/P7-contract-1794725143104-pomodoro.md",
+            "title": "P7-contract-1794725143104-pomodoro",
+            "status": "open",
+            "priority": "normal",
+            "scheduled": "2026-11-16",
+            "recurrence": "DTSTART:20261109;FREQ=WEEKLY;BYDAY=MO",
+            "dateCreated": "2026-11-15T01:45:48.329-05:00",
+            "dateModified": "2026-11-15T01:45:49.105-05:00",
+            "timeEntries": [
+              {
+                "startTime": "2026-11-15T06:45:48.752Z",
+                "description": "Work session",
+                "endTime": "2026-11-15T06:45:49.105Z"
+              }
+            ],
+            "complete_instances": [
+              "2026-11-09"
+            ],
+            "skipped_instances": [],
+            "tags": [
+              "task"
+            ],
+            "archived": false,
+            "staged": "2026-11-14",
+            "customProperties": {
+              "staged": "2026-11-14"
+            },
+            "id": "TaskNotes/Tasks/P7-contract-1794725143104-pomodoro.md",
+            "contexts": [],
+            "projects": [],
+            "totalTrackedTime": 0,
+            "isBlocked": false,
+            "isBlocking": false
+          },
+          "raw": "---\nstatus: open\npriority: normal\nscheduled: 2026-11-16\nrecurrence: DTSTART:20261109;FREQ=WEEKLY;BYDAY=MO\ndateCreated: 2026-11-15T01:45:48.329-05:00\ndateModified: 2026-11-15T01:45:49.105-05:00\ntags:\n  - task\nstaged: 2026-11-14\ntimeEntries:\n  - startTime: 2026-11-15T06:45:48.752Z\n    description: Work session\n    endTime: 2026-11-15T06:45:49.105Z\ncomplete_instances:\n  - 2026-11-09\nskipped_instances: []\n---\n\n"
+        },
+        "pomodoro": {
+          "isRunning": true,
+          "timeRemaining": 1500,
+          "currentSession": {
+            "id": "1794725148706",
+            "taskPath": "TaskNotes/Tasks/P7-contract-1794725143104-pomodoro.md",
+            "startTime": "2026-11-15T01:45:48.706-05:00",
+            "plannedDuration": 25,
+            "type": "work",
+            "completed": false,
+            "activePeriods": [
+              {
+                "startTime": "2026-11-15T01:45:48.706-05:00"
+              }
+            ],
+            "timeTrackingStartTime": "2026-11-15T06:45:48.752Z"
+          }
+        },
+        "active": []
+      }
+    },
+    {
+      "name": "ordinary-card-controller-callback",
+      "before": {
+        "task": {
+          "path": "TaskNotes/Tasks/P7-contract-1794725143104-ordinary-callback.md",
+          "title": "P7-contract-1794725143104-ordinary-callback",
+          "status": "open",
+          "priority": "normal",
+          "scheduled": "2026-11-09",
+          "dateCreated": "2026-11-15T01:45:49.646-05:00",
+          "dateModified": "2026-11-15T01:45:50.002-05:00",
+          "timeEntries": [
+            {
+              "startTime": "2026-11-15T06:45:50.002Z",
+              "description": "Work session"
+            }
+          ],
+          "tags": [
+            "task"
+          ],
+          "archived": false,
+          "staged": "2026-11-14",
+          "customProperties": {
+            "staged": "2026-11-14"
+          },
+          "id": "TaskNotes/Tasks/P7-contract-1794725143104-ordinary-callback.md",
+          "contexts": [],
+          "projects": [],
+          "totalTrackedTime": 0,
+          "isBlocked": false,
+          "isBlocking": false
+        },
+        "raw": "---\nstatus: open\npriority: normal\nscheduled: 2026-11-09\ndateCreated: 2026-11-15T01:45:49.646-05:00\ndateModified: 2026-11-15T01:45:50.002-05:00\ntags:\n  - task\nstaged: 2026-11-14\ntimeEntries:\n  - startTime: 2026-11-15T06:45:50.002Z\n    description: Work session\n---\n\n"
+      },
+      "outcome": "completed",
+      "after": {
+        "task": {
+          "path": "TaskNotes/Tasks/P7-contract-1794725143104-ordinary-callback.md",
+          "title": "P7-contract-1794725143104-ordinary-callback",
+          "status": "done",
+          "priority": "normal",
+          "scheduled": "2026-11-09",
+          "completedDate": "2026-11-15",
+          "dateCreated": "2026-11-15T01:45:49.646-05:00",
+          "dateModified": "2026-11-15T01:45:50.421-05:00",
+          "timeEntries": [
+            {
+              "startTime": "2026-11-15T06:45:50.002Z",
+              "description": "Work session",
+              "endTime": "2026-11-15T06:45:50.372Z"
+            }
+          ],
+          "tags": [
+            "task"
+          ],
+          "archived": false,
+          "staged": null,
+          "customProperties": {
+            "staged": null
+          },
+          "id": "TaskNotes/Tasks/P7-contract-1794725143104-ordinary-callback.md",
+          "contexts": [],
+          "projects": [],
+          "totalTrackedTime": 0,
+          "isBlocked": false,
+          "isBlocking": false
+        },
+        "raw": "---\nstatus: done\npriority: normal\nscheduled: 2026-11-09\ndateCreated: 2026-11-15T01:45:49.646-05:00\ndateModified: 2026-11-15T01:45:50.421-05:00\ntags:\n  - task\nstaged:\ntimeEntries:\n  - startTime: 2026-11-15T06:45:50.002Z\n    description: Work session\n    endTime: 2026-11-15T06:45:50.372Z\ncompletedDate: 2026-11-15\n---\n\n"
+      },
+      "busyAfter": false
+    },
+    {
+      "name": "coordinator-virtual-and-repeat",
+      "policy": "virtual",
+      "before": {
+        "task": {
+          "path": "TaskNotes/Tasks/P7-contract-1794725143104-coordinator-virtual.md",
+          "title": "P7-contract-1794725143104-coordinator-virtual",
+          "status": "open",
+          "priority": "normal",
+          "scheduled": "2026-11-09",
+          "recurrence": "DTSTART:20261109;FREQ=WEEKLY;BYDAY=MO",
+          "dateCreated": "2026-11-15T01:45:50.733-05:00",
+          "dateModified": "2026-11-15T01:45:51.098-05:00",
+          "timeEntries": [
+            {
+              "startTime": "2026-11-15T06:45:51.098Z",
+              "description": "Work session"
+            }
+          ],
+          "tags": [
+            "task"
+          ],
+          "archived": false,
+          "staged": "2026-11-14",
+          "customProperties": {
+            "staged": "2026-11-14"
+          },
+          "id": "TaskNotes/Tasks/P7-contract-1794725143104-coordinator-virtual.md"
+        },
+        "raw": "---\nstatus: open\npriority: normal\nscheduled: 2026-11-09\nrecurrence: DTSTART:20261109;FREQ=WEEKLY;BYDAY=MO\ndateCreated: 2026-11-15T01:45:50.733-05:00\ndateModified: 2026-11-15T01:45:51.098-05:00\ntags:\n  - task\nstaged: 2026-11-14\ntimeEntries:\n  - startTime: 2026-11-15T06:45:51.098Z\n    description: Work session\n---\n\n"
+      },
+      "outcome": "completed",
+      "after": {
+        "task": {
+          "path": "TaskNotes/Tasks/P7-contract-1794725143104-coordinator-virtual.md",
+          "title": "P7-contract-1794725143104-coordinator-virtual",
+          "status": "open",
+          "priority": "normal",
+          "scheduled": "2026-11-16",
+          "recurrence": "DTSTART:20261109;FREQ=WEEKLY;BYDAY=MO",
+          "dateCreated": "2026-11-15T01:45:50.733-05:00",
+          "dateModified": "2026-11-15T01:45:51.211-05:00",
+          "timeEntries": [
+            {
+              "startTime": "2026-11-15T06:45:51.098Z",
+              "description": "Work session",
+              "endTime": "2026-11-15T06:45:51.157Z"
+            }
+          ],
+          "complete_instances": [
+            "2026-11-09"
+          ],
+          "skipped_instances": [],
+          "tags": [
+            "task"
+          ],
+          "archived": false,
+          "staged": null,
+          "customProperties": {
+            "staged": null
+          },
+          "id": "TaskNotes/Tasks/P7-contract-1794725143104-coordinator-virtual.md",
+          "contexts": [],
+          "projects": [],
+          "totalTrackedTime": 0,
+          "isBlocked": false,
+          "isBlocking": false
+        },
+        "raw": "---\nstatus: open\npriority: normal\nscheduled: 2026-11-16\nrecurrence: DTSTART:20261109;FREQ=WEEKLY;BYDAY=MO\ndateCreated: 2026-11-15T01:45:50.733-05:00\ndateModified: 2026-11-15T01:45:51.211-05:00\ntags:\n  - task\nstaged:\ntimeEntries:\n  - startTime: 2026-11-15T06:45:51.098Z\n    description: Work session\n    endTime: 2026-11-15T06:45:51.157Z\ncomplete_instances:\n  - 2026-11-09\nskipped_instances: []\n---\n\n"
+      },
+      "second": "unavailable",
+      "afterRepeat": {
+        "task": {
+          "path": "TaskNotes/Tasks/P7-contract-1794725143104-coordinator-virtual.md",
+          "title": "P7-contract-1794725143104-coordinator-virtual",
+          "status": "open",
+          "priority": "normal",
+          "scheduled": "2026-11-16",
+          "recurrence": "DTSTART:20261109;FREQ=WEEKLY;BYDAY=MO",
+          "dateCreated": "2026-11-15T01:45:50.733-05:00",
+          "dateModified": "2026-11-15T01:45:51.211-05:00",
+          "timeEntries": [
+            {
+              "startTime": "2026-11-15T06:45:51.098Z",
+              "description": "Work session",
+              "endTime": "2026-11-15T06:45:51.157Z"
+            }
+          ],
+          "complete_instances": [
+            "2026-11-09"
+          ],
+          "skipped_instances": [],
+          "tags": [
+            "task"
+          ],
+          "archived": false,
+          "staged": null,
+          "customProperties": {
+            "staged": null
+          },
+          "id": "TaskNotes/Tasks/P7-contract-1794725143104-coordinator-virtual.md",
+          "contexts": [],
+          "projects": [],
+          "totalTrackedTime": 0,
+          "isBlocked": false,
+          "isBlocking": false
+        },
+        "raw": "---\nstatus: open\npriority: normal\nscheduled: 2026-11-16\nrecurrence: DTSTART:20261109;FREQ=WEEKLY;BYDAY=MO\ndateCreated: 2026-11-15T01:45:50.733-05:00\ndateModified: 2026-11-15T01:45:51.211-05:00\ntags:\n  - task\nstaged:\ntimeEntries:\n  - startTime: 2026-11-15T06:45:51.098Z\n    description: Work session\n    endTime: 2026-11-15T06:45:51.157Z\ncomplete_instances:\n  - 2026-11-09\nskipped_instances: []\n---\n\n"
+      },
+      "records": [
+        {
+          "attemptId": "4efc6dba-996a-4040-8992-547fbb8fdf11",
+          "sourcePath": "TaskNotes/Tasks/P7-contract-1794725143104-coordinator-virtual.md",
+          "requestDay": "2026-11-14",
+          "requestedAt": 1794725151113,
+          "beforeEvidence": {
+            "status": "open",
+            "staged": "2026-11-14",
+            "title": "P7-contract-1794725143104-coordinator-virtual",
+            "completedStatus": "done",
+            "parentPath": "TaskNotes/Tasks/P7-contract-1794725143104-coordinator-virtual.md",
+            "recurrence": "DTSTART:20261109;FREQ=WEEKLY;BYDAY=MO",
+            "completedDates": [],
+            "existingPaths": [
+              "TaskNotes/Tasks/P7-contract-1794725143104-coordinator-virtual.md"
+            ]
+          },
+          "replayProtected": true,
+          "cleanupEvidence": [
+            {
+              "path": "TaskNotes/Tasks/P7-contract-1794725143104-coordinator-virtual.md",
+              "staged": "2026-11-14"
+            }
+          ],
+          "phase": "confirmed",
+          "pendingCleanupPaths": [],
+          "completedPath": "TaskNotes/Tasks/P7-contract-1794725143104-coordinator-virtual.md",
+          "resolvedDate": "2026-11-09",
+          "completedAt": 1794725151113
+        }
+      ],
+      "related": [
+        {
+          "task": {
+            "path": "TaskNotes/Tasks/P7-contract-1794725143104-coordinator-virtual.md",
+            "title": "P7-contract-1794725143104-coordinator-virtual",
+            "status": "open",
+            "priority": "normal",
+            "scheduled": "2026-11-16",
+            "recurrence": "DTSTART:20261109;FREQ=WEEKLY;BYDAY=MO",
+            "dateCreated": "2026-11-15T01:45:50.733-05:00",
+            "dateModified": "2026-11-15T01:45:51.211-05:00",
+            "timeEntries": [
+              {
+                "startTime": "2026-11-15T06:45:51.098Z",
+                "description": "Work session",
+                "endTime": "2026-11-15T06:45:51.157Z"
+              }
+            ],
+            "complete_instances": [
+              "2026-11-09"
+            ],
+            "skipped_instances": [],
+            "tags": [
+              "task"
+            ],
+            "archived": false,
+            "staged": null,
+            "customProperties": {
+              "staged": null
+            },
+            "id": "TaskNotes/Tasks/P7-contract-1794725143104-coordinator-virtual.md",
+            "contexts": [],
+            "projects": [],
+            "totalTrackedTime": 0,
+            "isBlocked": false,
+            "isBlocking": false
+          },
+          "raw": "---\nstatus: open\npriority: normal\nscheduled: 2026-11-16\nrecurrence: DTSTART:20261109;FREQ=WEEKLY;BYDAY=MO\ndateCreated: 2026-11-15T01:45:50.733-05:00\ndateModified: 2026-11-15T01:45:51.211-05:00\ntags:\n  - task\nstaged:\ntimeEntries:\n  - startTime: 2026-11-15T06:45:51.098Z\n    description: Work session\n    endTime: 2026-11-15T06:45:51.157Z\ncomplete_instances:\n  - 2026-11-09\nskipped_instances: []\n---\n\n"
+        }
+      ]
+    },
+    {
+      "name": "coordinator-on_completion-and-repeat",
+      "policy": "on_completion",
+      "before": {
+        "task": {
+          "path": "TaskNotes/Tasks/P7-contract-1794725143104-coordinator-on_completion.md",
+          "title": "P7-contract-1794725143104-coordinator-on_completion",
+          "status": "open",
+          "priority": "normal",
+          "scheduled": "2026-11-09",
+          "recurrence": "DTSTART:20261109;FREQ=WEEKLY;BYDAY=MO",
+          "dateCreated": "2026-11-15T01:45:51.647-05:00",
+          "dateModified": "2026-11-15T01:45:52.195-05:00",
+          "timeEntries": [
+            {
+              "startTime": "2026-11-15T06:45:52.195Z",
+              "description": "Work session"
+            }
+          ],
+          "occurrence_materialization": "on_completion",
+          "tags": [
+            "task"
+          ],
+          "archived": false,
+          "staged": "2026-11-14",
+          "customProperties": {
+            "staged": "2026-11-14"
+          },
+          "id": "TaskNotes/Tasks/P7-contract-1794725143104-coordinator-on_completion.md"
+        },
+        "raw": "---\nstatus: open\npriority: normal\nscheduled: 2026-11-09\nrecurrence: DTSTART:20261109;FREQ=WEEKLY;BYDAY=MO\noccurrence_materialization: on_completion\ndateCreated: 2026-11-15T01:45:51.647-05:00\ndateModified: 2026-11-15T01:45:52.195-05:00\ntags:\n  - task\nstaged: 2026-11-14\ntimeEntries:\n  - startTime: 2026-11-15T06:45:52.195Z\n    description: Work session\n---\n\n"
+      },
+      "outcome": "completed",
+      "after": {
+        "task": {
+          "path": "TaskNotes/Tasks/P7-contract-1794725143104-coordinator-on_completion.md",
+          "title": "P7-contract-1794725143104-coordinator-on_completion",
+          "status": "open",
+          "priority": "normal",
+          "scheduled": "2026-11-16",
+          "recurrence": "DTSTART:20261109;FREQ=WEEKLY;BYDAY=MO",
+          "dateCreated": "2026-11-15T01:45:51.647-05:00",
+          "dateModified": "2026-11-15T01:45:52.396-05:00",
+          "timeEntries": [
+            {
+              "startTime": "2026-11-15T06:45:52.195Z",
+              "description": "Work session",
+              "endTime": "2026-11-15T06:45:52.338Z"
+            }
+          ],
+          "complete_instances": [
+            "2026-11-14"
+          ],
+          "occurrence_materialization": "on_completion",
+          "tags": [
+            "task"
+          ],
+          "archived": false,
+          "staged": null,
+          "customProperties": {
+            "staged": null
+          },
+          "id": "TaskNotes/Tasks/P7-contract-1794725143104-coordinator-on_completion.md",
+          "contexts": [],
+          "projects": [],
+          "totalTrackedTime": 0,
+          "isBlocked": false,
+          "isBlocking": false
+        },
+        "raw": "---\nstatus: open\npriority: normal\nscheduled: 2026-11-16\nrecurrence: DTSTART:20261109;FREQ=WEEKLY;BYDAY=MO\noccurrence_materialization: on_completion\ndateCreated: 2026-11-15T01:45:51.647-05:00\ndateModified: 2026-11-15T01:45:52.396-05:00\ntags:\n  - task\nstaged:\ntimeEntries:\n  - startTime: 2026-11-15T06:45:52.195Z\n    description: Work session\n    endTime: 2026-11-15T06:45:52.338Z\ncomplete_instances:\n  - 2026-11-14\n---\n\n"
+      },
+      "second": "unavailable",
+      "afterRepeat": {
+        "task": {
+          "path": "TaskNotes/Tasks/P7-contract-1794725143104-coordinator-on_completion.md",
+          "title": "P7-contract-1794725143104-coordinator-on_completion",
+          "status": "open",
+          "priority": "normal",
+          "scheduled": "2026-11-16",
+          "recurrence": "DTSTART:20261109;FREQ=WEEKLY;BYDAY=MO",
+          "dateCreated": "2026-11-15T01:45:51.647-05:00",
+          "dateModified": "2026-11-15T01:45:52.396-05:00",
+          "timeEntries": [
+            {
+              "startTime": "2026-11-15T06:45:52.195Z",
+              "description": "Work session",
+              "endTime": "2026-11-15T06:45:52.338Z"
+            }
+          ],
+          "complete_instances": [
+            "2026-11-14"
+          ],
+          "occurrence_materialization": "on_completion",
+          "tags": [
+            "task"
+          ],
+          "archived": false,
+          "staged": null,
+          "customProperties": {
+            "staged": null
+          },
+          "id": "TaskNotes/Tasks/P7-contract-1794725143104-coordinator-on_completion.md",
+          "contexts": [],
+          "projects": [],
+          "totalTrackedTime": 0,
+          "isBlocked": false,
+          "isBlocking": false
+        },
+        "raw": "---\nstatus: open\npriority: normal\nscheduled: 2026-11-16\nrecurrence: DTSTART:20261109;FREQ=WEEKLY;BYDAY=MO\noccurrence_materialization: on_completion\ndateCreated: 2026-11-15T01:45:51.647-05:00\ndateModified: 2026-11-15T01:45:52.396-05:00\ntags:\n  - task\nstaged:\ntimeEntries:\n  - startTime: 2026-11-15T06:45:52.195Z\n    description: Work session\n    endTime: 2026-11-15T06:45:52.338Z\ncomplete_instances:\n  - 2026-11-14\n---\n\n"
+      },
+      "records": [
+        {
+          "attemptId": "8fa8676f-a3f7-4f07-b9b3-58b13218bf96",
+          "sourcePath": "TaskNotes/Tasks/P7-contract-1794725143104-coordinator-on_completion.md",
+          "requestDay": "2026-11-14",
+          "requestedAt": 1794725152207,
+          "beforeEvidence": {
+            "status": "open",
+            "staged": "2026-11-14",
+            "title": "P7-contract-1794725143104-coordinator-on_completion",
+            "completedStatus": "done",
+            "parentPath": "TaskNotes/Tasks/P7-contract-1794725143104-coordinator-on_completion.md",
+            "recurrence": "DTSTART:20261109;FREQ=WEEKLY;BYDAY=MO",
+            "completedDates": [],
+            "existingPaths": [
+              "TaskNotes/Tasks/P7-contract-1794725143104-coordinator-on_completion.md",
+              "TaskNotes/Tasks/P7-contract-1794725143104-coordinator-on_completion-2.md"
+            ]
+          },
+          "replayProtected": true,
+          "cleanupEvidence": [
+            {
+              "path": "TaskNotes/Tasks/P7-contract-1794725143104-coordinator-on_completion.md",
+              "staged": "2026-11-14"
+            },
+            {
+              "path": "TaskNotes/Tasks/P7-contract-1794725143104-coordinator-on_completion-3.md",
+              "staged": "2026-11-14"
+            }
+          ],
+          "phase": "confirmed",
+          "pendingCleanupPaths": [],
+          "completedPath": "TaskNotes/Tasks/P7-contract-1794725143104-coordinator-on_completion-3.md",
+          "resolvedDate": "2026-11-14",
+          "completedAt": 1794725152207
+        }
+      ],
+      "related": [
+        {
+          "task": {
+            "path": "TaskNotes/Tasks/P7-contract-1794725143104-coordinator-on_completion-3.md",
+            "title": "P7-contract-1794725143104-coordinator-on_completion",
+            "status": "done",
+            "priority": "normal",
+            "scheduled": "2026-11-14",
+            "completedDate": "2026-11-15",
+            "dateCreated": "2026-11-15T01:45:52.239-05:00",
+            "dateModified": "2026-11-15T01:45:52.432-05:00",
+            "recurrence_parent": "[[TaskNotes/Tasks/P7-contract-1794725143104-coordinator-on_completion]]",
+            "occurrence_date": "2026-11-14",
+            "tags": [
+              "task"
+            ],
+            "archived": false,
+            "staged": null,
+            "customProperties": {
+              "staged": null
+            },
+            "id": "TaskNotes/Tasks/P7-contract-1794725143104-coordinator-on_completion-3.md",
+            "contexts": [],
+            "projects": [],
+            "totalTrackedTime": 0,
+            "isBlocked": false,
+            "isBlocking": false
+          },
+          "raw": "---\ntitle: P7-contract-1794725143104-coordinator-on_completion\nstatus: done\npriority: normal\nscheduled: 2026-11-14\nrecurrence_parent: \"[[TaskNotes/Tasks/P7-contract-1794725143104-coordinator-on_completion]]\"\noccurrence_date: 2026-11-14\ndateCreated: 2026-11-15T01:45:52.239-05:00\ndateModified: 2026-11-15T01:45:52.432-05:00\ntags:\n  - task\nstaged:\ncompletedDate: 2026-11-15\n---\n\n"
+        },
+        {
+          "task": {
+            "path": "TaskNotes/Tasks/P7-contract-1794725143104-coordinator-on_completion-2.md",
+            "title": "P7-contract-1794725143104-coordinator-on_completion",
+            "status": "open",
+            "priority": "normal",
+            "scheduled": "2026-11-16",
+            "dateCreated": "2026-11-15T01:45:51.711-05:00",
+            "dateModified": "2026-11-15T01:45:51.711-05:00",
+            "recurrence_parent": "[[TaskNotes/Tasks/P7-contract-1794725143104-coordinator-on_completion]]",
+            "occurrence_date": "2026-11-16",
+            "tags": [
+              "task"
+            ],
+            "archived": false,
+            "id": "TaskNotes/Tasks/P7-contract-1794725143104-coordinator-on_completion-2.md",
+            "contexts": [],
+            "projects": [],
+            "totalTrackedTime": 0,
+            "isBlocked": false,
+            "isBlocking": false
+          },
+          "raw": "---\ntitle: P7-contract-1794725143104-coordinator-on_completion\nstatus: open\npriority: normal\nscheduled: 2026-11-16\nrecurrence_parent: \"[[TaskNotes/Tasks/P7-contract-1794725143104-coordinator-on_completion]]\"\noccurrence_date: 2026-11-16\ndateCreated: 2026-11-15T01:45:51.711-05:00\ndateModified: 2026-11-15T01:45:51.711-05:00\ntags:\n  - task\n---\n\n"
+        },
+        {
+          "task": {
+            "path": "TaskNotes/Tasks/P7-contract-1794725143104-coordinator-on_completion.md",
+            "title": "P7-contract-1794725143104-coordinator-on_completion",
+            "status": "open",
+            "priority": "normal",
+            "scheduled": "2026-11-16",
+            "recurrence": "DTSTART:20261109;FREQ=WEEKLY;BYDAY=MO",
+            "dateCreated": "2026-11-15T01:45:51.647-05:00",
+            "dateModified": "2026-11-15T01:45:52.396-05:00",
+            "timeEntries": [
+              {
+                "startTime": "2026-11-15T06:45:52.195Z",
+                "description": "Work session",
+                "endTime": "2026-11-15T06:45:52.338Z"
+              }
+            ],
+            "complete_instances": [
+              "2026-11-14"
+            ],
+            "occurrence_materialization": "on_completion",
+            "tags": [
+              "task"
+            ],
+            "archived": false,
+            "staged": null,
+            "customProperties": {
+              "staged": null
+            },
+            "id": "TaskNotes/Tasks/P7-contract-1794725143104-coordinator-on_completion.md",
+            "contexts": [],
+            "projects": [],
+            "totalTrackedTime": 0,
+            "isBlocked": false,
+            "isBlocking": false
+          },
+          "raw": "---\nstatus: open\npriority: normal\nscheduled: 2026-11-16\nrecurrence: DTSTART:20261109;FREQ=WEEKLY;BYDAY=MO\noccurrence_materialization: on_completion\ndateCreated: 2026-11-15T01:45:51.647-05:00\ndateModified: 2026-11-15T01:45:52.396-05:00\ntags:\n  - task\nstaged:\ntimeEntries:\n  - startTime: 2026-11-15T06:45:52.195Z\n    description: Work session\n    endTime: 2026-11-15T06:45:52.338Z\ncomplete_instances:\n  - 2026-11-14\n---\n\n"
+        }
+      ]
+    },
+    {
+      "name": "coordinator-existing-and-repeat",
+      "policy": "existing",
+      "before": {
+        "task": {
+          "path": "TaskNotes/Tasks/P7-contract-1794725143104-coordinator-existing.md",
+          "title": "P7-contract-1794725143104-coordinator-existing",
+          "status": "open",
+          "priority": "normal",
+          "scheduled": "2026-11-09",
+          "recurrence": "DTSTART:20261109;FREQ=WEEKLY;BYDAY=MO",
+          "dateCreated": "2026-11-15T01:45:52.903-05:00",
+          "dateModified": "2026-11-15T01:45:53.336-05:00",
+          "timeEntries": [
+            {
+              "startTime": "2026-11-15T06:45:53.336Z",
+              "description": "Work session"
+            }
+          ],
+          "tags": [
+            "task"
+          ],
+          "archived": false,
+          "staged": "2026-11-14",
+          "customProperties": {
+            "staged": "2026-11-14"
+          },
+          "id": "TaskNotes/Tasks/P7-contract-1794725143104-coordinator-existing.md"
+        },
+        "raw": "---\nstatus: open\npriority: normal\nscheduled: 2026-11-09\nrecurrence: DTSTART:20261109;FREQ=WEEKLY;BYDAY=MO\ndateCreated: 2026-11-15T01:45:52.903-05:00\ndateModified: 2026-11-15T01:45:53.336-05:00\ntags:\n  - task\nstaged: 2026-11-14\ntimeEntries:\n  - startTime: 2026-11-15T06:45:53.336Z\n    description: Work session\n---\n\n"
+      },
+      "outcome": "completed",
+      "after": {
+        "task": {
+          "path": "TaskNotes/Tasks/P7-contract-1794725143104-coordinator-existing.md",
+          "title": "P7-contract-1794725143104-coordinator-existing",
+          "status": "open",
+          "priority": "normal",
+          "scheduled": "2026-11-16",
+          "recurrence": "DTSTART:20261109;FREQ=WEEKLY;BYDAY=MO",
+          "dateCreated": "2026-11-15T01:45:52.903-05:00",
+          "dateModified": "2026-11-15T01:45:53.454-05:00",
+          "timeEntries": [
+            {
+              "startTime": "2026-11-15T06:45:53.336Z",
+              "description": "Work session",
+              "endTime": "2026-11-15T06:45:53.393Z"
+            }
+          ],
+          "complete_instances": [
+            "2026-11-14"
+          ],
+          "tags": [
+            "task"
+          ],
+          "archived": false,
+          "staged": null,
+          "customProperties": {
+            "staged": null
+          },
+          "id": "TaskNotes/Tasks/P7-contract-1794725143104-coordinator-existing.md",
+          "contexts": [],
+          "projects": [],
+          "totalTrackedTime": 0,
+          "isBlocked": false,
+          "isBlocking": false
+        },
+        "raw": "---\nstatus: open\npriority: normal\nscheduled: 2026-11-16\nrecurrence: DTSTART:20261109;FREQ=WEEKLY;BYDAY=MO\ndateCreated: 2026-11-15T01:45:52.903-05:00\ndateModified: 2026-11-15T01:45:53.454-05:00\ntags:\n  - task\nstaged:\ntimeEntries:\n  - startTime: 2026-11-15T06:45:53.336Z\n    description: Work session\n    endTime: 2026-11-15T06:45:53.393Z\ncomplete_instances:\n  - 2026-11-14\n---\n\n"
+      },
+      "second": "unavailable",
+      "afterRepeat": {
+        "task": {
+          "path": "TaskNotes/Tasks/P7-contract-1794725143104-coordinator-existing.md",
+          "title": "P7-contract-1794725143104-coordinator-existing",
+          "status": "open",
+          "priority": "normal",
+          "scheduled": "2026-11-16",
+          "recurrence": "DTSTART:20261109;FREQ=WEEKLY;BYDAY=MO",
+          "dateCreated": "2026-11-15T01:45:52.903-05:00",
+          "dateModified": "2026-11-15T01:45:53.454-05:00",
+          "timeEntries": [
+            {
+              "startTime": "2026-11-15T06:45:53.336Z",
+              "description": "Work session",
+              "endTime": "2026-11-15T06:45:53.393Z"
+            }
+          ],
+          "complete_instances": [
+            "2026-11-14"
+          ],
+          "tags": [
+            "task"
+          ],
+          "archived": false,
+          "staged": null,
+          "customProperties": {
+            "staged": null
+          },
+          "id": "TaskNotes/Tasks/P7-contract-1794725143104-coordinator-existing.md",
+          "contexts": [],
+          "projects": [],
+          "totalTrackedTime": 0,
+          "isBlocked": false,
+          "isBlocking": false
+        },
+        "raw": "---\nstatus: open\npriority: normal\nscheduled: 2026-11-16\nrecurrence: DTSTART:20261109;FREQ=WEEKLY;BYDAY=MO\ndateCreated: 2026-11-15T01:45:52.903-05:00\ndateModified: 2026-11-15T01:45:53.454-05:00\ntags:\n  - task\nstaged:\ntimeEntries:\n  - startTime: 2026-11-15T06:45:53.336Z\n    description: Work session\n    endTime: 2026-11-15T06:45:53.393Z\ncomplete_instances:\n  - 2026-11-14\n---\n\n"
+      },
+      "records": [
+        {
+          "attemptId": "20468e66-5773-4502-8306-1f9061a7e93a",
+          "sourcePath": "TaskNotes/Tasks/P7-contract-1794725143104-coordinator-existing.md",
+          "requestDay": "2026-11-14",
+          "requestedAt": 1794725153351,
+          "beforeEvidence": {
+            "status": "open",
+            "staged": "2026-11-14",
+            "title": "P7-contract-1794725143104-coordinator-existing",
+            "completedStatus": "done",
+            "parentPath": "TaskNotes/Tasks/P7-contract-1794725143104-coordinator-existing.md",
+            "recurrence": "DTSTART:20261109;FREQ=WEEKLY;BYDAY=MO",
+            "completedDates": [],
+            "existingPaths": [
+              "TaskNotes/Tasks/P7-contract-1794725143104-coordinator-existing.md",
+              "TaskNotes/Tasks/P7-contract-1794725143104-coordinator-existing-2.md"
+            ]
+          },
+          "replayProtected": true,
+          "cleanupEvidence": [
+            {
+              "path": "TaskNotes/Tasks/P7-contract-1794725143104-coordinator-existing.md",
+              "staged": "2026-11-14"
+            }
+          ],
+          "phase": "confirmed",
+          "pendingCleanupPaths": [],
+          "completedPath": "TaskNotes/Tasks/P7-contract-1794725143104-coordinator-existing-2.md",
+          "resolvedDate": "2026-11-14",
+          "completedAt": 1794725153351
+        }
+      ],
+      "related": [
+        {
+          "task": {
+            "path": "TaskNotes/Tasks/P7-contract-1794725143104-coordinator-existing-2.md",
+            "title": "P7-contract-1794725143104-coordinator-existing",
+            "status": "done",
+            "priority": "normal",
+            "scheduled": "2026-11-14",
+            "completedDate": "2026-11-15",
+            "dateCreated": "2026-11-15T01:45:53.268-05:00",
+            "dateModified": "2026-11-15T01:45:53.404-05:00",
+            "recurrence_parent": "[[TaskNotes/Tasks/P7-contract-1794725143104-coordinator-existing]]",
+            "occurrence_date": "2026-11-14",
+            "tags": [
+              "task"
+            ],
+            "archived": false,
+            "staged": "2026-11-14",
+            "customProperties": {
+              "staged": "2026-11-14"
+            },
+            "id": "TaskNotes/Tasks/P7-contract-1794725143104-coordinator-existing-2.md",
+            "contexts": [],
+            "projects": [],
+            "totalTrackedTime": 0,
+            "isBlocked": false,
+            "isBlocking": false
+          },
+          "raw": "---\ntitle: P7-contract-1794725143104-coordinator-existing\nstatus: done\npriority: normal\nscheduled: 2026-11-14\nrecurrence_parent: \"[[TaskNotes/Tasks/P7-contract-1794725143104-coordinator-existing]]\"\noccurrence_date: 2026-11-14\ndateCreated: 2026-11-15T01:45:53.268-05:00\ndateModified: 2026-11-15T01:45:53.404-05:00\ntags:\n  - task\nstaged: 2026-11-14\ncompletedDate: 2026-11-15\n---\n\n"
+        },
+        {
+          "task": {
+            "path": "TaskNotes/Tasks/P7-contract-1794725143104-coordinator-existing.md",
+            "title": "P7-contract-1794725143104-coordinator-existing",
+            "status": "open",
+            "priority": "normal",
+            "scheduled": "2026-11-16",
+            "recurrence": "DTSTART:20261109;FREQ=WEEKLY;BYDAY=MO",
+            "dateCreated": "2026-11-15T01:45:52.903-05:00",
+            "dateModified": "2026-11-15T01:45:53.454-05:00",
+            "timeEntries": [
+              {
+                "startTime": "2026-11-15T06:45:53.336Z",
+                "description": "Work session",
+                "endTime": "2026-11-15T06:45:53.393Z"
+              }
+            ],
+            "complete_instances": [
+              "2026-11-14"
+            ],
+            "tags": [
+              "task"
+            ],
+            "archived": false,
+            "staged": null,
+            "customProperties": {
+              "staged": null
+            },
+            "id": "TaskNotes/Tasks/P7-contract-1794725143104-coordinator-existing.md",
+            "contexts": [],
+            "projects": [],
+            "totalTrackedTime": 0,
+            "isBlocked": false,
+            "isBlocking": false
+          },
+          "raw": "---\nstatus: open\npriority: normal\nscheduled: 2026-11-16\nrecurrence: DTSTART:20261109;FREQ=WEEKLY;BYDAY=MO\ndateCreated: 2026-11-15T01:45:52.903-05:00\ndateModified: 2026-11-15T01:45:53.454-05:00\ntags:\n  - task\nstaged:\ntimeEntries:\n  - startTime: 2026-11-15T06:45:53.336Z\n    description: Work session\n    endTime: 2026-11-15T06:45:53.393Z\ncomplete_instances:\n  - 2026-11-14\n---\n\n"
+        }
+      ]
+    },
+    {
+      "name": "coordinator-existing-next-and-repeat",
+      "policy": "existing-next",
+      "before": {
+        "task": {
+          "path": "TaskNotes/Tasks/P7-contract-1794725143104-coordinator-existing-next.md",
+          "title": "P7-contract-1794725143104-coordinator-existing-next",
+          "status": "open",
+          "priority": "normal",
+          "scheduled": "2026-11-09",
+          "recurrence": "DTSTART:20261109;FREQ=WEEKLY;BYDAY=MO",
+          "dateCreated": "2026-11-15T01:45:53.907-05:00",
+          "dateModified": "2026-11-15T01:45:54.446-05:00",
+          "timeEntries": [
+            {
+              "startTime": "2026-11-15T06:45:54.446Z",
+              "description": "Work session"
+            }
+          ],
+          "occurrence_materialization": "on_completion",
+          "tags": [
+            "task"
+          ],
+          "archived": false,
+          "staged": "2026-11-14",
+          "customProperties": {
+            "staged": "2026-11-14"
+          },
+          "id": "TaskNotes/Tasks/P7-contract-1794725143104-coordinator-existing-next.md"
+        },
+        "raw": "---\nstatus: open\npriority: normal\nscheduled: 2026-11-09\nrecurrence: DTSTART:20261109;FREQ=WEEKLY;BYDAY=MO\noccurrence_materialization: on_completion\ndateCreated: 2026-11-15T01:45:53.907-05:00\ndateModified: 2026-11-15T01:45:54.446-05:00\ntags:\n  - task\nstaged: 2026-11-14\ntimeEntries:\n  - startTime: 2026-11-15T06:45:54.446Z\n    description: Work session\n---\n\n"
+      },
+      "outcome": "completed",
+      "after": {
+        "task": {
+          "path": "TaskNotes/Tasks/P7-contract-1794725143104-coordinator-existing-next.md",
+          "title": "P7-contract-1794725143104-coordinator-existing-next",
+          "status": "open",
+          "priority": "normal",
+          "scheduled": "2026-11-16",
+          "recurrence": "DTSTART:20261109;FREQ=WEEKLY;BYDAY=MO",
+          "dateCreated": "2026-11-15T01:45:53.907-05:00",
+          "dateModified": "2026-11-15T01:45:54.660-05:00",
+          "timeEntries": [
+            {
+              "startTime": "2026-11-15T06:45:54.446Z",
+              "description": "Work session",
+              "endTime": "2026-11-15T06:45:54.599Z"
+            }
+          ],
+          "complete_instances": [
+            "2026-11-14"
+          ],
+          "occurrence_materialization": "on_completion",
+          "tags": [
+            "task"
+          ],
+          "archived": false,
+          "staged": null,
+          "customProperties": {
+            "staged": null
+          },
+          "id": "TaskNotes/Tasks/P7-contract-1794725143104-coordinator-existing-next.md",
+          "contexts": [],
+          "projects": [],
+          "totalTrackedTime": 0,
+          "isBlocked": false,
+          "isBlocking": false
+        },
+        "raw": "---\nstatus: open\npriority: normal\nscheduled: 2026-11-16\nrecurrence: DTSTART:20261109;FREQ=WEEKLY;BYDAY=MO\noccurrence_materialization: on_completion\ndateCreated: 2026-11-15T01:45:53.907-05:00\ndateModified: 2026-11-15T01:45:54.660-05:00\ntags:\n  - task\nstaged:\ntimeEntries:\n  - startTime: 2026-11-15T06:45:54.446Z\n    description: Work session\n    endTime: 2026-11-15T06:45:54.599Z\ncomplete_instances:\n  - 2026-11-14\n---\n\n"
+      },
+      "second": "unavailable",
+      "afterRepeat": {
+        "task": {
+          "path": "TaskNotes/Tasks/P7-contract-1794725143104-coordinator-existing-next.md",
+          "title": "P7-contract-1794725143104-coordinator-existing-next",
+          "status": "open",
+          "priority": "normal",
+          "scheduled": "2026-11-16",
+          "recurrence": "DTSTART:20261109;FREQ=WEEKLY;BYDAY=MO",
+          "dateCreated": "2026-11-15T01:45:53.907-05:00",
+          "dateModified": "2026-11-15T01:45:54.660-05:00",
+          "timeEntries": [
+            {
+              "startTime": "2026-11-15T06:45:54.446Z",
+              "description": "Work session",
+              "endTime": "2026-11-15T06:45:54.599Z"
+            }
+          ],
+          "complete_instances": [
+            "2026-11-14"
+          ],
+          "occurrence_materialization": "on_completion",
+          "tags": [
+            "task"
+          ],
+          "archived": false,
+          "staged": null,
+          "customProperties": {
+            "staged": null
+          },
+          "id": "TaskNotes/Tasks/P7-contract-1794725143104-coordinator-existing-next.md",
+          "contexts": [],
+          "projects": [],
+          "totalTrackedTime": 0,
+          "isBlocked": false,
+          "isBlocking": false
+        },
+        "raw": "---\nstatus: open\npriority: normal\nscheduled: 2026-11-16\nrecurrence: DTSTART:20261109;FREQ=WEEKLY;BYDAY=MO\noccurrence_materialization: on_completion\ndateCreated: 2026-11-15T01:45:53.907-05:00\ndateModified: 2026-11-15T01:45:54.660-05:00\ntags:\n  - task\nstaged:\ntimeEntries:\n  - startTime: 2026-11-15T06:45:54.446Z\n    description: Work session\n    endTime: 2026-11-15T06:45:54.599Z\ncomplete_instances:\n  - 2026-11-14\n---\n\n"
+      },
+      "records": [
+        {
+          "attemptId": "f747d1c9-634a-46e9-bcc3-62b584a48c7a",
+          "sourcePath": "TaskNotes/Tasks/P7-contract-1794725143104-coordinator-existing-next.md",
+          "requestDay": "2026-11-14",
+          "requestedAt": 1794725154459,
+          "beforeEvidence": {
+            "status": "open",
+            "staged": "2026-11-14",
+            "title": "P7-contract-1794725143104-coordinator-existing-next",
+            "completedStatus": "done",
+            "parentPath": "TaskNotes/Tasks/P7-contract-1794725143104-coordinator-existing-next.md",
+            "recurrence": "DTSTART:20261109;FREQ=WEEKLY;BYDAY=MO",
+            "completedDates": [],
+            "existingPaths": [
+              "TaskNotes/Tasks/P7-contract-1794725143104-coordinator-existing-next.md",
+              "TaskNotes/Tasks/P7-contract-1794725143104-coordinator-existing-next-2.md"
+            ]
+          },
+          "replayProtected": true,
+          "cleanupEvidence": [
+            {
+              "path": "TaskNotes/Tasks/P7-contract-1794725143104-coordinator-existing-next.md",
+              "staged": "2026-11-14"
+            },
+            {
+              "path": "TaskNotes/Tasks/P7-contract-1794725143104-coordinator-existing-next-3.md",
+              "staged": "2026-11-14"
+            }
+          ],
+          "phase": "confirmed",
+          "pendingCleanupPaths": [],
+          "completedPath": "TaskNotes/Tasks/P7-contract-1794725143104-coordinator-existing-next-3.md",
+          "resolvedDate": "2026-11-14",
+          "completedAt": 1794725154459
+        }
+      ],
+      "related": [
+        {
+          "task": {
+            "path": "TaskNotes/Tasks/P7-contract-1794725143104-coordinator-existing-next-3.md",
+            "title": "P7-contract-1794725143104-coordinator-existing-next",
+            "status": "done",
+            "priority": "normal",
+            "scheduled": "2026-11-14",
+            "completedDate": "2026-11-15",
+            "dateCreated": "2026-11-15T01:45:54.496-05:00",
+            "dateModified": "2026-11-15T01:45:54.701-05:00",
+            "recurrence_parent": "[[TaskNotes/Tasks/P7-contract-1794725143104-coordinator-existing-next]]",
+            "occurrence_date": "2026-11-14",
+            "tags": [
+              "task"
+            ],
+            "archived": false,
+            "staged": null,
+            "customProperties": {
+              "staged": null
+            },
+            "id": "TaskNotes/Tasks/P7-contract-1794725143104-coordinator-existing-next-3.md",
+            "contexts": [],
+            "projects": [],
+            "totalTrackedTime": 0,
+            "isBlocked": false,
+            "isBlocking": false
+          },
+          "raw": "---\ntitle: P7-contract-1794725143104-coordinator-existing-next\nstatus: done\npriority: normal\nscheduled: 2026-11-14\nrecurrence_parent: \"[[TaskNotes/Tasks/P7-contract-1794725143104-coordinator-existing-next]]\"\noccurrence_date: 2026-11-14\ndateCreated: 2026-11-15T01:45:54.496-05:00\ndateModified: 2026-11-15T01:45:54.701-05:00\ntags:\n  - task\nstaged:\ncompletedDate: 2026-11-15\n---\n\n"
+        },
+        {
+          "task": {
+            "path": "TaskNotes/Tasks/P7-contract-1794725143104-coordinator-existing-next-2.md",
+            "title": "P7-contract-1794725143104-coordinator-existing-next",
+            "status": "open",
+            "priority": "normal",
+            "scheduled": "2026-11-16",
+            "dateCreated": "2026-11-15T01:45:53.978-05:00",
+            "dateModified": "2026-11-15T01:45:54.306-05:00",
+            "recurrence_parent": "[[TaskNotes/Tasks/P7-contract-1794725143104-coordinator-existing-next]]",
+            "occurrence_date": "2026-11-16",
+            "tags": [
+              "task"
+            ],
+            "archived": false,
+            "staged": "2026-11-17",
+            "customProperties": {
+              "staged": "2026-11-17"
+            },
+            "id": "TaskNotes/Tasks/P7-contract-1794725143104-coordinator-existing-next-2.md",
+            "contexts": [],
+            "projects": [],
+            "totalTrackedTime": 0,
+            "isBlocked": false,
+            "isBlocking": false
+          },
+          "raw": "---\ntitle: P7-contract-1794725143104-coordinator-existing-next\nstatus: open\npriority: normal\nscheduled: 2026-11-16\nrecurrence_parent: \"[[TaskNotes/Tasks/P7-contract-1794725143104-coordinator-existing-next]]\"\noccurrence_date: 2026-11-16\ndateCreated: 2026-11-15T01:45:53.978-05:00\ndateModified: 2026-11-15T01:45:54.306-05:00\ntags:\n  - task\nstaged: 2026-11-17\n---\n\n"
+        },
+        {
+          "task": {
+            "path": "TaskNotes/Tasks/P7-contract-1794725143104-coordinator-existing-next.md",
+            "title": "P7-contract-1794725143104-coordinator-existing-next",
+            "status": "open",
+            "priority": "normal",
+            "scheduled": "2026-11-16",
+            "recurrence": "DTSTART:20261109;FREQ=WEEKLY;BYDAY=MO",
+            "dateCreated": "2026-11-15T01:45:53.907-05:00",
+            "dateModified": "2026-11-15T01:45:54.660-05:00",
+            "timeEntries": [
+              {
+                "startTime": "2026-11-15T06:45:54.446Z",
+                "description": "Work session",
+                "endTime": "2026-11-15T06:45:54.599Z"
+              }
+            ],
+            "complete_instances": [
+              "2026-11-14"
+            ],
+            "occurrence_materialization": "on_completion",
+            "tags": [
+              "task"
+            ],
+            "archived": false,
+            "staged": null,
+            "customProperties": {
+              "staged": null
+            },
+            "id": "TaskNotes/Tasks/P7-contract-1794725143104-coordinator-existing-next.md",
+            "contexts": [],
+            "projects": [],
+            "totalTrackedTime": 0,
+            "isBlocked": false,
+            "isBlocking": false
+          },
+          "raw": "---\nstatus: open\npriority: normal\nscheduled: 2026-11-16\nrecurrence: DTSTART:20261109;FREQ=WEEKLY;BYDAY=MO\noccurrence_materialization: on_completion\ndateCreated: 2026-11-15T01:45:53.907-05:00\ndateModified: 2026-11-15T01:45:54.660-05:00\ntags:\n  - task\nstaged:\ntimeEntries:\n  - startTime: 2026-11-15T06:45:54.446Z\n    description: Work session\n    endTime: 2026-11-15T06:45:54.599Z\ncomplete_instances:\n  - 2026-11-14\n---\n\n"
+        }
+      ]
+    },
+    {
+      "name": "coordinator-pomodoro-refusal",
+      "expectedOutcome": "unavailable",
+      "before": {
+        "task": {
+          "task": {
+            "path": "TaskNotes/Tasks/P7-contract-1794725143104-protected-pomodoro.md",
+            "title": "P7-contract-1794725143104-protected-pomodoro",
+            "status": "open",
+            "priority": "normal",
+            "scheduled": "2026-11-09",
+            "recurrence": "DTSTART:20261109;FREQ=WEEKLY;BYDAY=MO",
+            "dateCreated": "2026-11-15T01:45:55.186-05:00",
+            "dateModified": "2026-11-15T01:45:55.583-05:00",
+            "timeEntries": [
+              {
+                "startTime": "2026-11-15T06:45:55.583Z",
+                "description": "Work session"
+              }
+            ],
+            "tags": [
+              "task"
+            ],
+            "archived": false,
+            "staged": "2026-11-14",
+            "customProperties": {
+              "staged": "2026-11-14"
+            },
+            "id": "TaskNotes/Tasks/P7-contract-1794725143104-protected-pomodoro.md",
+            "contexts": [],
+            "projects": [],
+            "totalTrackedTime": 0,
+            "isBlocked": false,
+            "isBlocking": false
+          },
+          "raw": "---\nstatus: open\npriority: normal\nscheduled: 2026-11-09\nrecurrence: DTSTART:20261109;FREQ=WEEKLY;BYDAY=MO\ndateCreated: 2026-11-15T01:45:55.186-05:00\ndateModified: 2026-11-15T01:45:55.583-05:00\ntags:\n  - task\nstaged: 2026-11-14\ntimeEntries:\n  - startTime: 2026-11-15T06:45:55.583Z\n    description: Work session\n---\n\n"
+        },
+        "pomodoro": {
+          "isRunning": true,
+          "timeRemaining": 1500,
+          "currentSession": {
+            "id": "1794725155550",
+            "taskPath": "TaskNotes/Tasks/P7-contract-1794725143104-protected-pomodoro.md",
+            "startTime": "2026-11-15T01:45:55.550-05:00",
+            "plannedDuration": 25,
+            "type": "work",
+            "completed": false,
+            "activePeriods": [
+              {
+                "startTime": "2026-11-15T01:45:55.550-05:00"
+              }
+            ],
+            "timeTrackingStartTime": "2026-11-15T06:45:55.583Z"
+          }
+        }
+      },
+      "outcome": "unavailable",
+      "after": {
+        "task": {
+          "task": {
+            "path": "TaskNotes/Tasks/P7-contract-1794725143104-protected-pomodoro.md",
+            "title": "P7-contract-1794725143104-protected-pomodoro",
+            "status": "open",
+            "priority": "normal",
+            "scheduled": "2026-11-09",
+            "recurrence": "DTSTART:20261109;FREQ=WEEKLY;BYDAY=MO",
+            "dateCreated": "2026-11-15T01:45:55.186-05:00",
+            "dateModified": "2026-11-15T01:45:55.583-05:00",
+            "timeEntries": [
+              {
+                "startTime": "2026-11-15T06:45:55.583Z",
+                "description": "Work session"
+              }
+            ],
+            "tags": [
+              "task"
+            ],
+            "archived": false,
+            "staged": "2026-11-14",
+            "customProperties": {
+              "staged": "2026-11-14"
+            },
+            "id": "TaskNotes/Tasks/P7-contract-1794725143104-protected-pomodoro.md",
+            "contexts": [],
+            "projects": [],
+            "totalTrackedTime": 0,
+            "isBlocked": false,
+            "isBlocking": false
+          },
+          "raw": "---\nstatus: open\npriority: normal\nscheduled: 2026-11-09\nrecurrence: DTSTART:20261109;FREQ=WEEKLY;BYDAY=MO\ndateCreated: 2026-11-15T01:45:55.186-05:00\ndateModified: 2026-11-15T01:45:55.583-05:00\ntags:\n  - task\nstaged: 2026-11-14\ntimeEntries:\n  - startTime: 2026-11-15T06:45:55.583Z\n    description: Work session\n---\n\n"
+        },
+        "pomodoro": {
+          "isRunning": true,
+          "timeRemaining": 1500,
+          "currentSession": {
+            "id": "1794725155550",
+            "taskPath": "TaskNotes/Tasks/P7-contract-1794725143104-protected-pomodoro.md",
+            "startTime": "2026-11-15T01:45:55.550-05:00",
+            "plannedDuration": 25,
+            "type": "work",
+            "completed": false,
+            "activePeriods": [
+              {
+                "startTime": "2026-11-15T01:45:55.550-05:00"
+              }
+            ],
+            "timeTrackingStartTime": "2026-11-15T06:45:55.583Z"
+          }
+        }
+      }
+    },
+    {
+      "name": "coordinator-restart-refusal",
+      "expectedOutcome": "unavailable",
+      "freshPlugin": true,
+      "before": {
+        "task": {
+          "path": "TaskNotes/Tasks/P7-contract-1794725143104-coordinator-virtual.md",
+          "title": "P7-contract-1794725143104-coordinator-virtual",
+          "status": "open",
+          "priority": "normal",
+          "scheduled": "2026-11-16",
+          "recurrence": "DTSTART:20261109;FREQ=WEEKLY;BYDAY=MO",
+          "dateCreated": "2026-11-15T01:45:50.733-05:00",
+          "dateModified": "2026-11-15T01:45:51.211-05:00",
+          "timeEntries": [
+            {
+              "startTime": "2026-11-15T06:45:51.098Z",
+              "description": "Work session",
+              "endTime": "2026-11-15T06:45:51.157Z"
+            }
+          ],
+          "complete_instances": [
+            "2026-11-09"
+          ],
+          "skipped_instances": [],
+          "tags": [
+            "task"
+          ],
+          "archived": false,
+          "staged": null,
+          "customProperties": {
+            "staged": null
+          },
+          "id": "TaskNotes/Tasks/P7-contract-1794725143104-coordinator-virtual.md",
+          "contexts": [],
+          "projects": [],
+          "totalTrackedTime": 0,
+          "isBlocked": false,
+          "isBlocking": false
+        },
+        "raw": "---\nstatus: open\npriority: normal\nscheduled: 2026-11-16\nrecurrence: DTSTART:20261109;FREQ=WEEKLY;BYDAY=MO\ndateCreated: 2026-11-15T01:45:50.733-05:00\ndateModified: 2026-11-15T01:45:51.211-05:00\ntags:\n  - task\nstaged:\ntimeEntries:\n  - startTime: 2026-11-15T06:45:51.098Z\n    description: Work session\n    endTime: 2026-11-15T06:45:51.157Z\ncomplete_instances:\n  - 2026-11-09\nskipped_instances: []\n---\n\n"
+      },
+      "outcome": "unavailable",
+      "after": {
+        "task": {
+          "path": "TaskNotes/Tasks/P7-contract-1794725143104-coordinator-virtual.md",
+          "title": "P7-contract-1794725143104-coordinator-virtual",
+          "status": "open",
+          "priority": "normal",
+          "scheduled": "2026-11-16",
+          "recurrence": "DTSTART:20261109;FREQ=WEEKLY;BYDAY=MO",
+          "dateCreated": "2026-11-15T01:45:50.733-05:00",
+          "dateModified": "2026-11-15T01:45:51.211-05:00",
+          "timeEntries": [
+            {
+              "startTime": "2026-11-15T06:45:51.098Z",
+              "description": "Work session",
+              "endTime": "2026-11-15T06:45:51.157Z"
+            }
+          ],
+          "complete_instances": [
+            "2026-11-09"
+          ],
+          "skipped_instances": [],
+          "tags": [
+            "task"
+          ],
+          "archived": false,
+          "staged": null,
+          "customProperties": {
+            "staged": null
+          },
+          "id": "TaskNotes/Tasks/P7-contract-1794725143104-coordinator-virtual.md",
+          "contexts": [],
+          "projects": [],
+          "totalTrackedTime": 0,
+          "isBlocked": false,
+          "isBlocking": false
+        },
+        "raw": "---\nstatus: open\npriority: normal\nscheduled: 2026-11-16\nrecurrence: DTSTART:20261109;FREQ=WEEKLY;BYDAY=MO\ndateCreated: 2026-11-15T01:45:50.733-05:00\ndateModified: 2026-11-15T01:45:51.211-05:00\ntags:\n  - task\nstaged:\ntimeEntries:\n  - startTime: 2026-11-15T06:45:51.098Z\n    description: Work session\n    endTime: 2026-11-15T06:45:51.157Z\ncomplete_instances:\n  - 2026-11-09\nskipped_instances: []\n---\n\n"
+      },
+      "restoredRecords": [
+        {
+          "attemptId": "4efc6dba-996a-4040-8992-547fbb8fdf11",
+          "sourcePath": "TaskNotes/Tasks/P7-contract-1794725143104-coordinator-virtual.md",
+          "requestDay": "2026-11-14",
+          "requestedAt": 1794725151113,
+          "beforeEvidence": {
+            "status": "open",
+            "staged": "2026-11-14",
+            "title": "P7-contract-1794725143104-coordinator-virtual",
+            "completedStatus": "done",
+            "parentPath": "TaskNotes/Tasks/P7-contract-1794725143104-coordinator-virtual.md",
+            "recurrence": "DTSTART:20261109;FREQ=WEEKLY;BYDAY=MO",
+            "completedDates": [],
+            "existingPaths": [
+              "TaskNotes/Tasks/P7-contract-1794725143104-coordinator-virtual.md"
+            ]
+          },
+          "replayProtected": true,
+          "cleanupEvidence": [
+            {
+              "path": "TaskNotes/Tasks/P7-contract-1794725143104-coordinator-virtual.md",
+              "staged": "2026-11-14"
+            }
+          ],
+          "phase": "confirmed",
+          "pendingCleanupPaths": [],
+          "completedPath": "TaskNotes/Tasks/P7-contract-1794725143104-coordinator-virtual.md",
+          "resolvedDate": "2026-11-09",
+          "completedAt": 1794725151113
+        }
+      ]
+    }
+  ],
+  "fixturePaths": [
+    "TaskNotes/Tasks/P7-contract-1794725143104-exact.md",
+    "TaskNotes/Tasks/P7-contract-1794725143104-off-schedule.md",
+    "TaskNotes/Tasks/P7-contract-1794725143104-completion-anchor.md",
+    "TaskNotes/Tasks/P7-contract-1794725143104-existing.md",
+    "TaskNotes/Tasks/P7-contract-1794725143104-auto.md",
+    "TaskNotes/Tasks/P7-contract-1794725143104-existing-next.md",
+    "TaskNotes/Tasks/P7-contract-1794725143104-off-schedule-materialize.md",
+    "TaskNotes/Tasks/P7-contract-1794725143104-regular-timing.md",
+    "TaskNotes/Tasks/P7-contract-1794725143104-pomodoro.md",
+    "TaskNotes/Tasks/P7-contract-1794725143104-ordinary-callback.md",
+    "TaskNotes/Tasks/P7-contract-1794725143104-coordinator-virtual.md",
+    "TaskNotes/Tasks/P7-contract-1794725143104-coordinator-on_completion.md",
+    "TaskNotes/Tasks/P7-contract-1794725143104-coordinator-existing.md",
+    "TaskNotes/Tasks/P7-contract-1794725143104-coordinator-existing-next.md",
+    "TaskNotes/Tasks/P7-contract-1794725143104-protected-pomodoro.md"
+  ],
+  "currentStep": "restart:complete",
+  "autoStopSettings": {
+    "autoStopTimeTrackingOnComplete": true,
+    "autoStopTimeTrackingNotification": false
+  },
+  "fixtures": [
+    {
+      "task": {
+        "path": "TaskNotes/Tasks/P7-contract-1794725143104-protected-pomodoro.md",
+        "title": "P7-contract-1794725143104-protected-pomodoro",
+        "status": "open",
+        "priority": "normal",
+        "scheduled": "2026-11-09",
+        "recurrence": "DTSTART:20261109;FREQ=WEEKLY;BYDAY=MO",
+        "dateCreated": "2026-11-15T01:45:55.186-05:00",
+        "dateModified": "2026-11-15T01:45:56.100-05:00",
+        "timeEntries": [
+          {
+            "startTime": "2026-11-15T06:45:55.583Z",
+            "description": "Work session",
+            "endTime": "2026-11-15T06:45:56.100Z"
+          }
+        ],
+        "tags": [
+          "task"
+        ],
+        "archived": false,
+        "staged": "2026-11-14",
+        "customProperties": {
+          "staged": "2026-11-14"
+        },
+        "id": "TaskNotes/Tasks/P7-contract-1794725143104-protected-pomodoro.md",
+        "contexts": [],
+        "projects": [],
+        "totalTrackedTime": 0,
+        "isBlocked": false,
+        "isBlocking": false
+      },
+      "raw": "---\nstatus: open\npriority: normal\nscheduled: 2026-11-09\nrecurrence: DTSTART:20261109;FREQ=WEEKLY;BYDAY=MO\ndateCreated: 2026-11-15T01:45:55.186-05:00\ndateModified: 2026-11-15T01:45:56.100-05:00\ntags:\n  - task\nstaged: 2026-11-14\ntimeEntries:\n  - startTime: 2026-11-15T06:45:55.583Z\n    description: Work session\n    endTime: 2026-11-15T06:45:56.100Z\n---\n\n"
+    },
+    {
+      "task": {
+        "path": "TaskNotes/Tasks/P7-contract-1794725143104-coordinator-existing-next-3.md",
+        "title": "P7-contract-1794725143104-coordinator-existing-next",
+        "status": "done",
+        "priority": "normal",
+        "scheduled": "2026-11-14",
+        "completedDate": "2026-11-15",
+        "dateCreated": "2026-11-15T01:45:54.496-05:00",
+        "dateModified": "2026-11-15T01:45:54.701-05:00",
+        "recurrence_parent": "[[TaskNotes/Tasks/P7-contract-1794725143104-coordinator-existing-next]]",
+        "occurrence_date": "2026-11-14",
+        "tags": [
+          "task"
+        ],
+        "archived": false,
+        "staged": null,
+        "customProperties": {
+          "staged": null
+        },
+        "id": "TaskNotes/Tasks/P7-contract-1794725143104-coordinator-existing-next-3.md",
+        "contexts": [],
+        "projects": [],
+        "totalTrackedTime": 0,
+        "isBlocked": false,
+        "isBlocking": false
+      },
+      "raw": "---\ntitle: P7-contract-1794725143104-coordinator-existing-next\nstatus: done\npriority: normal\nscheduled: 2026-11-14\nrecurrence_parent: \"[[TaskNotes/Tasks/P7-contract-1794725143104-coordinator-existing-next]]\"\noccurrence_date: 2026-11-14\ndateCreated: 2026-11-15T01:45:54.496-05:00\ndateModified: 2026-11-15T01:45:54.701-05:00\ntags:\n  - task\nstaged:\ncompletedDate: 2026-11-15\n---\n\n"
+    },
+    {
+      "task": {
+        "path": "TaskNotes/Tasks/P7-contract-1794725143104-coordinator-existing-next-2.md",
+        "title": "P7-contract-1794725143104-coordinator-existing-next",
+        "status": "open",
+        "priority": "normal",
+        "scheduled": "2026-11-16",
+        "dateCreated": "2026-11-15T01:45:53.978-05:00",
+        "dateModified": "2026-11-15T01:45:54.306-05:00",
+        "recurrence_parent": "[[TaskNotes/Tasks/P7-contract-1794725143104-coordinator-existing-next]]",
+        "occurrence_date": "2026-11-16",
+        "tags": [
+          "task"
+        ],
+        "archived": false,
+        "staged": "2026-11-17",
+        "customProperties": {
+          "staged": "2026-11-17"
+        },
+        "id": "TaskNotes/Tasks/P7-contract-1794725143104-coordinator-existing-next-2.md",
+        "contexts": [],
+        "projects": [],
+        "totalTrackedTime": 0,
+        "isBlocked": false,
+        "isBlocking": false
+      },
+      "raw": "---\ntitle: P7-contract-1794725143104-coordinator-existing-next\nstatus: open\npriority: normal\nscheduled: 2026-11-16\nrecurrence_parent: \"[[TaskNotes/Tasks/P7-contract-1794725143104-coordinator-existing-next]]\"\noccurrence_date: 2026-11-16\ndateCreated: 2026-11-15T01:45:53.978-05:00\ndateModified: 2026-11-15T01:45:54.306-05:00\ntags:\n  - task\nstaged: 2026-11-17\n---\n\n"
+    },
+    {
+      "task": {
+        "path": "TaskNotes/Tasks/P7-contract-1794725143104-coordinator-existing-next.md",
+        "title": "P7-contract-1794725143104-coordinator-existing-next",
+        "status": "open",
+        "priority": "normal",
+        "scheduled": "2026-11-16",
+        "recurrence": "DTSTART:20261109;FREQ=WEEKLY;BYDAY=MO",
+        "dateCreated": "2026-11-15T01:45:53.907-05:00",
+        "dateModified": "2026-11-15T01:45:54.660-05:00",
+        "timeEntries": [
+          {
+            "startTime": "2026-11-15T06:45:54.446Z",
+            "description": "Work session",
+            "endTime": "2026-11-15T06:45:54.599Z"
+          }
+        ],
+        "complete_instances": [
+          "2026-11-14"
+        ],
+        "occurrence_materialization": "on_completion",
+        "tags": [
+          "task"
+        ],
+        "archived": false,
+        "staged": null,
+        "customProperties": {
+          "staged": null
+        },
+        "id": "TaskNotes/Tasks/P7-contract-1794725143104-coordinator-existing-next.md",
+        "contexts": [],
+        "projects": [],
+        "totalTrackedTime": 0,
+        "isBlocked": false,
+        "isBlocking": false
+      },
+      "raw": "---\nstatus: open\npriority: normal\nscheduled: 2026-11-16\nrecurrence: DTSTART:20261109;FREQ=WEEKLY;BYDAY=MO\noccurrence_materialization: on_completion\ndateCreated: 2026-11-15T01:45:53.907-05:00\ndateModified: 2026-11-15T01:45:54.660-05:00\ntags:\n  - task\nstaged:\ntimeEntries:\n  - startTime: 2026-11-15T06:45:54.446Z\n    description: Work session\n    endTime: 2026-11-15T06:45:54.599Z\ncomplete_instances:\n  - 2026-11-14\n---\n\n"
+    },
+    {
+      "task": {
+        "path": "TaskNotes/Tasks/P7-contract-1794725143104-coordinator-existing-2.md",
+        "title": "P7-contract-1794725143104-coordinator-existing",
+        "status": "done",
+        "priority": "normal",
+        "scheduled": "2026-11-14",
+        "completedDate": "2026-11-15",
+        "dateCreated": "2026-11-15T01:45:53.268-05:00",
+        "dateModified": "2026-11-15T01:45:53.404-05:00",
+        "recurrence_parent": "[[TaskNotes/Tasks/P7-contract-1794725143104-coordinator-existing]]",
+        "occurrence_date": "2026-11-14",
+        "tags": [
+          "task"
+        ],
+        "archived": false,
+        "staged": "2026-11-14",
+        "customProperties": {
+          "staged": "2026-11-14"
+        },
+        "id": "TaskNotes/Tasks/P7-contract-1794725143104-coordinator-existing-2.md",
+        "contexts": [],
+        "projects": [],
+        "totalTrackedTime": 0,
+        "isBlocked": false,
+        "isBlocking": false
+      },
+      "raw": "---\ntitle: P7-contract-1794725143104-coordinator-existing\nstatus: done\npriority: normal\nscheduled: 2026-11-14\nrecurrence_parent: \"[[TaskNotes/Tasks/P7-contract-1794725143104-coordinator-existing]]\"\noccurrence_date: 2026-11-14\ndateCreated: 2026-11-15T01:45:53.268-05:00\ndateModified: 2026-11-15T01:45:53.404-05:00\ntags:\n  - task\nstaged: 2026-11-14\ncompletedDate: 2026-11-15\n---\n\n"
+    },
+    {
+      "task": {
+        "path": "TaskNotes/Tasks/P7-contract-1794725143104-coordinator-existing.md",
+        "title": "P7-contract-1794725143104-coordinator-existing",
+        "status": "open",
+        "priority": "normal",
+        "scheduled": "2026-11-16",
+        "recurrence": "DTSTART:20261109;FREQ=WEEKLY;BYDAY=MO",
+        "dateCreated": "2026-11-15T01:45:52.903-05:00",
+        "dateModified": "2026-11-15T01:45:53.454-05:00",
+        "timeEntries": [
+          {
+            "startTime": "2026-11-15T06:45:53.336Z",
+            "description": "Work session",
+            "endTime": "2026-11-15T06:45:53.393Z"
+          }
+        ],
+        "complete_instances": [
+          "2026-11-14"
+        ],
+        "tags": [
+          "task"
+        ],
+        "archived": false,
+        "staged": null,
+        "customProperties": {
+          "staged": null
+        },
+        "id": "TaskNotes/Tasks/P7-contract-1794725143104-coordinator-existing.md",
+        "contexts": [],
+        "projects": [],
+        "totalTrackedTime": 0,
+        "isBlocked": false,
+        "isBlocking": false
+      },
+      "raw": "---\nstatus: open\npriority: normal\nscheduled: 2026-11-16\nrecurrence: DTSTART:20261109;FREQ=WEEKLY;BYDAY=MO\ndateCreated: 2026-11-15T01:45:52.903-05:00\ndateModified: 2026-11-15T01:45:53.454-05:00\ntags:\n  - task\nstaged:\ntimeEntries:\n  - startTime: 2026-11-15T06:45:53.336Z\n    description: Work session\n    endTime: 2026-11-15T06:45:53.393Z\ncomplete_instances:\n  - 2026-11-14\n---\n\n"
+    },
+    {
+      "task": {
+        "path": "TaskNotes/Tasks/P7-contract-1794725143104-coordinator-on_completion-3.md",
+        "title": "P7-contract-1794725143104-coordinator-on_completion",
+        "status": "done",
+        "priority": "normal",
+        "scheduled": "2026-11-14",
+        "completedDate": "2026-11-15",
+        "dateCreated": "2026-11-15T01:45:52.239-05:00",
+        "dateModified": "2026-11-15T01:45:52.432-05:00",
+        "recurrence_parent": "[[TaskNotes/Tasks/P7-contract-1794725143104-coordinator-on_completion]]",
+        "occurrence_date": "2026-11-14",
+        "tags": [
+          "task"
+        ],
+        "archived": false,
+        "staged": null,
+        "customProperties": {
+          "staged": null
+        },
+        "id": "TaskNotes/Tasks/P7-contract-1794725143104-coordinator-on_completion-3.md",
+        "contexts": [],
+        "projects": [],
+        "totalTrackedTime": 0,
+        "isBlocked": false,
+        "isBlocking": false
+      },
+      "raw": "---\ntitle: P7-contract-1794725143104-coordinator-on_completion\nstatus: done\npriority: normal\nscheduled: 2026-11-14\nrecurrence_parent: \"[[TaskNotes/Tasks/P7-contract-1794725143104-coordinator-on_completion]]\"\noccurrence_date: 2026-11-14\ndateCreated: 2026-11-15T01:45:52.239-05:00\ndateModified: 2026-11-15T01:45:52.432-05:00\ntags:\n  - task\nstaged:\ncompletedDate: 2026-11-15\n---\n\n"
+    },
+    {
+      "task": {
+        "path": "TaskNotes/Tasks/P7-contract-1794725143104-coordinator-on_completion-2.md",
+        "title": "P7-contract-1794725143104-coordinator-on_completion",
+        "status": "open",
+        "priority": "normal",
+        "scheduled": "2026-11-16",
+        "dateCreated": "2026-11-15T01:45:51.711-05:00",
+        "dateModified": "2026-11-15T01:45:51.711-05:00",
+        "recurrence_parent": "[[TaskNotes/Tasks/P7-contract-1794725143104-coordinator-on_completion]]",
+        "occurrence_date": "2026-11-16",
+        "tags": [
+          "task"
+        ],
+        "archived": false,
+        "id": "TaskNotes/Tasks/P7-contract-1794725143104-coordinator-on_completion-2.md",
+        "contexts": [],
+        "projects": [],
+        "totalTrackedTime": 0,
+        "isBlocked": false,
+        "isBlocking": false
+      },
+      "raw": "---\ntitle: P7-contract-1794725143104-coordinator-on_completion\nstatus: open\npriority: normal\nscheduled: 2026-11-16\nrecurrence_parent: \"[[TaskNotes/Tasks/P7-contract-1794725143104-coordinator-on_completion]]\"\noccurrence_date: 2026-11-16\ndateCreated: 2026-11-15T01:45:51.711-05:00\ndateModified: 2026-11-15T01:45:51.711-05:00\ntags:\n  - task\n---\n\n"
+    },
+    {
+      "task": {
+        "path": "TaskNotes/Tasks/P7-contract-1794725143104-coordinator-on_completion.md",
+        "title": "P7-contract-1794725143104-coordinator-on_completion",
+        "status": "open",
+        "priority": "normal",
+        "scheduled": "2026-11-16",
+        "recurrence": "DTSTART:20261109;FREQ=WEEKLY;BYDAY=MO",
+        "dateCreated": "2026-11-15T01:45:51.647-05:00",
+        "dateModified": "2026-11-15T01:45:52.396-05:00",
+        "timeEntries": [
+          {
+            "startTime": "2026-11-15T06:45:52.195Z",
+            "description": "Work session",
+            "endTime": "2026-11-15T06:45:52.338Z"
+          }
+        ],
+        "complete_instances": [
+          "2026-11-14"
+        ],
+        "occurrence_materialization": "on_completion",
+        "tags": [
+          "task"
+        ],
+        "archived": false,
+        "staged": null,
+        "customProperties": {
+          "staged": null
+        },
+        "id": "TaskNotes/Tasks/P7-contract-1794725143104-coordinator-on_completion.md",
+        "contexts": [],
+        "projects": [],
+        "totalTrackedTime": 0,
+        "isBlocked": false,
+        "isBlocking": false
+      },
+      "raw": "---\nstatus: open\npriority: normal\nscheduled: 2026-11-16\nrecurrence: DTSTART:20261109;FREQ=WEEKLY;BYDAY=MO\noccurrence_materialization: on_completion\ndateCreated: 2026-11-15T01:45:51.647-05:00\ndateModified: 2026-11-15T01:45:52.396-05:00\ntags:\n  - task\nstaged:\ntimeEntries:\n  - startTime: 2026-11-15T06:45:52.195Z\n    description: Work session\n    endTime: 2026-11-15T06:45:52.338Z\ncomplete_instances:\n  - 2026-11-14\n---\n\n"
+    },
+    {
+      "task": {
+        "path": "TaskNotes/Tasks/P7-contract-1794725143104-coordinator-virtual.md",
+        "title": "P7-contract-1794725143104-coordinator-virtual",
+        "status": "open",
+        "priority": "normal",
+        "scheduled": "2026-11-16",
+        "recurrence": "DTSTART:20261109;FREQ=WEEKLY;BYDAY=MO",
+        "dateCreated": "2026-11-15T01:45:50.733-05:00",
+        "dateModified": "2026-11-15T01:45:51.211-05:00",
+        "timeEntries": [
+          {
+            "startTime": "2026-11-15T06:45:51.098Z",
+            "description": "Work session",
+            "endTime": "2026-11-15T06:45:51.157Z"
+          }
+        ],
+        "complete_instances": [
+          "2026-11-09"
+        ],
+        "skipped_instances": [],
+        "tags": [
+          "task"
+        ],
+        "archived": false,
+        "staged": null,
+        "customProperties": {
+          "staged": null
+        },
+        "id": "TaskNotes/Tasks/P7-contract-1794725143104-coordinator-virtual.md",
+        "contexts": [],
+        "projects": [],
+        "totalTrackedTime": 0,
+        "isBlocked": false,
+        "isBlocking": false
+      },
+      "raw": "---\nstatus: open\npriority: normal\nscheduled: 2026-11-16\nrecurrence: DTSTART:20261109;FREQ=WEEKLY;BYDAY=MO\ndateCreated: 2026-11-15T01:45:50.733-05:00\ndateModified: 2026-11-15T01:45:51.211-05:00\ntags:\n  - task\nstaged:\ntimeEntries:\n  - startTime: 2026-11-15T06:45:51.098Z\n    description: Work session\n    endTime: 2026-11-15T06:45:51.157Z\ncomplete_instances:\n  - 2026-11-09\nskipped_instances: []\n---\n\n"
+    },
+    {
+      "task": {
+        "path": "TaskNotes/Tasks/P7-contract-1794725143104-ordinary-callback.md",
+        "title": "P7-contract-1794725143104-ordinary-callback",
+        "status": "done",
+        "priority": "normal",
+        "scheduled": "2026-11-09",
+        "completedDate": "2026-11-15",
+        "dateCreated": "2026-11-15T01:45:49.646-05:00",
+        "dateModified": "2026-11-15T01:45:50.421-05:00",
+        "timeEntries": [
+          {
+            "startTime": "2026-11-15T06:45:50.002Z",
+            "description": "Work session",
+            "endTime": "2026-11-15T06:45:50.372Z"
+          }
+        ],
+        "tags": [
+          "task"
+        ],
+        "archived": false,
+        "staged": null,
+        "customProperties": {
+          "staged": null
+        },
+        "id": "TaskNotes/Tasks/P7-contract-1794725143104-ordinary-callback.md",
+        "contexts": [],
+        "projects": [],
+        "totalTrackedTime": 0,
+        "isBlocked": false,
+        "isBlocking": false
+      },
+      "raw": "---\nstatus: done\npriority: normal\nscheduled: 2026-11-09\ndateCreated: 2026-11-15T01:45:49.646-05:00\ndateModified: 2026-11-15T01:45:50.421-05:00\ntags:\n  - task\nstaged:\ntimeEntries:\n  - startTime: 2026-11-15T06:45:50.002Z\n    description: Work session\n    endTime: 2026-11-15T06:45:50.372Z\ncompletedDate: 2026-11-15\n---\n\n"
+    },
+    {
+      "task": {
+        "path": "TaskNotes/Tasks/P7-contract-1794725143104-pomodoro.md",
+        "title": "P7-contract-1794725143104-pomodoro",
+        "status": "open",
+        "priority": "normal",
+        "scheduled": "2026-11-16",
+        "recurrence": "DTSTART:20261109;FREQ=WEEKLY;BYDAY=MO",
+        "dateCreated": "2026-11-15T01:45:48.329-05:00",
+        "dateModified": "2026-11-15T01:45:49.105-05:00",
+        "timeEntries": [
+          {
+            "startTime": "2026-11-15T06:45:48.752Z",
+            "description": "Work session",
+            "endTime": "2026-11-15T06:45:49.105Z"
+          }
+        ],
+        "complete_instances": [
+          "2026-11-09"
+        ],
+        "skipped_instances": [],
+        "tags": [
+          "task"
+        ],
+        "archived": false,
+        "staged": "2026-11-14",
+        "customProperties": {
+          "staged": "2026-11-14"
+        },
+        "id": "TaskNotes/Tasks/P7-contract-1794725143104-pomodoro.md",
+        "contexts": [],
+        "projects": [],
+        "totalTrackedTime": 0,
+        "isBlocked": false,
+        "isBlocking": false
+      },
+      "raw": "---\nstatus: open\npriority: normal\nscheduled: 2026-11-16\nrecurrence: DTSTART:20261109;FREQ=WEEKLY;BYDAY=MO\ndateCreated: 2026-11-15T01:45:48.329-05:00\ndateModified: 2026-11-15T01:45:49.105-05:00\ntags:\n  - task\nstaged: 2026-11-14\ntimeEntries:\n  - startTime: 2026-11-15T06:45:48.752Z\n    description: Work session\n    endTime: 2026-11-15T06:45:49.105Z\ncomplete_instances:\n  - 2026-11-09\nskipped_instances: []\n---\n\n"
+    },
+    {
+      "task": {
+        "path": "TaskNotes/Tasks/P7-contract-1794725143104-regular-timing.md",
+        "title": "P7-contract-1794725143104-regular-timing",
+        "status": "open",
+        "priority": "normal",
+        "scheduled": "2026-11-16",
+        "recurrence": "DTSTART:20261109;FREQ=WEEKLY;BYDAY=MO",
+        "dateCreated": "2026-11-15T01:45:47.461-05:00",
+        "dateModified": "2026-11-15T01:45:47.825-05:00",
+        "timeEntries": [
+          {
+            "startTime": "2026-11-15T06:45:47.798Z",
+            "description": "Work session",
+            "endTime": "2026-11-15T06:45:47.826Z"
+          }
+        ],
+        "complete_instances": [
+          "2026-11-09"
+        ],
+        "skipped_instances": [],
+        "tags": [
+          "task"
+        ],
+        "archived": false,
+        "staged": "2026-11-14",
+        "customProperties": {
+          "staged": "2026-11-14"
+        },
+        "id": "TaskNotes/Tasks/P7-contract-1794725143104-regular-timing.md",
+        "contexts": [],
+        "projects": [],
+        "totalTrackedTime": 0,
+        "isBlocked": false,
+        "isBlocking": false
+      },
+      "raw": "---\nstatus: open\npriority: normal\nscheduled: 2026-11-16\nrecurrence: DTSTART:20261109;FREQ=WEEKLY;BYDAY=MO\ndateCreated: 2026-11-15T01:45:47.461-05:00\ndateModified: 2026-11-15T01:45:47.825-05:00\ntags:\n  - task\nstaged: 2026-11-14\ntimeEntries:\n  - startTime: 2026-11-15T06:45:47.798Z\n    description: Work session\n    endTime: 2026-11-15T06:45:47.826Z\ncomplete_instances:\n  - 2026-11-09\nskipped_instances: []\n---\n\n"
+    },
+    {
+      "task": {
+        "path": "TaskNotes/Tasks/P7-contract-1794725143104-off-schedule-materialize-2.md",
+        "title": "P7-contract-1794725143104-off-schedule-materialize",
+        "status": "open",
+        "priority": "normal",
+        "scheduled": "2026-11-14",
+        "dateCreated": "2026-11-15T01:45:47.400-05:00",
+        "dateModified": "2026-11-15T01:45:47.400-05:00",
+        "recurrence_parent": "[[TaskNotes/Tasks/P7-contract-1794725143104-off-schedule-materialize]]",
+        "occurrence_date": "2026-11-14",
+        "tags": [
+          "task"
+        ],
+        "archived": false,
+        "staged": "2026-11-14",
+        "customProperties": {
+          "staged": "2026-11-14"
+        },
+        "id": "TaskNotes/Tasks/P7-contract-1794725143104-off-schedule-materialize-2.md",
+        "contexts": [],
+        "projects": [],
+        "totalTrackedTime": 0,
+        "isBlocked": false,
+        "isBlocking": false
+      },
+      "raw": "---\ntitle: P7-contract-1794725143104-off-schedule-materialize\nstatus: open\npriority: normal\nscheduled: 2026-11-14\nrecurrence_parent: \"[[TaskNotes/Tasks/P7-contract-1794725143104-off-schedule-materialize]]\"\noccurrence_date: 2026-11-14\ndateCreated: 2026-11-15T01:45:47.400-05:00\ndateModified: 2026-11-15T01:45:47.400-05:00\ntags:\n  - task\nstaged: 2026-11-14\n---\n\n"
+    },
+    {
+      "task": {
+        "path": "TaskNotes/Tasks/P7-contract-1794725143104-off-schedule-materialize.md",
+        "title": "P7-contract-1794725143104-off-schedule-materialize",
+        "status": "open",
+        "priority": "normal",
+        "scheduled": "2026-11-09",
+        "recurrence": "DTSTART:20261109;FREQ=WEEKLY;BYDAY=MO",
+        "dateCreated": "2026-11-15T01:45:47.055-05:00",
+        "dateModified": "2026-11-15T01:45:47.117-05:00",
+        "occurrence_materialization": "manual",
+        "tags": [
+          "task"
+        ],
+        "archived": false,
+        "staged": "2026-11-14",
+        "customProperties": {
+          "staged": "2026-11-14"
+        },
+        "id": "TaskNotes/Tasks/P7-contract-1794725143104-off-schedule-materialize.md",
+        "contexts": [],
+        "projects": [],
+        "totalTrackedTime": 0,
+        "isBlocked": false,
+        "isBlocking": false
+      },
+      "raw": "---\nstatus: open\npriority: normal\nscheduled: 2026-11-09\nrecurrence: DTSTART:20261109;FREQ=WEEKLY;BYDAY=MO\noccurrence_materialization: manual\ndateCreated: 2026-11-15T01:45:47.055-05:00\ndateModified: 2026-11-15T01:45:47.117-05:00\ntags:\n  - task\nstaged: 2026-11-14\n---\n\n"
+    },
+    {
+      "task": {
+        "path": "TaskNotes/Tasks/P7-contract-1794725143104-existing-next-3.md",
+        "title": "P7-contract-1794725143104-existing-next",
+        "status": "done",
+        "priority": "normal",
+        "scheduled": "2026-11-14",
+        "completedDate": "2026-11-15",
+        "dateCreated": "2026-11-15T01:45:46.618-05:00",
+        "dateModified": "2026-11-15T01:45:46.681-05:00",
+        "recurrence_parent": "[[TaskNotes/Tasks/P7-contract-1794725143104-existing-next]]",
+        "occurrence_date": "2026-11-14",
+        "tags": [
+          "task"
+        ],
+        "archived": false,
+        "staged": "2026-11-14",
+        "customProperties": {
+          "staged": "2026-11-14"
+        },
+        "id": "TaskNotes/Tasks/P7-contract-1794725143104-existing-next-3.md",
+        "contexts": [],
+        "projects": [],
+        "totalTrackedTime": 0,
+        "isBlocked": false,
+        "isBlocking": false
+      },
+      "raw": "---\ntitle: P7-contract-1794725143104-existing-next\nstatus: done\npriority: normal\nscheduled: 2026-11-14\nrecurrence_parent: \"[[TaskNotes/Tasks/P7-contract-1794725143104-existing-next]]\"\noccurrence_date: 2026-11-14\ndateCreated: 2026-11-15T01:45:46.618-05:00\ndateModified: 2026-11-15T01:45:46.681-05:00\ntags:\n  - task\nstaged: 2026-11-14\ncompletedDate: 2026-11-15\n---\n\n"
+    },
+    {
+      "task": {
+        "path": "TaskNotes/Tasks/P7-contract-1794725143104-existing-next-2.md",
+        "title": "P7-contract-1794725143104-existing-next",
+        "status": "open",
+        "priority": "normal",
+        "scheduled": "2026-11-16",
+        "dateCreated": "2026-11-15T01:45:46.257-05:00",
+        "dateModified": "2026-11-15T01:45:46.606-05:00",
+        "recurrence_parent": "[[TaskNotes/Tasks/P7-contract-1794725143104-existing-next]]",
+        "occurrence_date": "2026-11-16",
+        "tags": [
+          "task"
+        ],
+        "archived": false,
+        "staged": "2026-11-17",
+        "customProperties": {
+          "staged": "2026-11-17"
+        },
+        "id": "TaskNotes/Tasks/P7-contract-1794725143104-existing-next-2.md",
+        "contexts": [],
+        "projects": [],
+        "totalTrackedTime": 0,
+        "isBlocked": false,
+        "isBlocking": false
+      },
+      "raw": "---\ntitle: P7-contract-1794725143104-existing-next\nstatus: open\npriority: normal\nscheduled: 2026-11-16\nrecurrence_parent: \"[[TaskNotes/Tasks/P7-contract-1794725143104-existing-next]]\"\noccurrence_date: 2026-11-16\ndateCreated: 2026-11-15T01:45:46.257-05:00\ndateModified: 2026-11-15T01:45:46.606-05:00\ntags:\n  - task\nstaged: 2026-11-17\n---\n\n"
+    },
+    {
+      "task": {
+        "path": "TaskNotes/Tasks/P7-contract-1794725143104-existing-next.md",
+        "title": "P7-contract-1794725143104-existing-next",
+        "status": "open",
+        "priority": "normal",
+        "scheduled": "2026-11-16",
+        "recurrence": "DTSTART:20261109;FREQ=WEEKLY;BYDAY=MO",
+        "dateCreated": "2026-11-15T01:45:46.195-05:00",
+        "dateModified": "2026-11-15T01:45:46.695-05:00",
+        "complete_instances": [
+          "2026-11-14"
+        ],
+        "occurrence_materialization": "on_completion",
+        "tags": [
+          "task"
+        ],
+        "archived": false,
+        "staged": "2026-11-14",
+        "customProperties": {
+          "staged": "2026-11-14"
+        },
+        "id": "TaskNotes/Tasks/P7-contract-1794725143104-existing-next.md",
+        "contexts": [],
+        "projects": [],
+        "totalTrackedTime": 0,
+        "isBlocked": false,
+        "isBlocking": false
+      },
+      "raw": "---\nstatus: open\npriority: normal\nscheduled: 2026-11-16\nrecurrence: DTSTART:20261109;FREQ=WEEKLY;BYDAY=MO\noccurrence_materialization: on_completion\ndateCreated: 2026-11-15T01:45:46.195-05:00\ndateModified: 2026-11-15T01:45:46.695-05:00\ntags:\n  - task\nstaged: 2026-11-14\ncomplete_instances:\n  - 2026-11-14\n---\n\n"
+    },
+    {
+      "task": {
+        "path": "TaskNotes/Tasks/P7-contract-1794725143104-auto-3.md",
+        "title": "P7-contract-1794725143104-auto",
+        "status": "done",
+        "priority": "normal",
+        "scheduled": "2026-11-14",
+        "completedDate": "2026-11-15",
+        "dateCreated": "2026-11-15T01:45:45.764-05:00",
+        "dateModified": "2026-11-15T01:45:45.825-05:00",
+        "recurrence_parent": "[[TaskNotes/Tasks/P7-contract-1794725143104-auto]]",
+        "occurrence_date": "2026-11-14",
+        "tags": [
+          "task"
+        ],
+        "archived": false,
+        "staged": "2026-11-14",
+        "customProperties": {
+          "staged": "2026-11-14"
+        },
+        "id": "TaskNotes/Tasks/P7-contract-1794725143104-auto-3.md",
+        "contexts": [],
+        "projects": [],
+        "totalTrackedTime": 0,
+        "isBlocked": false,
+        "isBlocking": false
+      },
+      "raw": "---\ntitle: P7-contract-1794725143104-auto\nstatus: done\npriority: normal\nscheduled: 2026-11-14\nrecurrence_parent: \"[[TaskNotes/Tasks/P7-contract-1794725143104-auto]]\"\noccurrence_date: 2026-11-14\ndateCreated: 2026-11-15T01:45:45.764-05:00\ndateModified: 2026-11-15T01:45:45.825-05:00\ntags:\n  - task\nstaged: 2026-11-14\ncompletedDate: 2026-11-15\n---\n\n"
+    },
+    {
+      "task": {
+        "path": "TaskNotes/Tasks/P7-contract-1794725143104-auto-2.md",
+        "title": "P7-contract-1794725143104-auto",
+        "status": "open",
+        "priority": "normal",
+        "scheduled": "2026-11-16",
+        "dateCreated": "2026-11-15T01:45:45.436-05:00",
+        "dateModified": "2026-11-15T01:45:45.436-05:00",
+        "recurrence_parent": "[[TaskNotes/Tasks/P7-contract-1794725143104-auto]]",
+        "occurrence_date": "2026-11-16",
+        "tags": [
+          "task"
+        ],
+        "archived": false,
+        "id": "TaskNotes/Tasks/P7-contract-1794725143104-auto-2.md",
+        "contexts": [],
+        "projects": [],
+        "totalTrackedTime": 0,
+        "isBlocked": false,
+        "isBlocking": false
+      },
+      "raw": "---\ntitle: P7-contract-1794725143104-auto\nstatus: open\npriority: normal\nscheduled: 2026-11-16\nrecurrence_parent: \"[[TaskNotes/Tasks/P7-contract-1794725143104-auto]]\"\noccurrence_date: 2026-11-16\ndateCreated: 2026-11-15T01:45:45.436-05:00\ndateModified: 2026-11-15T01:45:45.436-05:00\ntags:\n  - task\n---\n\n"
+    },
+    {
+      "task": {
+        "path": "TaskNotes/Tasks/P7-contract-1794725143104-auto.md",
+        "title": "P7-contract-1794725143104-auto",
+        "status": "open",
+        "priority": "normal",
+        "scheduled": "2026-11-16",
+        "recurrence": "DTSTART:20261109;FREQ=WEEKLY;BYDAY=MO",
+        "dateCreated": "2026-11-15T01:45:45.355-05:00",
+        "dateModified": "2026-11-15T01:45:45.836-05:00",
+        "complete_instances": [
+          "2026-11-14"
+        ],
+        "occurrence_materialization": "on_completion",
+        "tags": [
+          "task"
+        ],
+        "archived": false,
+        "staged": "2026-11-14",
+        "customProperties": {
+          "staged": "2026-11-14"
+        },
+        "id": "TaskNotes/Tasks/P7-contract-1794725143104-auto.md",
+        "contexts": [],
+        "projects": [],
+        "totalTrackedTime": 0,
+        "isBlocked": false,
+        "isBlocking": false
+      },
+      "raw": "---\nstatus: open\npriority: normal\nscheduled: 2026-11-16\nrecurrence: DTSTART:20261109;FREQ=WEEKLY;BYDAY=MO\noccurrence_materialization: on_completion\ndateCreated: 2026-11-15T01:45:45.355-05:00\ndateModified: 2026-11-15T01:45:45.836-05:00\ntags:\n  - task\nstaged: 2026-11-14\ncomplete_instances:\n  - 2026-11-14\n---\n\n"
+    },
+    {
+      "task": {
+        "path": "TaskNotes/Tasks/P7-contract-1794725143104-existing-2.md",
+        "title": "P7-contract-1794725143104-existing",
+        "status": "open",
+        "priority": "normal",
+        "scheduled": "2026-11-09",
+        "dateCreated": "2026-11-15T01:45:44.604-05:00",
+        "dateModified": "2026-11-15T01:45:45.328-05:00",
+        "recurrence_parent": "[[TaskNotes/Tasks/P7-contract-1794725143104-existing]]",
+        "occurrence_date": "2026-11-09",
+        "tags": [
+          "task"
+        ],
+        "archived": false,
+        "staged": "2026-11-14",
+        "customProperties": {
+          "staged": "2026-11-14"
+        },
+        "id": "TaskNotes/Tasks/P7-contract-1794725143104-existing-2.md",
+        "contexts": [],
+        "projects": [],
+        "totalTrackedTime": 0,
+        "isBlocked": false,
+        "isBlocking": false
+      },
+      "raw": "---\ntitle: P7-contract-1794725143104-existing\nstatus: open\npriority: normal\nscheduled: 2026-11-09\nrecurrence_parent: \"[[TaskNotes/Tasks/P7-contract-1794725143104-existing]]\"\noccurrence_date: 2026-11-09\ndateCreated: 2026-11-15T01:45:44.604-05:00\ndateModified: 2026-11-15T01:45:45.328-05:00\ntags:\n  - task\nstaged: 2026-11-14\n---\n\n"
+    },
+    {
+      "task": {
+        "path": "TaskNotes/Tasks/P7-contract-1794725143104-existing.md",
+        "title": "P7-contract-1794725143104-existing",
+        "status": "open",
+        "priority": "normal",
+        "scheduled": "2026-11-16",
+        "recurrence": "DTSTART:20261109;FREQ=WEEKLY;BYDAY=MO",
+        "dateCreated": "2026-11-15T01:45:44.279-05:00",
+        "dateModified": "2026-11-15T01:45:45.341-05:00",
+        "occurrence_materialization": "manual",
+        "tags": [
+          "task"
+        ],
+        "archived": false,
+        "staged": "2026-11-14",
+        "customProperties": {
+          "staged": "2026-11-14"
+        },
+        "id": "TaskNotes/Tasks/P7-contract-1794725143104-existing.md",
+        "contexts": [],
+        "projects": [],
+        "totalTrackedTime": 0,
+        "isBlocked": false,
+        "isBlocking": false
+      },
+      "raw": "---\nstatus: open\npriority: normal\nscheduled: 2026-11-16\nrecurrence: DTSTART:20261109;FREQ=WEEKLY;BYDAY=MO\noccurrence_materialization: manual\ndateCreated: 2026-11-15T01:45:44.279-05:00\ndateModified: 2026-11-15T01:45:45.341-05:00\ntags:\n  - task\nstaged: 2026-11-14\n---\n\n"
+    },
+    {
+      "task": {
+        "path": "TaskNotes/Tasks/P7-contract-1794725143104-completion-anchor.md",
+        "title": "P7-contract-1794725143104-completion-anchor",
+        "status": "open",
+        "priority": "normal",
+        "scheduled": "2026-11-16",
+        "recurrence": "DTSTART:20261114;FREQ=DAILY;INTERVAL=2",
+        "recurrence_anchor": "completion",
+        "dateCreated": "2026-11-15T01:45:43.871-05:00",
+        "dateModified": "2026-11-15T01:45:44.267-05:00",
+        "complete_instances": [
+          "2026-11-14"
+        ],
+        "skipped_instances": [],
+        "tags": [
+          "task"
+        ],
+        "archived": false,
+        "staged": "2026-11-14",
+        "customProperties": {
+          "staged": "2026-11-14"
+        },
+        "id": "TaskNotes/Tasks/P7-contract-1794725143104-completion-anchor.md",
+        "contexts": [],
+        "projects": [],
+        "totalTrackedTime": 0,
+        "isBlocked": false,
+        "isBlocking": false
+      },
+      "raw": "---\nstatus: open\npriority: normal\nscheduled: 2026-11-16\nrecurrence: DTSTART:20261114;FREQ=DAILY;INTERVAL=2\nrecurrence_anchor: completion\ndateCreated: 2026-11-15T01:45:43.871-05:00\ndateModified: 2026-11-15T01:45:44.267-05:00\ntags:\n  - task\nstaged: 2026-11-14\ncomplete_instances:\n  - 2026-11-14\nskipped_instances: []\n---\n\n"
+    },
+    {
+      "task": {
+        "path": "TaskNotes/Tasks/P7-contract-1794725143104-off-schedule.md",
+        "title": "P7-contract-1794725143104-off-schedule",
+        "status": "open",
+        "priority": "normal",
+        "scheduled": "2026-11-23",
+        "recurrence": "DTSTART:20261109;FREQ=WEEKLY;BYDAY=MO",
+        "dateCreated": "2026-11-15T01:45:43.489-05:00",
+        "dateModified": "2026-11-15T01:45:43.839-05:00",
+        "complete_instances": [
+          "2026-11-09",
+          "2026-11-16"
+        ],
+        "skipped_instances": [],
+        "tags": [
+          "task"
+        ],
+        "archived": false,
+        "staged": "2026-11-14",
+        "customProperties": {
+          "staged": "2026-11-14"
+        },
+        "id": "TaskNotes/Tasks/P7-contract-1794725143104-off-schedule.md",
+        "contexts": [],
+        "projects": [],
+        "totalTrackedTime": 0,
+        "isBlocked": false,
+        "isBlocking": false
+      },
+      "raw": "---\nstatus: open\npriority: normal\nscheduled: 2026-11-23\nrecurrence: DTSTART:20261109;FREQ=WEEKLY;BYDAY=MO\ndateCreated: 2026-11-15T01:45:43.489-05:00\ndateModified: 2026-11-15T01:45:43.839-05:00\ntags:\n  - task\nstaged: 2026-11-14\ncomplete_instances:\n  - 2026-11-09\n  - 2026-11-16\nskipped_instances: []\n---\n\n"
+    },
+    {
+      "task": {
+        "path": "TaskNotes/Tasks/P7-contract-1794725143104-exact.md",
+        "title": "P7-contract-1794725143104-exact",
+        "status": "open",
+        "priority": "normal",
+        "scheduled": "2026-11-16",
+        "recurrence": "DTSTART:20261109;FREQ=WEEKLY;BYDAY=MO",
+        "dateCreated": "2026-11-15T01:45:43.104-05:00",
+        "dateModified": "2026-11-15T01:45:43.478-05:00",
+        "complete_instances": [],
+        "skipped_instances": [],
+        "tags": [
+          "task"
+        ],
+        "archived": false,
+        "staged": "2026-11-14",
+        "customProperties": {
+          "staged": "2026-11-14"
+        },
+        "id": "TaskNotes/Tasks/P7-contract-1794725143104-exact.md",
+        "contexts": [],
+        "projects": [],
+        "totalTrackedTime": 0,
+        "isBlocked": false,
+        "isBlocking": false
+      },
+      "raw": "---\nstatus: open\npriority: normal\nscheduled: 2026-11-16\nrecurrence: DTSTART:20261109;FREQ=WEEKLY;BYDAY=MO\ndateCreated: 2026-11-15T01:45:43.104-05:00\ndateModified: 2026-11-15T01:45:43.478-05:00\ntags:\n  - task\nstaged: 2026-11-14\ncomplete_instances: []\nskipped_instances: []\n---\n\n"
+    }
+  ]
+}

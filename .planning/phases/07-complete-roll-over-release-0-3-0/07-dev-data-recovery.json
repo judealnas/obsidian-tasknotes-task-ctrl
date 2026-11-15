@@ -1,0 +1,538 @@
+{
+  "basis": "pre-rehearsal recorded settings and orders; recovered native completion attempts; missing original raw data quarantined",
+  "data": {
+    "completionStatus": null,
+    "rolloverHour": 6,
+    "pauseRecordsVersion": 1,
+    "pauseRecords": [],
+    "cardOrder": [
+      "TaskNotes/Tasks/Staging spike scratch.md\u00002026-11-13T20:05:31.448Z",
+      "TaskNotes/Tasks/Staging spike weekly.md\u00002026-11-13T20:05:31.459Z"
+    ],
+    "stagedOrder": [
+      "TaskNotes/Tasks/P7-contract-1794715327261-exact.md",
+      "TaskNotes/Tasks/P7-contract-1794715327261-off-schedule.md",
+      "TaskNotes/Tasks/P7-contract-1794715327261-completion-anchor.md",
+      "TaskNotes/Tasks/P7-contract-1794715327261-existing.md",
+      "TaskNotes/Tasks/P7-contract-1794715327261-existing-2.md",
+      "TaskNotes/Tasks/P7-contract-1794715327261-auto.md",
+      "TaskNotes/Tasks/P7-contract-1794715327261-existing-next.md",
+      "TaskNotes/Tasks/P7-contract-1794715327261-off-schedule-materialize.md",
+      "TaskNotes/Tasks/P7-contract-1794715327261-off-schedule-materialize-2.md",
+      "TaskNotes/Tasks/P7-contract-1794715327261-regular-timing.md",
+      "TaskNotes/Tasks/P7-contract-1794715327261-pomodoro.md",
+      "TaskNotes/Tasks/P7-contract-1794715327261-ordinary-callback.md",
+      "TaskNotes/Tasks/P7-contract-1794715327261-coordinator-virtual.md",
+      "TaskNotes/Tasks/P7-contract-1794715327261-coordinator-on_completion.md",
+      "TaskNotes/Tasks/P7-contract-1794715327261-coordinator-existing-next.md",
+      "TaskNotes/Tasks/P7-contract-1794715327261-protected-pomodoro.md",
+      "TaskNotes/Tasks/P7-contract-1794725038353-exact.md",
+      "TaskNotes/Tasks/P7-contract-1794725038353-off-schedule.md",
+      "TaskNotes/Tasks/P7-contract-1794725038353-completion-anchor.md",
+      "TaskNotes/Tasks/P7-contract-1794725038353-existing.md",
+      "TaskNotes/Tasks/P7-contract-1794725038353-existing-2.md",
+      "TaskNotes/Tasks/P7-contract-1794725038353-existing-next.md",
+      "TaskNotes/Tasks/P7-contract-1794725038353-off-schedule-materialize.md",
+      "TaskNotes/Tasks/P7-contract-1794725038353-off-schedule-materialize-2.md",
+      "TaskNotes/Tasks/P7-contract-1794725038353-regular-timing.md",
+      "TaskNotes/Tasks/P7-contract-1794725038353-pomodoro.md",
+      "TaskNotes/Tasks/P7-contract-1794725038353-ordinary-callback.md",
+      "TaskNotes/Tasks/P7-contract-1794725038353-coordinator-on_completion.md",
+      "TaskNotes/Tasks/P7-contract-1794725038353-coordinator-existing.md",
+      "TaskNotes/Tasks/P7-contract-1794725038353-coordinator-existing-next.md",
+      "TaskNotes/Tasks/P7-contract-1794725038353-protected-pomodoro.md"
+    ],
+    "completionRecordsVersion": "recovery-required",
+    "completionRecords": [
+      {
+        "attemptId": "bb39e91a-9cad-4c44-a37b-3c6fc83da7f3",
+        "sourcePath": "TaskNotes/Tasks/P7-contract-1794715327261-coordinator-virtual.md",
+        "requestDay": "2026-11-14",
+        "requestedAt": 1794715334612,
+        "beforeEvidence": {
+          "status": "open",
+          "staged": "2026-11-14",
+          "title": "P7-contract-1794715327261-coordinator-virtual",
+          "completedStatus": "done",
+          "parentPath": "TaskNotes/Tasks/P7-contract-1794715327261-coordinator-virtual.md",
+          "recurrence": "DTSTART:20261109;FREQ=WEEKLY;BYDAY=MO",
+          "completedDates": [],
+          "existingPaths": [
+            "TaskNotes/Tasks/P7-contract-1794715327261-coordinator-virtual.md"
+          ]
+        },
+        "replayProtected": true,
+        "cleanupEvidence": [
+          {
+            "path": "TaskNotes/Tasks/P7-contract-1794715327261-coordinator-virtual.md",
+            "staged": "2026-11-14"
+          }
+        ],
+        "phase": "confirmed",
+        "pendingCleanupPaths": [],
+        "completedPath": "TaskNotes/Tasks/P7-contract-1794715327261-coordinator-virtual.md",
+        "resolvedDate": "2026-11-09",
+        "completedAt": 1794715334612
+      },
+      {
+        "attemptId": "08d8b708-b598-4341-8455-69fab1c2c5d5",
+        "sourcePath": "TaskNotes/Tasks/P7-contract-1794715327261-coordinator-on_completion.md",
+        "requestDay": "2026-11-14",
+        "requestedAt": 1794715335219,
+        "beforeEvidence": {
+          "status": "open",
+          "staged": "2026-11-14",
+          "title": "P7-contract-1794715327261-coordinator-on_completion",
+          "completedStatus": "done",
+          "parentPath": "TaskNotes/Tasks/P7-contract-1794715327261-coordinator-on_completion.md",
+          "recurrence": "DTSTART:20261109;FREQ=WEEKLY;BYDAY=MO",
+          "completedDates": [],
+          "existingPaths": [
+            "TaskNotes/Tasks/P7-contract-1794715327261-coordinator-on_completion.md",
+            "TaskNotes/Tasks/P7-contract-1794715327261-coordinator-on_completion-2.md"
+          ]
+        },
+        "replayProtected": true,
+        "cleanupEvidence": [
+          {
+            "path": "TaskNotes/Tasks/P7-contract-1794715327261-coordinator-on_completion.md",
+            "staged": "2026-11-14"
+          },
+          {
+            "path": "TaskNotes/Tasks/P7-contract-1794715327261-coordinator-on_completion-3.md",
+            "staged": "2026-11-14"
+          }
+        ],
+        "phase": "confirmed",
+        "pendingCleanupPaths": [],
+        "completedPath": "TaskNotes/Tasks/P7-contract-1794715327261-coordinator-on_completion-3.md",
+        "resolvedDate": "2026-11-14",
+        "completedAt": 1794715335219
+      },
+      {
+        "attemptId": "ba006081-905c-4617-a66e-9d360f3840eb",
+        "sourcePath": "TaskNotes/Tasks/P7-contract-1794715327261-coordinator-existing.md",
+        "requestDay": "2026-11-14",
+        "requestedAt": 1794715335857,
+        "beforeEvidence": {
+          "status": "open",
+          "staged": "2026-11-14",
+          "title": "P7-contract-1794715327261-coordinator-existing",
+          "completedStatus": "done",
+          "parentPath": "TaskNotes/Tasks/P7-contract-1794715327261-coordinator-existing.md",
+          "recurrence": "DTSTART:20261109;FREQ=WEEKLY;BYDAY=MO",
+          "completedDates": [],
+          "existingPaths": [
+            "TaskNotes/Tasks/P7-contract-1794715327261-coordinator-existing.md",
+            "TaskNotes/Tasks/P7-contract-1794715327261-coordinator-existing-2.md"
+          ]
+        },
+        "replayProtected": true,
+        "cleanupEvidence": [
+          {
+            "path": "TaskNotes/Tasks/P7-contract-1794715327261-coordinator-existing.md",
+            "staged": "2026-11-14"
+          }
+        ],
+        "phase": "confirmed",
+        "pendingCleanupPaths": [],
+        "completedPath": "TaskNotes/Tasks/P7-contract-1794715327261-coordinator-existing-2.md",
+        "resolvedDate": "2026-11-14",
+        "completedAt": 1794715335857
+      },
+      {
+        "attemptId": "eb8ceeaa-ec3f-4c4f-a4b6-e87f8e0d8a32",
+        "sourcePath": "TaskNotes/Tasks/P7-contract-1794715327261-coordinator-existing-next.md",
+        "requestDay": "2026-11-14",
+        "requestedAt": 1794715336498,
+        "beforeEvidence": {
+          "status": "open",
+          "staged": "2026-11-14",
+          "title": "P7-contract-1794715327261-coordinator-existing-next",
+          "completedStatus": "done",
+          "parentPath": "TaskNotes/Tasks/P7-contract-1794715327261-coordinator-existing-next.md",
+          "recurrence": "DTSTART:20261109;FREQ=WEEKLY;BYDAY=MO",
+          "completedDates": [],
+          "existingPaths": [
+            "TaskNotes/Tasks/P7-contract-1794715327261-coordinator-existing-next.md",
+            "TaskNotes/Tasks/P7-contract-1794715327261-coordinator-existing-next-2.md"
+          ]
+        },
+        "replayProtected": true,
+        "cleanupEvidence": [
+          {
+            "path": "TaskNotes/Tasks/P7-contract-1794715327261-coordinator-existing-next.md",
+            "staged": "2026-11-14"
+          },
+          {
+            "path": "TaskNotes/Tasks/P7-contract-1794715327261-coordinator-existing-next-3.md",
+            "staged": "2026-11-14"
+          }
+        ],
+        "phase": "confirmed",
+        "pendingCleanupPaths": [],
+        "completedPath": "TaskNotes/Tasks/P7-contract-1794715327261-coordinator-existing-next-3.md",
+        "resolvedDate": "2026-11-14",
+        "completedAt": 1794715336498
+      },
+      {
+        "attemptId": "794fdfc4-121e-4b06-85b2-a2c69dcb4dc6",
+        "sourcePath": "TaskNotes/Tasks/P7-contract-1794725038353-coordinator-virtual.md",
+        "requestDay": "2026-11-14",
+        "requestedAt": 1794725046001,
+        "beforeEvidence": {
+          "status": "open",
+          "staged": "2026-11-14",
+          "title": "P7-contract-1794725038353-coordinator-virtual",
+          "completedStatus": "done",
+          "parentPath": "TaskNotes/Tasks/P7-contract-1794725038353-coordinator-virtual.md",
+          "recurrence": "DTSTART:20261109;FREQ=WEEKLY;BYDAY=MO",
+          "completedDates": [],
+          "existingPaths": [
+            "TaskNotes/Tasks/P7-contract-1794725038353-coordinator-virtual.md"
+          ]
+        },
+        "replayProtected": true,
+        "cleanupEvidence": [
+          {
+            "path": "TaskNotes/Tasks/P7-contract-1794725038353-coordinator-virtual.md",
+            "staged": "2026-11-14"
+          }
+        ],
+        "phase": "confirmed",
+        "pendingCleanupPaths": [],
+        "completedPath": "TaskNotes/Tasks/P7-contract-1794725038353-coordinator-virtual.md",
+        "resolvedDate": "2026-11-09",
+        "completedAt": 1794725046001
+      },
+      {
+        "attemptId": "f45498a4-16e0-4906-a714-dd7b523af5d2",
+        "sourcePath": "TaskNotes/Tasks/P7-contract-1794725038353-coordinator-on_completion.md",
+        "requestDay": "2026-11-14",
+        "requestedAt": 1794725046821,
+        "beforeEvidence": {
+          "status": "open",
+          "staged": "2026-11-14",
+          "title": "P7-contract-1794725038353-coordinator-on_completion",
+          "completedStatus": "done",
+          "parentPath": "TaskNotes/Tasks/P7-contract-1794725038353-coordinator-on_completion.md",
+          "recurrence": "DTSTART:20261109;FREQ=WEEKLY;BYDAY=MO",
+          "completedDates": [],
+          "existingPaths": [
+            "TaskNotes/Tasks/P7-contract-1794725038353-coordinator-on_completion.md",
+            "TaskNotes/Tasks/P7-contract-1794725038353-coordinator-on_completion-2.md"
+          ]
+        },
+        "replayProtected": true,
+        "cleanupEvidence": [
+          {
+            "path": "TaskNotes/Tasks/P7-contract-1794725038353-coordinator-on_completion.md",
+            "staged": "2026-11-14"
+          },
+          {
+            "path": "TaskNotes/Tasks/P7-contract-1794725038353-coordinator-on_completion-3.md",
+            "staged": "2026-11-14"
+          }
+        ],
+        "phase": "confirmed",
+        "pendingCleanupPaths": [],
+        "completedPath": "TaskNotes/Tasks/P7-contract-1794725038353-coordinator-on_completion-3.md",
+        "resolvedDate": "2026-11-14",
+        "completedAt": 1794725046821
+      },
+      {
+        "attemptId": "281072d1-1bbb-4268-95ed-a1f1470af525",
+        "sourcePath": "TaskNotes/Tasks/P7-contract-1794725038353-coordinator-existing.md",
+        "requestDay": "2026-11-14",
+        "requestedAt": 1794725047843,
+        "beforeEvidence": {
+          "status": "open",
+          "staged": "2026-11-14",
+          "title": "P7-contract-1794725038353-coordinator-existing",
+          "completedStatus": "done",
+          "parentPath": "TaskNotes/Tasks/P7-contract-1794725038353-coordinator-existing.md",
+          "recurrence": "DTSTART:20261109;FREQ=WEEKLY;BYDAY=MO",
+          "completedDates": [],
+          "existingPaths": [
+            "TaskNotes/Tasks/P7-contract-1794725038353-coordinator-existing.md",
+            "TaskNotes/Tasks/P7-contract-1794725038353-coordinator-existing-2.md"
+          ]
+        },
+        "replayProtected": true,
+        "cleanupEvidence": [
+          {
+            "path": "TaskNotes/Tasks/P7-contract-1794725038353-coordinator-existing.md",
+            "staged": "2026-11-14"
+          }
+        ],
+        "phase": "confirmed",
+        "pendingCleanupPaths": [],
+        "completedPath": "TaskNotes/Tasks/P7-contract-1794725038353-coordinator-existing-2.md",
+        "resolvedDate": "2026-11-14",
+        "completedAt": 1794725047843
+      },
+      {
+        "attemptId": "2ed6ae1e-aa8e-4093-9927-ca25a40d619b",
+        "sourcePath": "TaskNotes/Tasks/P7-contract-1794725038353-coordinator-existing-next.md",
+        "requestDay": "2026-11-14",
+        "requestedAt": 1794725048753,
+        "beforeEvidence": {
+          "status": "open",
+          "staged": "2026-11-14",
+          "title": "P7-contract-1794725038353-coordinator-existing-next",
+          "completedStatus": "done",
+          "parentPath": "TaskNotes/Tasks/P7-contract-1794725038353-coordinator-existing-next.md",
+          "recurrence": "DTSTART:20261109;FREQ=WEEKLY;BYDAY=MO",
+          "completedDates": [],
+          "existingPaths": [
+            "TaskNotes/Tasks/P7-contract-1794725038353-coordinator-existing-next.md",
+            "TaskNotes/Tasks/P7-contract-1794725038353-coordinator-existing-next-2.md"
+          ]
+        },
+        "replayProtected": true,
+        "cleanupEvidence": [
+          {
+            "path": "TaskNotes/Tasks/P7-contract-1794725038353-coordinator-existing-next.md",
+            "staged": "2026-11-14"
+          },
+          {
+            "path": "TaskNotes/Tasks/P7-contract-1794725038353-coordinator-existing-next-3.md",
+            "staged": "2026-11-14"
+          }
+        ],
+        "phase": "confirmed",
+        "pendingCleanupPaths": [],
+        "completedPath": "TaskNotes/Tasks/P7-contract-1794725038353-coordinator-existing-next-3.md",
+        "resolvedDate": "2026-11-14",
+        "completedAt": 1794725048753
+      },
+      {
+        "attemptId": "e5be61df-245d-4183-88ee-db144a422881",
+        "sourcePath": "TaskNotes/Tasks/P7-contract-1794714653876-coordinator-virtual.md",
+        "requestDay": "2026-11-14",
+        "requestedAt": 1794714682312,
+        "beforeEvidence": {
+          "status": "open",
+          "staged": "2026-11-14",
+          "title": "P7-contract-1794714653876-coordinator-virtual",
+          "completedStatus": "done",
+          "parentPath": "TaskNotes/Tasks/P7-contract-1794714653876-coordinator-virtual.md",
+          "recurrence": "DTSTART:20261109;FREQ=WEEKLY;BYDAY=MO",
+          "completedDates": [],
+          "existingPaths": [
+            "TaskNotes/Tasks/P7-contract-1794714653876-coordinator-virtual.md"
+          ]
+        },
+        "replayProtected": true,
+        "cleanupEvidence": [
+          {
+            "path": "TaskNotes/Tasks/P7-contract-1794714653876-coordinator-virtual.md",
+            "staged": "2026-11-14"
+          }
+        ],
+        "phase": "confirmed",
+        "pendingCleanupPaths": [],
+        "completedPath": "TaskNotes/Tasks/P7-contract-1794714653876-coordinator-virtual.md",
+        "resolvedDate": "2026-11-09",
+        "completedAt": 1794714682312
+      },
+      {
+        "attemptId": "ed963e7a-61d6-42e7-9468-74078642ddaa",
+        "sourcePath": "TaskNotes/Tasks/P7-contract-1794714653876-coordinator-on_completion.md",
+        "requestDay": "2026-11-14",
+        "requestedAt": 1794714689724,
+        "beforeEvidence": {
+          "status": "open",
+          "staged": "2026-11-14",
+          "title": "P7-contract-1794714653876-coordinator-on_completion",
+          "completedStatus": "done",
+          "parentPath": "TaskNotes/Tasks/P7-contract-1794714653876-coordinator-on_completion.md",
+          "recurrence": "DTSTART:20261109;FREQ=WEEKLY;BYDAY=MO",
+          "completedDates": [],
+          "existingPaths": [
+            "TaskNotes/Tasks/P7-contract-1794714653876-coordinator-on_completion.md",
+            "TaskNotes/Tasks/P7-contract-1794714653876-coordinator-on_completion-2.md"
+          ]
+        },
+        "replayProtected": true,
+        "cleanupEvidence": [
+          {
+            "path": "TaskNotes/Tasks/P7-contract-1794714653876-coordinator-on_completion.md",
+            "staged": "2026-11-14"
+          },
+          {
+            "path": "TaskNotes/Tasks/P7-contract-1794714653876-coordinator-on_completion-3.md",
+            "staged": "2026-11-14"
+          }
+        ],
+        "phase": "confirmed",
+        "pendingCleanupPaths": [],
+        "completedPath": "TaskNotes/Tasks/P7-contract-1794714653876-coordinator-on_completion-3.md",
+        "resolvedDate": "2026-11-14",
+        "completedAt": 1794714689724
+      },
+      {
+        "attemptId": "11047f08-f80f-42c1-9910-e388d0ec0441",
+        "sourcePath": "TaskNotes/Tasks/P7-contract-1794714653876-coordinator-existing.md",
+        "requestDay": "2026-11-14",
+        "requestedAt": 1794714697758,
+        "beforeEvidence": {
+          "status": "open",
+          "staged": "2026-11-14",
+          "title": "P7-contract-1794714653876-coordinator-existing",
+          "completedStatus": "done",
+          "parentPath": "TaskNotes/Tasks/P7-contract-1794714653876-coordinator-existing.md",
+          "recurrence": "DTSTART:20261109;FREQ=WEEKLY;BYDAY=MO",
+          "completedDates": [],
+          "existingPaths": [
+            "TaskNotes/Tasks/P7-contract-1794714653876-coordinator-existing.md",
+            "TaskNotes/Tasks/P7-contract-1794714653876-coordinator-existing-2.md"
+          ]
+        },
+        "replayProtected": true,
+        "cleanupEvidence": [
+          {
+            "path": "TaskNotes/Tasks/P7-contract-1794714653876-coordinator-existing.md",
+            "staged": "2026-11-14"
+          }
+        ],
+        "phase": "confirmed",
+        "pendingCleanupPaths": [],
+        "completedPath": "TaskNotes/Tasks/P7-contract-1794714653876-coordinator-existing-2.md",
+        "resolvedDate": "2026-11-14",
+        "completedAt": 1794714697758
+      },
+      {
+        "attemptId": "4efc6dba-996a-4040-8992-547fbb8fdf11",
+        "sourcePath": "TaskNotes/Tasks/P7-contract-1794725143104-coordinator-virtual.md",
+        "requestDay": "2026-11-14",
+        "requestedAt": 1794725151113,
+        "beforeEvidence": {
+          "status": "open",
+          "staged": "2026-11-14",
+          "title": "P7-contract-1794725143104-coordinator-virtual",
+          "completedStatus": "done",
+          "parentPath": "TaskNotes/Tasks/P7-contract-1794725143104-coordinator-virtual.md",
+          "recurrence": "DTSTART:20261109;FREQ=WEEKLY;BYDAY=MO",
+          "completedDates": [],
+          "existingPaths": [
+            "TaskNotes/Tasks/P7-contract-1794725143104-coordinator-virtual.md"
+          ]
+        },
+        "replayProtected": true,
+        "cleanupEvidence": [
+          {
+            "path": "TaskNotes/Tasks/P7-contract-1794725143104-coordinator-virtual.md",
+            "staged": "2026-11-14"
+          }
+        ],
+        "phase": "confirmed",
+        "pendingCleanupPaths": [],
+        "completedPath": "TaskNotes/Tasks/P7-contract-1794725143104-coordinator-virtual.md",
+        "resolvedDate": "2026-11-09",
+        "completedAt": 1794725151113
+      },
+      {
+        "attemptId": "8fa8676f-a3f7-4f07-b9b3-58b13218bf96",
+        "sourcePath": "TaskNotes/Tasks/P7-contract-1794725143104-coordinator-on_completion.md",
+        "requestDay": "2026-11-14",
+        "requestedAt": 1794725152207,
+        "beforeEvidence": {
+          "status": "open",
+          "staged": "2026-11-14",
+          "title": "P7-contract-1794725143104-coordinator-on_completion",
+          "completedStatus": "done",
+          "parentPath": "TaskNotes/Tasks/P7-contract-1794725143104-coordinator-on_completion.md",
+          "recurrence": "DTSTART:20261109;FREQ=WEEKLY;BYDAY=MO",
+          "completedDates": [],
+          "existingPaths": [
+            "TaskNotes/Tasks/P7-contract-1794725143104-coordinator-on_completion.md",
+            "TaskNotes/Tasks/P7-contract-1794725143104-coordinator-on_completion-2.md"
+          ]
+        },
+        "replayProtected": true,
+        "cleanupEvidence": [
+          {
+            "path": "TaskNotes/Tasks/P7-contract-1794725143104-coordinator-on_completion.md",
+            "staged": "2026-11-14"
+          },
+          {
+            "path": "TaskNotes/Tasks/P7-contract-1794725143104-coordinator-on_completion-3.md",
+            "staged": "2026-11-14"
+          }
+        ],
+        "phase": "confirmed",
+        "pendingCleanupPaths": [],
+        "completedPath": "TaskNotes/Tasks/P7-contract-1794725143104-coordinator-on_completion-3.md",
+        "resolvedDate": "2026-11-14",
+        "completedAt": 1794725152207
+      },
+      {
+        "attemptId": "20468e66-5773-4502-8306-1f9061a7e93a",
+        "sourcePath": "TaskNotes/Tasks/P7-contract-1794725143104-coordinator-existing.md",
+        "requestDay": "2026-11-14",
+        "requestedAt": 1794725153351,
+        "beforeEvidence": {
+          "status": "open",
+          "staged": "2026-11-14",
+          "title": "P7-contract-1794725143104-coordinator-existing",
+          "completedStatus": "done",
+          "parentPath": "TaskNotes/Tasks/P7-contract-1794725143104-coordinator-existing.md",
+          "recurrence": "DTSTART:20261109;FREQ=WEEKLY;BYDAY=MO",
+          "completedDates": [],
+          "existingPaths": [
+            "TaskNotes/Tasks/P7-contract-1794725143104-coordinator-existing.md",
+            "TaskNotes/Tasks/P7-contract-1794725143104-coordinator-existing-2.md"
+          ]
+        },
+        "replayProtected": true,
+        "cleanupEvidence": [
+          {
+            "path": "TaskNotes/Tasks/P7-contract-1794725143104-coordinator-existing.md",
+            "staged": "2026-11-14"
+          }
+        ],
+        "phase": "confirmed",
+        "pendingCleanupPaths": [],
+        "completedPath": "TaskNotes/Tasks/P7-contract-1794725143104-coordinator-existing-2.md",
+        "resolvedDate": "2026-11-14",
+        "completedAt": 1794725153351
+      },
+      {
+        "attemptId": "f747d1c9-634a-46e9-bcc3-62b584a48c7a",
+        "sourcePath": "TaskNotes/Tasks/P7-contract-1794725143104-coordinator-existing-next.md",
+        "requestDay": "2026-11-14",
+        "requestedAt": 1794725154459,
+        "beforeEvidence": {
+          "status": "open",
+          "staged": "2026-11-14",
+          "title": "P7-contract-1794725143104-coordinator-existing-next",
+          "completedStatus": "done",
+          "parentPath": "TaskNotes/Tasks/P7-contract-1794725143104-coordinator-existing-next.md",
+          "recurrence": "DTSTART:20261109;FREQ=WEEKLY;BYDAY=MO",
+          "completedDates": [],
+          "existingPaths": [
+            "TaskNotes/Tasks/P7-contract-1794725143104-coordinator-existing-next.md",
+            "TaskNotes/Tasks/P7-contract-1794725143104-coordinator-existing-next-2.md"
+          ]
+        },
+        "replayProtected": true,
+        "cleanupEvidence": [
+          {
+            "path": "TaskNotes/Tasks/P7-contract-1794725143104-coordinator-existing-next.md",
+            "staged": "2026-11-14"
+          },
+          {
+            "path": "TaskNotes/Tasks/P7-contract-1794725143104-coordinator-existing-next-3.md",
+            "staged": "2026-11-14"
+          }
+        ],
+        "phase": "confirmed",
+        "pendingCleanupPaths": [],
+        "completedPath": "TaskNotes/Tasks/P7-contract-1794725143104-coordinator-existing-next-3.md",
+        "resolvedDate": "2026-11-14",
+        "completedAt": 1794725154459
+      }
+    ]
+  }
+}
