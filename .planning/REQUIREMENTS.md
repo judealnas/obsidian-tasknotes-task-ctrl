@@ -46,7 +46,7 @@ Design sources: `.planning/research/STAGING-DECISIONS.md` (settled decisions; v0
 
 - [ ] **DONE-01**: ✓ on a non-recurring staged task completes it (configured completed status), stops its timer, and clears `staged`
 - [ ] **CTRL-13**: On either tab, ✓ on a recurring task completes only today's instance (staging day passed explicitly), never closes the series, and a repeated ✓ never un-completes it
-- [ ] **DONE-02**: A "Done today" section on the Staged tab lists staged tasks completed today — from the pane (plugin's own record) or elsewhere (no write by the pane) — until rollover
+- [x] **DONE-02**: A "Done today" section on the Staged tab lists staged tasks completed today — from the pane (plugin's own record) or elsewhere (no write by the pane) — until rollover
 
 ### Rollover
 
@@ -111,7 +111,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 | ORDER-04 | Phase 7 | Pending |
 | DONE-01 | Phase 7 | Pending |
 | CTRL-13 | Phase 7 | Pending |
-| DONE-02 | Phase 7 | Pending |
+| DONE-02 | Phase 7 | Complete |
 | ROLL-01 | Phase 4 | Complete |
 | ROLL-02 | Phase 7 | Pending |
 | ROLL-03 | Phase 7 | Pending |

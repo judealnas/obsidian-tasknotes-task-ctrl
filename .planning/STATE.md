@@ -5,17 +5,17 @@ milestone_name: Staging Tasks
 current_phase: 07
 current_phase_name: Complete, Roll Over & Release 0.3.0
 status: executing
-stopped_at: Phase 7 planned — ready to execute
-last_updated: "2026-11-15T04:05:26.604Z"
-last_activity: 2026-11-14
+stopped_at: 07-05 tasks 1-2 complete; native acceptance and dev-history recovery remain open
+last_updated: "2026-11-15T06:55:15.325Z"
+last_activity: 2026-11-15
 last_activity_desc: Phase 07 execution started
-state_head: cb9a3de7b78f72878893f42f6b073df386811630
+state_head: bc988d080db5e75a05dd57239f204cb428175cf7
 progress:
   total_phases: 4
-  completed_phases: 6
+  completed_phases: 3
   total_plans: 19
-  completed_plans: 15
-  percent: 79
+  completed_plans: 17
+  percent: 89
 ---
 
 # Project State
@@ -30,12 +30,12 @@ See: .planning/PROJECT.md (updated 2026-11-13)
 ## Current Position
 
 Phase: 07 (Complete, Roll Over & Release 0.3.0) — EXECUTING
-Plan: 3 of 6
-Status: Ready to execute
+Plan: 5 of 6 — tasks 1–2 implemented; task 3 native acceptance incomplete
+Status: Awaiting native acceptance and dev-vault completion-history recovery
 Note: Phase 4 complete: UAT 6/6, VERIFICATION passed, SECURITY 19/19 closed. 04-01 spike cleanup done (`staged:` null line confirmed, `spikedefault` removed).
-Last activity: 2026-11-14 — Phase 07 execution started
+Last activity: 2026-11-15 — Phase 07 execution started
 
-Progress (v0.3): 13/19 plans implemented (68%). Phase 7 has six unexecuted plans in six sequential waves. Phases 4–6 have completed UAT records but canonical verification is stale; none currently passes the fresh-verification gate. Phase 7 planning checks cover 7/7 requirements and 16/16 decisions; independent plan checking is disabled in project configuration.
+Progress (v0.3): 17/19 plans complete (89%). Phase 7 plans 01–04 have summaries. Plan 05 version/display/tests are committed, but native overnight, physical sleep, mobile and full upgrade acceptance remain open. Plan 06 publication has not started. Milestone verification remains open; no release was tagged or published.
 
 ## Performance Metrics
 
@@ -186,13 +186,14 @@ Items acknowledged and deferred at milestone close, most recent first:
 
 ## Session Continuity
 
-Last session: 2026-11-14T23:35:05.160Z
-Stopped at: Phase 7 planned — ready to execute
-Resume file: .planning/phases/07-complete-roll-over-release-0-3-0/07-01-PLAN.md
+Last session: 2026-11-15T06:55:15.084Z
+Stopped at: 07-05 tasks 1-2 complete; native acceptance and dev-history recovery remain open
+Resume file: .planning/phases/07-complete-roll-over-release-0-3-0/.continue-here.md
 
 ## Operator Next Steps
 
-- Next planned implementation: $gsd-execute-phase 7 — six sequential plans, including native recurrence-contract and publication checkpoints.
+- Resume Plan 07-05 task 3 from `.planning/phases/07-complete-roll-over-release-0-3-0/.continue-here.md`. Review dev-vault recovery before any new completion/rehearsal writes.
 - Canonical verification for Phases 4–6 is stale; refresh with execute-phase before claiming milestone completion.
-- Current branch: milestone-v0.3. Planning did not change branches or application source.
-- Native recurrence/materialization, overnight/sleep and upgrade evidence remain execution requirements; publication requires approval of the prepared candidate.
+- Current branch: gsd/phase-07-complete-roll-over-release-0-3-0. Local 0.3.0 candidate is prepared; 725 automated tests pass.
+- Two final native recurrence matrices ran 16 cases each with auto-stop on. The off-labelled repeat was corrected; earlier 13-case auto-stop-off evidence remains historical. Final-candidate off-setting, real overnight/sleep, physical mobile and full upgrade acceptance remain open; publication requires later explicit approval.
+- Dev-vault rehearsal incident: exact pre-rehearsal data bytes were lost during a failed cleanup. Recorded settings/orders and 15 completion attempts were recovered; completion history is quarantined (`completionRecordsVersion: recovery-required`). Personal Vault was not touched. See 07-NATIVE-EVIDENCE.md and 07-dev-data-recovery.json. UAT is stopped.

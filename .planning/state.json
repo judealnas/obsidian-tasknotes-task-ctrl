@@ -1,7 +1,7 @@
 {
   "contract": "1.0.0",
   "flavor": "core",
-  "milestone": "v0.3 — Staging Tasks",
+  "milestone": "v0.3 \u2014 Staging Tasks",
   "phases": [
     {
       "number": "1",
@@ -40,9 +40,9 @@
     }
   ],
   "next": {
-    "command": "/gsd:progress --next",
-    "label": "Advance to the next step",
-    "reason": "Phase 07 of 4 · 79% · executing"
+    "command": "$gsd-execute-phase 7",
+    "label": "Review dev-vault recovery, then finish native acceptance",
+    "reason": "Phase 7 has 4/6 complete plans; Plan 05 task 3 remains open; 89% of milestone plans complete"
   },
-  "updated_at": "2026-11-15T04:05:26.712Z"
+  "updated_at": "2026-11-15T06:57:17.291877Z"
 }
