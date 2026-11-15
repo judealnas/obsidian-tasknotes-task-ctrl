@@ -1,4 +1,4 @@
-# TaskNotes Timer Pane
+# TaskNotes Task Control
 
 ## What it is
 
@@ -13,14 +13,34 @@ An Obsidian plugin that adds a dockable pane for monitoring and controlling Task
 
 ## Using the pane
 
-- Open it with the ribbon icon "Open TaskNotes timer" or the command "Open timer pane". It opens in the right sidebar. If the pane is already open, it is revealed where it is instead of opening a second copy, and it stays in place across restarts.
+Version 0.3.0 adds **Staged** beside **Timers**, with independent saved order, task/running-timer counts, and a running cue on Timers. The display name changes; the plugin id, installed folder, saved data and view type remain `tasknotes-timer-pane`, and the command id remains `open-timer-pane`. Upgrade in place and keep `data.json`.
+
+### Daily staging
+
+In TaskNotes settings → Task Properties → Custom User Fields, register **key `staged`**, type **Date**, with **no default value**. The key is fixed. Incorrect or unreadable setup disables Stage and explains how to recover; timer controls remain usable.
+
+- **Stage** opens a searchable batch picker. Picking a task appends it and keeps the picker open. Completed, archived and already-staged tasks are hidden.
+- Staging writes `staged: YYYY-MM-DD` through TaskNotes. Past staged dates carry forward; future dates stay hidden until that day. Cards show their staged age.
+- Start, pause, resume, stop or complete from each staged card. **✕** unstages immediately, stopping regular timing or clearing a saved pause while protecting Pomodoro timing. It writes `staged: null`.
+- **Complete** stops eligible regular timing before completion. Recurring tasks follow TaskNotes' resolved occurrence, which can differ from the requested staging day on an off-schedule request. Repeated pane completion is protected against replay. Failures use Notices; successful completion is quiet.
+- **Done today** contains clickable titles of staged tasks confirmed completed through the pane or observed completed elsewhere. Newest completions appear first; reopening removes a row. Observing completion never changes TaskNotes data.
+- **Rollover hour** in settings defaults to **4 AM**. Done today clears at that hour, and unfinished tasks keep their order and gain a day of age without frontmatter writes. Changing the hour updates cached lists immediately. Age uses calendar dates, including daylight-saving changes and several days away.
+- Drag a reorder handle or use its Up/Down keys. On mobile, left-side **▲/▼** controls move a card within its own tab; screen readers receive its new position.
+
+External history has a limit: TaskNotes' date-only completion evidence cannot establish an exact unobserved completion time or reliably assign an early-morning completion to a staging day. After a cold start, historical rows use the recorded completion/occurrence date as a best-effort day and observation time for ordering. Live external transitions use their first observation time; `dateModified` is never presented as a completion timestamp.
+
+Staging and recurring completion require TaskNotes **4.13.0+** and the relevant public API capabilities. Missing materialization capabilities disable the affected action with an explanation. Regular timers retain the **4.10.0+** floor. Native Phase 7 recurrence checks so far cover **4.18.2** only. Actual overnight, physical sleep/wake, mobile-device and release-upgrade acceptance remain open while this candidate is under review.
+
+### Timer controls
+
+- Open it with the ribbon icon "Open TaskNotes Task Control" or the command "Open timer pane". It opens in the right sidebar. If the pane is already open, it is revealed where it is instead of opening a second copy, and it stays in place across restarts.
 - While a timer runs, the card shows the task title (click it to open the note; Ctrl/Cmd-click opens it in a new tab), the current session as H:MM:SS ticking every second, and the task's total tracked time including the running session.
 - "Stop timer" stops only the timer the card displays.
 - Several timers at once: the pane shows one card per timer, new timers at the top. Drag a card's handle (or press Up/Down arrow on it) to reorder; the order is remembered.
 - "Start task" opens a searchable picker and starts a timer alongside existing timers. Completed tasks remain selectable at the end of the list.
 - "Stop all" stops regular timers sequentially and preserves the timer owned by an active Pomodoro. It is disabled when ownership cannot be verified or there is nothing eligible to stop.
-- "Complete" beside Stop sets the task's completed status, then stops its same still-open timer. If the status write fails, the timer keeps running. If stopping later fails, the task stays completed and a Notice explains that its timer needs checking.
-- Settings → TaskNotes Timer Pane → Completion status offers "Same as TaskNotes" (the first completed status) and TaskNotes' live completed statuses. A removed saved status falls back to the first completed status. No completed statuses means Complete is disabled.
+- "Complete" beside Stop stops eligible regular timing before completing the task. If an action partly succeeds, a Notice explains what still needs checking; completed tasks are never rolled back automatically.
+- Settings → TaskNotes Task Control → Completion status offers "Same as TaskNotes" (the first completed status) and TaskNotes' live completed statuses. A removed saved status falls back to the first completed status. No completed statuses means Complete is disabled.
 - "Pause" on a card stops its TaskNotes time entry and keeps the card in place, marked "Paused", with the session time frozen. "Resume" starts a new TaskNotes entry on the same task and the session carries on from the paused value. Pause and Resume write only through TaskNotes, so its status bar, cards and totals stay in sync.
 - "Pause all" and "Resume all" in the header pause every regular running timer, or resume every paused card, one at a time.
 - Pauses are remembered across restarts. A pause follows its note when the note is renamed or moved, and is cleared when the note is deleted, the task gets a completed status, or a Pomodoro starts on that task. Starting the task's timer elsewhere in TaskNotes turns the paused card back into a running one.

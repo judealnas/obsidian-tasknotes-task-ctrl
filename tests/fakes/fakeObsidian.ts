@@ -8,11 +8,13 @@ export const host = {
 	layoutReady: [] as Array<() => void>,
 	/** Paths vault.getFileByPath finds. */
 	files: new Set<string>(),
+	viewTypes: [] as string[], commands: [] as Array<{ id: string; name: string }>, ribbonLabels: [] as string[],
 };
 export function resetHost(): void {
 	host.order = []; host.data = undefined; host.saved = []; host.notices = [];
 	host.settings = []; host.tabs = []; host.failSave = false;
 	host.vaultHandlers = {}; host.layoutReady = []; host.files = new Set();
+	host.viewTypes = []; host.commands = []; host.ribbonLabels = [];
 }
 /** Fires every vault handler registered for `name`. */
 export function emitVault(name: string, ...args: unknown[]): void {
@@ -65,15 +67,15 @@ export class Plugin {
 		},
 	};
 	register(): void {}
-	registerView(): void { host.order.push("view"); }
+	registerView(type: string): void { host.order.push("view"); host.viewTypes.push(type); }
 	addSettingTab(tab: PluginSettingTab): void { host.order.push("settings"); host.tabs.push(tab); }
 	loadData(): Promise<unknown> { host.order.push("load"); return Promise.resolve(host.data); }
 	saveData(data: unknown): Promise<void> {
 		if (host.failSave) return Promise.reject(new Error("private/path"));
 		host.saved.push(data); return Promise.resolve();
 	}
-	addRibbonIcon(): void {}
-	addCommand(): void {}
+	addRibbonIcon(_icon: string, label: string): void { host.ribbonLabels.push(label); }
+	addCommand(command: { id: string; name: string }): void { host.commands.push({ id: command.id, name: command.name }); }
 	registerInterval(): void {}
 	registerEvent(): void {}
 }

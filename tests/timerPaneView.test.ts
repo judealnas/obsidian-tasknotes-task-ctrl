@@ -57,6 +57,11 @@ export function setup(initial: OpenTimer[] = [timer()], cardOrder = new CardOrde
 }
 beforeEach(() => { vi.useFakeTimers(); vi.setSystemTime(new Date("2026-11-13T12:01:00Z")); resetViewHost(); pickerHost.instances = []; });
 afterEach(() => { vi.clearAllTimers(); vi.useRealTimers(); vi.unstubAllGlobals(); });
+test("product display name changes while saved pane identity stays unchanged", () => {
+ const s = setup();
+ expect(s.view.getDisplayText()).toBe("TaskNotes Task Control");
+ expect(s.view.getViewType()).toBe("tasknotes-timer-pane"); s.view.unload();
+});
 
 test("mobile arrows reorder both owning lists, announce once and retain boundary focus", async () => {
  Platform.isMobile = true;

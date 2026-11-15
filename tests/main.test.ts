@@ -34,6 +34,29 @@ beforeEach(() => { resetHost(); captured.stores = []; vi.useFakeTimers(); vi.stu
 afterEach(() => { vi.useRealTimers(); vi.unstubAllGlobals(); });
 const flush = async () => { for (let i = 0; i < 12; i++) await Promise.resolve(); };
 
+test.each([null, undefined, {}])("legacy empty data %j keeps defaults and stable registration", async data => {
+ host.data = data;
+ const plugin = new TaskNotesTimerPanePlugin({} as App, {} as PluginManifest); plugin.onload(); await flush();
+ expect(host.viewTypes).toEqual(["tasknotes-timer-pane"]);
+ expect(host.commands).toEqual([{ id: "open-timer-pane", name: "Open timer pane" }]);
+ expect(host.ribbonLabels).toEqual(["Open TaskNotes Task Control"]);
+ expect(depsOf(host.tabs[0]).getSettings()).toEqual({ completionStatus: null, rolloverHour: 4 });
+ expect(host.saved).toEqual([]);
+});
+
+test("populated 0.2 data round-trips through candidate settings saves without losing user state", async () => {
+ host.data = { completionStatus: "done", rolloverHour: 6, pauseRecordsVersion: 1, pauseRecords: [PAUSED], cardOrder: ["a", "b"], stagedOrder: ["Tasks/A.md", "Tasks/B.md"], unknownExtension: { retained: true } };
+ const old = structuredClone(host.data);
+ const plugin = new TaskNotesTimerPanePlugin({} as App, {} as PluginManifest); plugin.onload(); await flush();
+ await saveSettingsOf(host.tabs[0])({ completionStatus: "done", rolloverHour: 6 });
+ expect(host.saved[host.saved.length - 1]).toEqual(old);
+ host.data = host.saved[host.saved.length - 1];
+ const next = new TaskNotesTimerPanePlugin({} as App, {} as PluginManifest); next.onload(); await flush();
+ expect(depsOf(host.tabs[1]).getSettings()).toEqual({ completionStatus: "done", rolloverHour: 6 });
+ expect(orderOf(next).get()).toEqual(["a", "b"]);
+ expect(stagedOrderOf(next).get()).toEqual(["Tasks/A.md", "Tasks/B.md"]);
+});
+
 test("no-pane safety resync and saved rollover-hour changes rederive cached tasks even offline", async () => {
  vi.setSystemTime(new Date(2026, 10, 14, 3, 59, 59));
  const plugin = new TaskNotesTimerPanePlugin({} as App, {} as PluginManifest); plugin.onload(); await flush();

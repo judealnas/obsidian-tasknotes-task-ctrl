@@ -112,7 +112,7 @@ export class TimerPaneView extends ItemView {
 	}
 
 	getDisplayText(): string {
-		return "TaskNotes timer";
+		return "TaskNotes Task Control";
 	}
 
 	getIcon(): string {

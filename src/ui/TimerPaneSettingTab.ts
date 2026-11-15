@@ -32,7 +32,7 @@ export class TimerPaneSettingTab extends PluginSettingTab {
 		const description = unavailable ? "TaskNotes statuses are unavailable. Try opening these settings again when TaskNotes is ready."
 			: !resolved ? "TaskNotes has no completed statuses. Complete is disabled until one is available."
 			: preference !== null && !validExplicit ? "The saved status is unavailable. Same as TaskNotes uses the first completed status."
-			: "Same as TaskNotes uses the first completed status. Complete sets this status, then stops the task's timer.";
+			: "Same as TaskNotes uses the first completed status. Recurring tasks complete an occurrence instead of closing the series.";
 		new Setting(this.containerEl)
 			.setName("Completion status")
 			.setDesc(description)

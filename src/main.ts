@@ -172,7 +172,7 @@ export default class TaskNotesTimerPanePlugin extends Plugin {
 			void this.activateView().catch((error: unknown) =>
 				log("Opening the timer pane failed: " + (error instanceof Error ? error.message : String(error))),
 			);
-		this.addRibbonIcon("timer", "Open TaskNotes timer", open);
+		this.addRibbonIcon("timer", "Open TaskNotes Task Control", open);
 		this.addCommand({ id: "open-timer-pane", name: "Open timer pane", callback: open });
 
 		this.app.workspace.onLayoutReady(() => {

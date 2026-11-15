@@ -54,7 +54,7 @@ export default defineConfig(
 	},
 	{
 		rules: {
-			"obsidianmd/ui/sentence-case": ["warn", { brands: ["TaskNotes", "Obsidian"] }],
+			"obsidianmd/ui/sentence-case": ["warn", { brands: ["TaskNotes Task Control", "TaskNotes", "Obsidian"] }],
 		},
 	},
 );
