@@ -164,6 +164,7 @@ None yet.
 
 | # | Description | Date | Commit | Directory |
 |---|-------------|------|--------|-----------|
+| 261115-hco | Publish 0.3.0-beta.2 with beta feedback changes | 2026-11-15 | 68add19 | [261115-hco-publish-0-3-0-beta-2-with-beta-feedback-](./quick/261115-hco-publish-0-3-0-beta-2-with-beta-feedback-/) |
 | 261115-gpo | Remove Done today/custom rollover; apply beta pane feedback | 2026-11-15 | 71d8d73 | [261115-gpo-apply-beta-feedback-remove-done-today-an](./quick/261115-gpo-apply-beta-feedback-remove-done-today-an/) |
 | 261115-fup | Publish 0.3.0-beta.1 with explicit outstanding acceptance limits | 2026-11-15 | bdc5f0f | [261115-fup-publish-0-3-0-beta-1-from-milestone-v0-3](./quick/261115-fup-publish-0-3-0-beta-1-from-milestone-v0-3/) |
 | 261014-whq | Render card titles as wikilinks so TaskNotes' task-link chip appears; fall back to api.ui.taskMenu on right-click | 2026-10-14 | 1886e77 | [261014-whq-render-card-titles-as-wikilinks-so-taskn](./quick/261014-whq-render-card-titles-as-wikilinks-so-taskn/) |
@@ -193,6 +194,8 @@ Stopped at: 07-05 disabled-auto-stop matrix and cold upgrade passed; physical ac
 Resume file: .planning/phases/07-complete-roll-over-release-0-3-0/.continue-here.md
 
 ## Operator Next Steps
+
+- [2026-11-15 beta.2 publication]: User authorized and published 0.3.0-beta.2 from milestone-v0.3 at 68add19e6b378baffc662e9a9e1b5df4fa1161f3, including the completed feedback revision. Local/GitHub build, lint and 636 tests passed; downloaded assets matched the tested bundle/tagged source. Release workflow 43741551679 succeeded. GitHub Latest remains 0.2.0. Physical mobile and actual BRAT update remain open. Prior statements below that no subsequent beta was authorized are historical; stable 0.3.0 remains unpublished and acceptance incomplete. See quick task 261115-hco for release URL and hashes.
 
 - [2026-11-15 beta feedback scope revision]: Done today, external history collection and configurable rollover are removed by explicit user direction. Staging and recurring requests now use local calendar dates; unfinished tasks persist and calendar age refreshes without task writes. Completion safety/replay records remain. See quick task 261115-gpo for UI fixes, tests and native evidence. This supersedes older instructions below to wait for overnight/custom-rollover acceptance. Physical mobile/touch, actual BRAT upgrade and stable publication remain open. No new beta publication was requested.
 
