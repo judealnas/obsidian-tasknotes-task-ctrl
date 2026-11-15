@@ -1,0 +1,31 @@
+{
+  "at": "2026-11-15T08:25:13.976Z",
+  "cdpRequired": false,
+  "checks": [
+    {
+      "file": "\\.obsidian\\plugins\\tasknotes-timer-pane\\main.js",
+      "restored": true,
+      "sha256": "0d49928c2d505bf0972705e7e5edeaccf0596b6eff042cbdab3e8fc6188d7bee"
+    },
+    {
+      "file": "\\.obsidian\\plugins\\tasknotes-timer-pane\\manifest.json",
+      "restored": true,
+      "sha256": "e70688449ceee914ff762cb6d8896c92c2cbee1b64c9d3a3186829165211f677"
+    },
+    {
+      "file": "\\.obsidian\\plugins\\tasknotes-timer-pane\\styles.css",
+      "restored": true,
+      "sha256": "db55f2d65882845be635814cd9e6006f74cf27ff21487ee7e88402a274ec29fb"
+    },
+    {
+      "file": "\\.obsidian\\plugins\\tasknotes-timer-pane\\data.json",
+      "restored": true,
+      "sha256": "6a17ba0b3a23919e04417921cc318c8280a5dd7ddb926c00536573202b0241ed"
+    },
+    {
+      "file": "\\.obsidian\\workspace.json",
+      "restored": true,
+      "sha256": "761ba029c7b0b603db4dfdd963f238f535af35cc2d132a3cae616604b8d3d355"
+    }
+  ]
+}

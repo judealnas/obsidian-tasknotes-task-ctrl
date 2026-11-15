@@ -1,0 +1,1584 @@
+{
+  "at": "2026-11-15T08:23:36.432Z",
+  "vault": "C:\\Users\\ja384\\Home\\obsidian-tasknotes-timer-pane\\dev-vault",
+  "product": {
+    "id": "tasknotes-timer-pane",
+    "name": "TaskNotes Task Control",
+    "version": "0.3.0",
+    "minAppVersion": "1.12.2",
+    "description": "Stage daily tasks, control regular task timers, and review completed work.",
+    "author": "Jude Alnas",
+    "isDesktopOnly": false,
+    "dir": ".obsidian/plugins/tasknotes-timer-pane"
+  },
+  "settings": {
+    "completionStatus": "done",
+    "rolloverHour": 6
+  },
+  "data": {
+    "acceptanceExtra": {
+      "keep": "upgrade sentinel after durable backup",
+      "unicode": "Δ task ✓"
+    },
+    "completionRecordsVersion": 1,
+    "completionRecords": [
+      {
+        "attemptId": "2598b84e-feb9-4b9a-bcd2-e459ce06a052",
+        "sourcePath": "TaskNotes/Tasks/P7-contract-1794730767443-ordinary-callback.md",
+        "requestDay": "2026-11-14",
+        "requestedAt": 1794730774795,
+        "beforeEvidence": {
+          "status": "open",
+          "staged": "2026-11-14",
+          "title": "P7-contract-1794730767443-ordinary-callback",
+          "completedStatus": "done"
+        },
+        "cleanupEvidence": [
+          {
+            "path": "TaskNotes/Tasks/P7-contract-1794730767443-ordinary-callback.md",
+            "staged": "2026-11-14"
+          }
+        ],
+        "phase": "confirmed",
+        "pendingCleanupPaths": [],
+        "completedPath": "TaskNotes/Tasks/P7-contract-1794730767443-ordinary-callback.md",
+        "completedAt": 1794730774795
+      },
+      {
+        "attemptId": "776570ae-a437-4dda-a47f-257abeafa009",
+        "sourcePath": "TaskNotes/Tasks/P7-contract-1794730767443-coordinator-virtual.md",
+        "requestDay": "2026-11-14",
+        "requestedAt": 1794730775597,
+        "beforeEvidence": {
+          "status": "open",
+          "staged": "2026-11-14",
+          "title": "P7-contract-1794730767443-coordinator-virtual",
+          "completedStatus": "done",
+          "parentPath": "TaskNotes/Tasks/P7-contract-1794730767443-coordinator-virtual.md",
+          "recurrence": "DTSTART:20261109;FREQ=WEEKLY;BYDAY=MO",
+          "completedDates": [],
+          "existingPaths": [
+            "TaskNotes/Tasks/P7-contract-1794730767443-coordinator-virtual.md"
+          ]
+        },
+        "replayProtected": true,
+        "cleanupEvidence": [
+          {
+            "path": "TaskNotes/Tasks/P7-contract-1794730767443-coordinator-virtual.md",
+            "staged": "2026-11-14"
+          }
+        ],
+        "phase": "confirmed",
+        "pendingCleanupPaths": [],
+        "completedPath": "TaskNotes/Tasks/P7-contract-1794730767443-coordinator-virtual.md",
+        "resolvedDate": "2026-11-09",
+        "completedAt": 1794730775597
+      },
+      {
+        "attemptId": "e4e340e4-883c-440c-a1d2-bbc40c5d6efa",
+        "sourcePath": "TaskNotes/Tasks/P7-contract-1794730767443-coordinator-on_completion.md",
+        "requestDay": "2026-11-14",
+        "requestedAt": 1794730776541,
+        "beforeEvidence": {
+          "status": "open",
+          "staged": "2026-11-14",
+          "title": "P7-contract-1794730767443-coordinator-on_completion",
+          "completedStatus": "done",
+          "parentPath": "TaskNotes/Tasks/P7-contract-1794730767443-coordinator-on_completion.md",
+          "recurrence": "DTSTART:20261109;FREQ=WEEKLY;BYDAY=MO",
+          "completedDates": [],
+          "existingPaths": [
+            "TaskNotes/Tasks/P7-contract-1794730767443-coordinator-on_completion.md",
+            "TaskNotes/Tasks/P7-contract-1794730767443-coordinator-on_completion-2.md"
+          ]
+        },
+        "replayProtected": true,
+        "cleanupEvidence": [
+          {
+            "path": "TaskNotes/Tasks/P7-contract-1794730767443-coordinator-on_completion.md",
+            "staged": "2026-11-14"
+          },
+          {
+            "path": "TaskNotes/Tasks/P7-contract-1794730767443-coordinator-on_completion-3.md",
+            "staged": "2026-11-14"
+          }
+        ],
+        "phase": "confirmed",
+        "pendingCleanupPaths": [],
+        "completedPath": "TaskNotes/Tasks/P7-contract-1794730767443-coordinator-on_completion-3.md",
+        "resolvedDate": "2026-11-14",
+        "completedAt": 1794730776541
+      },
+      {
+        "attemptId": "73f28efd-418a-4f3f-ae21-81419aef72e6",
+        "sourcePath": "TaskNotes/Tasks/P7-contract-1794730767443-coordinator-existing.md",
+        "requestDay": "2026-11-14",
+        "requestedAt": 1794730777678,
+        "beforeEvidence": {
+          "status": "open",
+          "staged": "2026-11-14",
+          "title": "P7-contract-1794730767443-coordinator-existing",
+          "completedStatus": "done",
+          "parentPath": "TaskNotes/Tasks/P7-contract-1794730767443-coordinator-existing.md",
+          "recurrence": "DTSTART:20261109;FREQ=WEEKLY;BYDAY=MO",
+          "completedDates": [],
+          "existingPaths": [
+            "TaskNotes/Tasks/P7-contract-1794730767443-coordinator-existing.md",
+            "TaskNotes/Tasks/P7-contract-1794730767443-coordinator-existing-2.md"
+          ]
+        },
+        "replayProtected": true,
+        "cleanupEvidence": [
+          {
+            "path": "TaskNotes/Tasks/P7-contract-1794730767443-coordinator-existing.md",
+            "staged": "2026-11-14"
+          }
+        ],
+        "phase": "confirmed",
+        "pendingCleanupPaths": [],
+        "completedPath": "TaskNotes/Tasks/P7-contract-1794730767443-coordinator-existing-2.md",
+        "resolvedDate": "2026-11-14",
+        "completedAt": 1794730777678
+      },
+      {
+        "attemptId": "66b7ec19-c8a5-4d87-b640-cba794f7282c",
+        "sourcePath": "TaskNotes/Tasks/P7-contract-1794730767443-coordinator-existing-next.md",
+        "requestDay": "2026-11-14",
+        "requestedAt": 1794730778714,
+        "beforeEvidence": {
+          "status": "open",
+          "staged": "2026-11-14",
+          "title": "P7-contract-1794730767443-coordinator-existing-next",
+          "completedStatus": "done",
+          "parentPath": "TaskNotes/Tasks/P7-contract-1794730767443-coordinator-existing-next.md",
+          "recurrence": "DTSTART:20261109;FREQ=WEEKLY;BYDAY=MO",
+          "completedDates": [],
+          "existingPaths": [
+            "TaskNotes/Tasks/P7-contract-1794730767443-coordinator-existing-next.md",
+            "TaskNotes/Tasks/P7-contract-1794730767443-coordinator-existing-next-2.md"
+          ]
+        },
+        "replayProtected": true,
+        "cleanupEvidence": [
+          {
+            "path": "TaskNotes/Tasks/P7-contract-1794730767443-coordinator-existing-next.md",
+            "staged": "2026-11-14"
+          },
+          {
+            "path": "TaskNotes/Tasks/P7-contract-1794730767443-coordinator-existing-next-3.md",
+            "staged": "2026-11-14"
+          }
+        ],
+        "phase": "confirmed",
+        "pendingCleanupPaths": [],
+        "completedPath": "TaskNotes/Tasks/P7-contract-1794730767443-coordinator-existing-next-3.md",
+        "resolvedDate": "2026-11-14",
+        "completedAt": 1794730778714
+      },
+      {
+        "kind": "observation",
+        "sourcePath": "TaskNotes/Tasks/P7-contract-1794725143104-regular-timing.md",
+        "completedPath": "TaskNotes/Tasks/P7-contract-1794725143104-regular-timing.md",
+        "completionFingerprint": "member:TaskNotes/Tasks/P7-contract-1794725143104-regular-timing.md",
+        "capturedDay": "2026-11-14",
+        "firstObservedAt": 1794730565579,
+        "completedAt": 1794730565579,
+        "membershipEvidence": {
+          "staged": "2026-11-14"
+        },
+        "stillCompleted": false
+      },
+      {
+        "kind": "observation",
+        "sourcePath": "TaskNotes/Tasks/P7-contract-1794725143104-regular-timing.md",
+        "completedPath": "TaskNotes/Tasks/P7-contract-1794725143104-regular-timing.md",
+        "resolvedDate": "2026-11-09",
+        "completionFingerprint": "observed:[\"TaskNotes/Tasks/P7-contract-1794725143104-regular-timing.md\",\"2026-11-09\"]",
+        "capturedDay": "2026-11-09",
+        "firstObservedAt": 1794730565579,
+        "completedAt": 1794730565579,
+        "membershipEvidence": {
+          "staged": "2026-11-14"
+        },
+        "stillCompleted": true
+      },
+      {
+        "kind": "observation",
+        "sourcePath": "TaskNotes/Tasks/P7-contract-1794725143104-off-schedule-materialize-2.md",
+        "completedPath": "TaskNotes/Tasks/P7-contract-1794725143104-off-schedule-materialize-2.md",
+        "completionFingerprint": "member:TaskNotes/Tasks/P7-contract-1794725143104-off-schedule-materialize-2.md",
+        "capturedDay": "2026-11-14",
+        "firstObservedAt": 1794730565579,
+        "completedAt": 1794730565579,
+        "membershipEvidence": {
+          "staged": "2026-11-14"
+        },
+        "stillCompleted": false
+      },
+      {
+        "kind": "observation",
+        "sourcePath": "TaskNotes/Tasks/P7-contract-1794725143104-protected-pomodoro.md",
+        "completedPath": "TaskNotes/Tasks/P7-contract-1794725143104-protected-pomodoro.md",
+        "completionFingerprint": "member:TaskNotes/Tasks/P7-contract-1794725143104-protected-pomodoro.md",
+        "capturedDay": "2026-11-14",
+        "firstObservedAt": 1794730565579,
+        "completedAt": 1794730565579,
+        "membershipEvidence": {
+          "staged": "2026-11-14"
+        },
+        "stillCompleted": false
+      },
+      {
+        "kind": "observation",
+        "sourcePath": "TaskNotes/Tasks/P7-contract-1794725143104-pomodoro.md",
+        "completedPath": "TaskNotes/Tasks/P7-contract-1794725143104-pomodoro.md",
+        "completionFingerprint": "member:TaskNotes/Tasks/P7-contract-1794725143104-pomodoro.md",
+        "capturedDay": "2026-11-14",
+        "firstObservedAt": 1794730565579,
+        "completedAt": 1794730565579,
+        "membershipEvidence": {
+          "staged": "2026-11-14"
+        },
+        "stillCompleted": false
+      },
+      {
+        "kind": "observation",
+        "sourcePath": "TaskNotes/Tasks/P7-contract-1794725143104-pomodoro.md",
+        "completedPath": "TaskNotes/Tasks/P7-contract-1794725143104-pomodoro.md",
+        "resolvedDate": "2026-11-09",
+        "completionFingerprint": "observed:[\"TaskNotes/Tasks/P7-contract-1794725143104-pomodoro.md\",\"2026-11-09\"]",
+        "capturedDay": "2026-11-09",
+        "firstObservedAt": 1794730565579,
+        "completedAt": 1794730565579,
+        "membershipEvidence": {
+          "staged": "2026-11-14"
+        },
+        "stillCompleted": true
+      },
+      {
+        "kind": "observation",
+        "sourcePath": "TaskNotes/Tasks/P7-contract-1794725143104-off-schedule.md",
+        "completedPath": "TaskNotes/Tasks/P7-contract-1794725143104-off-schedule.md",
+        "completionFingerprint": "member:TaskNotes/Tasks/P7-contract-1794725143104-off-schedule.md",
+        "capturedDay": "2026-11-14",
+        "firstObservedAt": 1794730565579,
+        "completedAt": 1794730565579,
+        "membershipEvidence": {
+          "staged": "2026-11-14"
+        },
+        "stillCompleted": false
+      },
+      {
+        "kind": "observation",
+        "sourcePath": "TaskNotes/Tasks/P7-contract-1794725143104-off-schedule.md",
+        "completedPath": "TaskNotes/Tasks/P7-contract-1794725143104-off-schedule.md",
+        "resolvedDate": "2026-11-09",
+        "completionFingerprint": "observed:[\"TaskNotes/Tasks/P7-contract-1794725143104-off-schedule.md\",\"2026-11-09\"]",
+        "capturedDay": "2026-11-09",
+        "firstObservedAt": 1794730565579,
+        "completedAt": 1794730565579,
+        "membershipEvidence": {
+          "staged": "2026-11-14"
+        },
+        "stillCompleted": true
+      },
+      {
+        "kind": "observation",
+        "sourcePath": "TaskNotes/Tasks/P7-contract-1794725143104-off-schedule.md",
+        "completedPath": "TaskNotes/Tasks/P7-contract-1794725143104-off-schedule.md",
+        "resolvedDate": "2026-11-16",
+        "completionFingerprint": "observed:[\"TaskNotes/Tasks/P7-contract-1794725143104-off-schedule.md\",\"2026-11-16\"]",
+        "capturedDay": "2026-11-16",
+        "firstObservedAt": 1794730565579,
+        "completedAt": 1794730565579,
+        "membershipEvidence": {
+          "staged": "2026-11-14"
+        },
+        "stillCompleted": true
+      },
+      {
+        "kind": "observation",
+        "sourcePath": "TaskNotes/Tasks/P7-contract-1794725143104-off-schedule-materialize.md",
+        "completedPath": "TaskNotes/Tasks/P7-contract-1794725143104-off-schedule-materialize.md",
+        "completionFingerprint": "member:TaskNotes/Tasks/P7-contract-1794725143104-off-schedule-materialize.md",
+        "capturedDay": "2026-11-14",
+        "firstObservedAt": 1794730565579,
+        "completedAt": 1794730565579,
+        "membershipEvidence": {
+          "staged": "2026-11-14"
+        },
+        "stillCompleted": false
+      },
+      {
+        "kind": "observation",
+        "sourcePath": "TaskNotes/Tasks/P7-contract-1794725143104-existing.md",
+        "completedPath": "TaskNotes/Tasks/P7-contract-1794725143104-existing.md",
+        "completionFingerprint": "member:TaskNotes/Tasks/P7-contract-1794725143104-existing.md",
+        "capturedDay": "2026-11-14",
+        "firstObservedAt": 1794730565579,
+        "completedAt": 1794730565579,
+        "membershipEvidence": {
+          "staged": "2026-11-14"
+        },
+        "stillCompleted": false
+      },
+      {
+        "kind": "observation",
+        "sourcePath": "TaskNotes/Tasks/P7-contract-1794725143104-existing-next.md",
+        "completedPath": "TaskNotes/Tasks/P7-contract-1794725143104-existing-next.md",
+        "completionFingerprint": "member:TaskNotes/Tasks/P7-contract-1794725143104-existing-next.md",
+        "capturedDay": "2026-11-14",
+        "firstObservedAt": 1794730565579,
+        "completedAt": 1794730565579,
+        "membershipEvidence": {
+          "staged": "2026-11-14"
+        },
+        "stillCompleted": false
+      },
+      {
+        "kind": "observation",
+        "sourcePath": "TaskNotes/Tasks/P7-contract-1794725143104-existing-next-3.md",
+        "completedPath": "TaskNotes/Tasks/P7-contract-1794725143104-existing-next-3.md",
+        "resolvedDate": "2026-11-14",
+        "completionFingerprint": "observed:[\"TaskNotes/Tasks/P7-contract-1794725143104-existing-next-3.md\",\"2026-11-14\"]",
+        "capturedDay": "2026-11-15",
+        "firstObservedAt": 1794730565579,
+        "completedAt": 1794730565579,
+        "membershipEvidence": {
+          "staged": "2026-11-14"
+        },
+        "stillCompleted": true
+      },
+      {
+        "kind": "observation",
+        "sourcePath": "TaskNotes/Tasks/P7-contract-1794725143104-existing-next-3.md",
+        "completedPath": "TaskNotes/Tasks/P7-contract-1794725143104-existing-next-3.md",
+        "completionFingerprint": "member:TaskNotes/Tasks/P7-contract-1794725143104-existing-next-3.md",
+        "capturedDay": "2026-11-14",
+        "firstObservedAt": 1794730565579,
+        "completedAt": 1794730565579,
+        "membershipEvidence": {
+          "staged": "2026-11-14"
+        },
+        "stillCompleted": false
+      },
+      {
+        "kind": "observation",
+        "sourcePath": "TaskNotes/Tasks/P7-contract-1794725143104-exact.md",
+        "completedPath": "TaskNotes/Tasks/P7-contract-1794725143104-exact.md",
+        "completionFingerprint": "member:TaskNotes/Tasks/P7-contract-1794725143104-exact.md",
+        "capturedDay": "2026-11-14",
+        "firstObservedAt": 1794730565579,
+        "completedAt": 1794730565579,
+        "membershipEvidence": {
+          "staged": "2026-11-14"
+        },
+        "stillCompleted": false
+      },
+      {
+        "kind": "observation",
+        "sourcePath": "TaskNotes/Tasks/P7-contract-1794725143104-existing-2.md",
+        "completedPath": "TaskNotes/Tasks/P7-contract-1794725143104-existing-2.md",
+        "completionFingerprint": "member:TaskNotes/Tasks/P7-contract-1794725143104-existing-2.md",
+        "capturedDay": "2026-11-14",
+        "firstObservedAt": 1794730565579,
+        "completedAt": 1794730565579,
+        "membershipEvidence": {
+          "staged": "2026-11-14"
+        },
+        "stillCompleted": false
+      },
+      {
+        "kind": "observation",
+        "sourcePath": "TaskNotes/Tasks/P7-contract-1794725143104-coordinator-existing-2.md",
+        "completedPath": "TaskNotes/Tasks/P7-contract-1794725143104-coordinator-existing-2.md",
+        "completionFingerprint": "member:TaskNotes/Tasks/P7-contract-1794725143104-coordinator-existing-2.md",
+        "capturedDay": "2026-11-14",
+        "firstObservedAt": 1794730565579,
+        "completedAt": 1794730565579,
+        "membershipEvidence": {
+          "staged": "2026-11-14"
+        },
+        "stillCompleted": false
+      },
+      {
+        "kind": "observation",
+        "sourcePath": "TaskNotes/Tasks/P7-contract-1794725143104-coordinator-existing-2.md",
+        "completedPath": "TaskNotes/Tasks/P7-contract-1794725143104-coordinator-existing-2.md",
+        "resolvedDate": "2026-11-14",
+        "completionFingerprint": "observed:[\"TaskNotes/Tasks/P7-contract-1794725143104-coordinator-existing-2.md\",\"2026-11-14\"]",
+        "capturedDay": "2026-11-15",
+        "firstObservedAt": 1794730565579,
+        "completedAt": 1794730565579,
+        "membershipEvidence": {
+          "staged": "2026-11-14"
+        },
+        "stillCompleted": true
+      },
+      {
+        "kind": "observation",
+        "sourcePath": "TaskNotes/Tasks/P7-contract-1794725143104-completion-anchor.md",
+        "completedPath": "TaskNotes/Tasks/P7-contract-1794725143104-completion-anchor.md",
+        "completionFingerprint": "member:TaskNotes/Tasks/P7-contract-1794725143104-completion-anchor.md",
+        "capturedDay": "2026-11-14",
+        "firstObservedAt": 1794730565579,
+        "completedAt": 1794730565579,
+        "membershipEvidence": {
+          "staged": "2026-11-14"
+        },
+        "stillCompleted": false
+      },
+      {
+        "kind": "observation",
+        "sourcePath": "TaskNotes/Tasks/P7-contract-1794725143104-completion-anchor.md",
+        "completedPath": "TaskNotes/Tasks/P7-contract-1794725143104-completion-anchor.md",
+        "resolvedDate": "2026-11-14",
+        "completionFingerprint": "observed:[\"TaskNotes/Tasks/P7-contract-1794725143104-completion-anchor.md\",\"2026-11-14\"]",
+        "capturedDay": "2026-11-14",
+        "firstObservedAt": 1794730565579,
+        "completedAt": 1794730565579,
+        "membershipEvidence": {
+          "staged": "2026-11-14"
+        },
+        "stillCompleted": true
+      },
+      {
+        "kind": "observation",
+        "sourcePath": "TaskNotes/Tasks/P7-contract-1794725143104-auto-3.md",
+        "completedPath": "TaskNotes/Tasks/P7-contract-1794725143104-auto-3.md",
+        "completionFingerprint": "member:TaskNotes/Tasks/P7-contract-1794725143104-auto-3.md",
+        "capturedDay": "2026-11-14",
+        "firstObservedAt": 1794730565579,
+        "completedAt": 1794730565579,
+        "membershipEvidence": {
+          "staged": "2026-11-14"
+        },
+        "stillCompleted": false
+      },
+      {
+        "kind": "observation",
+        "sourcePath": "TaskNotes/Tasks/P7-contract-1794725143104-auto.md",
+        "completedPath": "TaskNotes/Tasks/P7-contract-1794725143104-auto-3.md",
+        "resolvedDate": "2026-11-14",
+        "completionFingerprint": "observed:[\"TaskNotes/Tasks/P7-contract-1794725143104-auto-3.md\",\"2026-11-14\"]",
+        "capturedDay": "2026-11-15",
+        "firstObservedAt": 1794730565579,
+        "completedAt": 1794730565579,
+        "membershipEvidence": {
+          "staged": "2026-11-14"
+        },
+        "stillCompleted": true
+      },
+      {
+        "kind": "observation",
+        "sourcePath": "TaskNotes/Tasks/P7-contract-1794725143104-auto.md",
+        "completedPath": "TaskNotes/Tasks/P7-contract-1794725143104-auto.md",
+        "completionFingerprint": "member:TaskNotes/Tasks/P7-contract-1794725143104-auto.md",
+        "capturedDay": "2026-11-14",
+        "firstObservedAt": 1794730565579,
+        "completedAt": 1794730565579,
+        "membershipEvidence": {
+          "staged": "2026-11-14"
+        },
+        "stillCompleted": false
+      },
+      {
+        "kind": "observation",
+        "sourcePath": "TaskNotes/Tasks/P7-contract-1794725038353-regular-timing.md",
+        "completedPath": "TaskNotes/Tasks/P7-contract-1794725038353-regular-timing.md",
+        "completionFingerprint": "member:TaskNotes/Tasks/P7-contract-1794725038353-regular-timing.md",
+        "capturedDay": "2026-11-14",
+        "firstObservedAt": 1794730565579,
+        "completedAt": 1794730565579,
+        "membershipEvidence": {
+          "staged": "2026-11-14"
+        },
+        "stillCompleted": false
+      },
+      {
+        "kind": "observation",
+        "sourcePath": "TaskNotes/Tasks/P7-contract-1794725038353-regular-timing.md",
+        "completedPath": "TaskNotes/Tasks/P7-contract-1794725038353-regular-timing.md",
+        "resolvedDate": "2026-11-09",
+        "completionFingerprint": "observed:[\"TaskNotes/Tasks/P7-contract-1794725038353-regular-timing.md\",\"2026-11-09\"]",
+        "capturedDay": "2026-11-09",
+        "firstObservedAt": 1794730565579,
+        "completedAt": 1794730565579,
+        "membershipEvidence": {
+          "staged": "2026-11-14"
+        },
+        "stillCompleted": true
+      },
+      {
+        "kind": "observation",
+        "sourcePath": "TaskNotes/Tasks/P7-contract-1794725038353-off-schedule-materialize-2.md",
+        "completedPath": "TaskNotes/Tasks/P7-contract-1794725038353-off-schedule-materialize-2.md",
+        "completionFingerprint": "member:TaskNotes/Tasks/P7-contract-1794725038353-off-schedule-materialize-2.md",
+        "capturedDay": "2026-11-14",
+        "firstObservedAt": 1794730565579,
+        "completedAt": 1794730565579,
+        "membershipEvidence": {
+          "staged": "2026-11-14"
+        },
+        "stillCompleted": false
+      },
+      {
+        "kind": "observation",
+        "sourcePath": "TaskNotes/Tasks/P7-contract-1794725038353-off-schedule-materialize.md",
+        "completedPath": "TaskNotes/Tasks/P7-contract-1794725038353-off-schedule-materialize.md",
+        "completionFingerprint": "member:TaskNotes/Tasks/P7-contract-1794725038353-off-schedule-materialize.md",
+        "capturedDay": "2026-11-14",
+        "firstObservedAt": 1794730565579,
+        "completedAt": 1794730565579,
+        "membershipEvidence": {
+          "staged": "2026-11-14"
+        },
+        "stillCompleted": false
+      },
+      {
+        "kind": "observation",
+        "sourcePath": "TaskNotes/Tasks/P7-contract-1794725038353-protected-pomodoro.md",
+        "completedPath": "TaskNotes/Tasks/P7-contract-1794725038353-protected-pomodoro.md",
+        "completionFingerprint": "member:TaskNotes/Tasks/P7-contract-1794725038353-protected-pomodoro.md",
+        "capturedDay": "2026-11-14",
+        "firstObservedAt": 1794730565579,
+        "completedAt": 1794730565579,
+        "membershipEvidence": {
+          "staged": "2026-11-14"
+        },
+        "stillCompleted": false
+      },
+      {
+        "kind": "observation",
+        "sourcePath": "TaskNotes/Tasks/P7-contract-1794725038353-pomodoro.md",
+        "completedPath": "TaskNotes/Tasks/P7-contract-1794725038353-pomodoro.md",
+        "completionFingerprint": "member:TaskNotes/Tasks/P7-contract-1794725038353-pomodoro.md",
+        "capturedDay": "2026-11-14",
+        "firstObservedAt": 1794730565579,
+        "completedAt": 1794730565579,
+        "membershipEvidence": {
+          "staged": "2026-11-14"
+        },
+        "stillCompleted": false
+      },
+      {
+        "kind": "observation",
+        "sourcePath": "TaskNotes/Tasks/P7-contract-1794725038353-pomodoro.md",
+        "completedPath": "TaskNotes/Tasks/P7-contract-1794725038353-pomodoro.md",
+        "resolvedDate": "2026-11-09",
+        "completionFingerprint": "observed:[\"TaskNotes/Tasks/P7-contract-1794725038353-pomodoro.md\",\"2026-11-09\"]",
+        "capturedDay": "2026-11-09",
+        "firstObservedAt": 1794730565579,
+        "completedAt": 1794730565579,
+        "membershipEvidence": {
+          "staged": "2026-11-14"
+        },
+        "stillCompleted": true
+      },
+      {
+        "kind": "observation",
+        "sourcePath": "TaskNotes/Tasks/P7-contract-1794725038353-off-schedule.md",
+        "completedPath": "TaskNotes/Tasks/P7-contract-1794725038353-off-schedule.md",
+        "completionFingerprint": "member:TaskNotes/Tasks/P7-contract-1794725038353-off-schedule.md",
+        "capturedDay": "2026-11-14",
+        "firstObservedAt": 1794730565579,
+        "completedAt": 1794730565579,
+        "membershipEvidence": {
+          "staged": "2026-11-14"
+        },
+        "stillCompleted": false
+      },
+      {
+        "kind": "observation",
+        "sourcePath": "TaskNotes/Tasks/P7-contract-1794725038353-off-schedule.md",
+        "completedPath": "TaskNotes/Tasks/P7-contract-1794725038353-off-schedule.md",
+        "resolvedDate": "2026-11-09",
+        "completionFingerprint": "observed:[\"TaskNotes/Tasks/P7-contract-1794725038353-off-schedule.md\",\"2026-11-09\"]",
+        "capturedDay": "2026-11-09",
+        "firstObservedAt": 1794730565579,
+        "completedAt": 1794730565579,
+        "membershipEvidence": {
+          "staged": "2026-11-14"
+        },
+        "stillCompleted": true
+      },
+      {
+        "kind": "observation",
+        "sourcePath": "TaskNotes/Tasks/P7-contract-1794725038353-off-schedule.md",
+        "completedPath": "TaskNotes/Tasks/P7-contract-1794725038353-off-schedule.md",
+        "resolvedDate": "2026-11-16",
+        "completionFingerprint": "observed:[\"TaskNotes/Tasks/P7-contract-1794725038353-off-schedule.md\",\"2026-11-16\"]",
+        "capturedDay": "2026-11-16",
+        "firstObservedAt": 1794730565579,
+        "completedAt": 1794730565579,
+        "membershipEvidence": {
+          "staged": "2026-11-14"
+        },
+        "stillCompleted": true
+      },
+      {
+        "kind": "observation",
+        "sourcePath": "TaskNotes/Tasks/P7-contract-1794725038353-existing.md",
+        "completedPath": "TaskNotes/Tasks/P7-contract-1794725038353-existing.md",
+        "completionFingerprint": "member:TaskNotes/Tasks/P7-contract-1794725038353-existing.md",
+        "capturedDay": "2026-11-14",
+        "firstObservedAt": 1794730565579,
+        "completedAt": 1794730565579,
+        "membershipEvidence": {
+          "staged": "2026-11-14"
+        },
+        "stillCompleted": false
+      },
+      {
+        "kind": "observation",
+        "sourcePath": "TaskNotes/Tasks/P7-contract-1794725038353-existing-next.md",
+        "completedPath": "TaskNotes/Tasks/P7-contract-1794725038353-existing-next.md",
+        "completionFingerprint": "member:TaskNotes/Tasks/P7-contract-1794725038353-existing-next.md",
+        "capturedDay": "2026-11-14",
+        "firstObservedAt": 1794730565579,
+        "completedAt": 1794730565579,
+        "membershipEvidence": {
+          "staged": "2026-11-14"
+        },
+        "stillCompleted": false
+      },
+      {
+        "kind": "observation",
+        "sourcePath": "TaskNotes/Tasks/P7-contract-1794725038353-existing-next-3.md",
+        "completedPath": "TaskNotes/Tasks/P7-contract-1794725038353-existing-next-3.md",
+        "resolvedDate": "2026-11-14",
+        "completionFingerprint": "observed:[\"TaskNotes/Tasks/P7-contract-1794725038353-existing-next-3.md\",\"2026-11-14\"]",
+        "capturedDay": "2026-11-15",
+        "firstObservedAt": 1794730565579,
+        "completedAt": 1794730565579,
+        "membershipEvidence": {
+          "staged": "2026-11-14"
+        },
+        "stillCompleted": true
+      },
+      {
+        "kind": "observation",
+        "sourcePath": "TaskNotes/Tasks/P7-contract-1794725038353-existing-next-3.md",
+        "completedPath": "TaskNotes/Tasks/P7-contract-1794725038353-existing-next-3.md",
+        "completionFingerprint": "member:TaskNotes/Tasks/P7-contract-1794725038353-existing-next-3.md",
+        "capturedDay": "2026-11-14",
+        "firstObservedAt": 1794730565579,
+        "completedAt": 1794730565579,
+        "membershipEvidence": {
+          "staged": "2026-11-14"
+        },
+        "stillCompleted": false
+      },
+      {
+        "kind": "observation",
+        "sourcePath": "TaskNotes/Tasks/P7-contract-1794725038353-existing-2.md",
+        "completedPath": "TaskNotes/Tasks/P7-contract-1794725038353-existing-2.md",
+        "completionFingerprint": "member:TaskNotes/Tasks/P7-contract-1794725038353-existing-2.md",
+        "capturedDay": "2026-11-14",
+        "firstObservedAt": 1794730565579,
+        "completedAt": 1794730565579,
+        "membershipEvidence": {
+          "staged": "2026-11-14"
+        },
+        "stillCompleted": false
+      },
+      {
+        "kind": "observation",
+        "sourcePath": "TaskNotes/Tasks/P7-contract-1794725038353-exact.md",
+        "completedPath": "TaskNotes/Tasks/P7-contract-1794725038353-exact.md",
+        "completionFingerprint": "member:TaskNotes/Tasks/P7-contract-1794725038353-exact.md",
+        "capturedDay": "2026-11-14",
+        "firstObservedAt": 1794730565579,
+        "completedAt": 1794730565579,
+        "membershipEvidence": {
+          "staged": "2026-11-14"
+        },
+        "stillCompleted": false
+      },
+      {
+        "kind": "observation",
+        "sourcePath": "TaskNotes/Tasks/P7-contract-1794725038353-coordinator-existing-2.md",
+        "completedPath": "TaskNotes/Tasks/P7-contract-1794725038353-coordinator-existing-2.md",
+        "completionFingerprint": "member:TaskNotes/Tasks/P7-contract-1794725038353-coordinator-existing-2.md",
+        "capturedDay": "2026-11-14",
+        "firstObservedAt": 1794730565579,
+        "completedAt": 1794730565579,
+        "membershipEvidence": {
+          "staged": "2026-11-14"
+        },
+        "stillCompleted": false
+      },
+      {
+        "kind": "observation",
+        "sourcePath": "TaskNotes/Tasks/P7-contract-1794725038353-coordinator-existing-2.md",
+        "completedPath": "TaskNotes/Tasks/P7-contract-1794725038353-coordinator-existing-2.md",
+        "resolvedDate": "2026-11-14",
+        "completionFingerprint": "observed:[\"TaskNotes/Tasks/P7-contract-1794725038353-coordinator-existing-2.md\",\"2026-11-14\"]",
+        "capturedDay": "2026-11-15",
+        "firstObservedAt": 1794730565579,
+        "completedAt": 1794730565579,
+        "membershipEvidence": {
+          "staged": "2026-11-14"
+        },
+        "stillCompleted": true
+      },
+      {
+        "kind": "observation",
+        "sourcePath": "TaskNotes/Tasks/P7-contract-1794725038353-auto.md",
+        "completedPath": "TaskNotes/Tasks/P7-contract-1794725038353-auto.md",
+        "completionFingerprint": "member:TaskNotes/Tasks/P7-contract-1794725038353-auto.md",
+        "capturedDay": "2026-11-14",
+        "firstObservedAt": 1794730565579,
+        "completedAt": 1794730565579,
+        "membershipEvidence": {
+          "staged": "2026-11-14"
+        },
+        "stillCompleted": false
+      },
+      {
+        "kind": "observation",
+        "sourcePath": "TaskNotes/Tasks/P7-contract-1794725038353-auto-3.md",
+        "completedPath": "TaskNotes/Tasks/P7-contract-1794725038353-auto-3.md",
+        "resolvedDate": "2026-11-14",
+        "completionFingerprint": "observed:[\"TaskNotes/Tasks/P7-contract-1794725038353-auto-3.md\",\"2026-11-14\"]",
+        "capturedDay": "2026-11-15",
+        "firstObservedAt": 1794730565579,
+        "completedAt": 1794730565579,
+        "membershipEvidence": {
+          "staged": "2026-11-14"
+        },
+        "stillCompleted": true
+      },
+      {
+        "kind": "observation",
+        "sourcePath": "TaskNotes/Tasks/P7-contract-1794725038353-auto-3.md",
+        "completedPath": "TaskNotes/Tasks/P7-contract-1794725038353-auto-3.md",
+        "completionFingerprint": "member:TaskNotes/Tasks/P7-contract-1794725038353-auto-3.md",
+        "capturedDay": "2026-11-14",
+        "firstObservedAt": 1794730565579,
+        "completedAt": 1794730565579,
+        "membershipEvidence": {
+          "staged": "2026-11-14"
+        },
+        "stillCompleted": false
+      },
+      {
+        "kind": "observation",
+        "sourcePath": "TaskNotes/Tasks/P7-contract-1794725038353-completion-anchor.md",
+        "completedPath": "TaskNotes/Tasks/P7-contract-1794725038353-completion-anchor.md",
+        "completionFingerprint": "member:TaskNotes/Tasks/P7-contract-1794725038353-completion-anchor.md",
+        "capturedDay": "2026-11-14",
+        "firstObservedAt": 1794730565579,
+        "completedAt": 1794730565579,
+        "membershipEvidence": {
+          "staged": "2026-11-14"
+        },
+        "stillCompleted": false
+      },
+      {
+        "kind": "observation",
+        "sourcePath": "TaskNotes/Tasks/P7-contract-1794725038353-completion-anchor.md",
+        "completedPath": "TaskNotes/Tasks/P7-contract-1794725038353-completion-anchor.md",
+        "resolvedDate": "2026-11-14",
+        "completionFingerprint": "observed:[\"TaskNotes/Tasks/P7-contract-1794725038353-completion-anchor.md\",\"2026-11-14\"]",
+        "capturedDay": "2026-11-14",
+        "firstObservedAt": 1794730565579,
+        "completedAt": 1794730565579,
+        "membershipEvidence": {
+          "staged": "2026-11-14"
+        },
+        "stillCompleted": true
+      },
+      {
+        "kind": "observation",
+        "sourcePath": "TaskNotes/Tasks/P7-contract-1794715327261-regular-timing.md",
+        "completedPath": "TaskNotes/Tasks/P7-contract-1794715327261-regular-timing.md",
+        "completionFingerprint": "member:TaskNotes/Tasks/P7-contract-1794715327261-regular-timing.md",
+        "capturedDay": "2026-11-14",
+        "firstObservedAt": 1794730565579,
+        "completedAt": 1794730565579,
+        "membershipEvidence": {
+          "staged": "2026-11-14"
+        },
+        "stillCompleted": false
+      },
+      {
+        "kind": "observation",
+        "sourcePath": "TaskNotes/Tasks/P7-contract-1794715327261-regular-timing.md",
+        "completedPath": "TaskNotes/Tasks/P7-contract-1794715327261-regular-timing.md",
+        "resolvedDate": "2026-11-09",
+        "completionFingerprint": "observed:[\"TaskNotes/Tasks/P7-contract-1794715327261-regular-timing.md\",\"2026-11-09\"]",
+        "capturedDay": "2026-11-09",
+        "firstObservedAt": 1794730565579,
+        "completedAt": 1794730565579,
+        "membershipEvidence": {
+          "staged": "2026-11-14"
+        },
+        "stillCompleted": true
+      },
+      {
+        "kind": "observation",
+        "sourcePath": "TaskNotes/Tasks/P7-contract-1794715327261-protected-pomodoro.md",
+        "completedPath": "TaskNotes/Tasks/P7-contract-1794715327261-protected-pomodoro.md",
+        "completionFingerprint": "member:TaskNotes/Tasks/P7-contract-1794715327261-protected-pomodoro.md",
+        "capturedDay": "2026-11-14",
+        "firstObservedAt": 1794730565579,
+        "completedAt": 1794730565579,
+        "membershipEvidence": {
+          "staged": "2026-11-14"
+        },
+        "stillCompleted": false
+      },
+      {
+        "kind": "observation",
+        "sourcePath": "TaskNotes/Tasks/P7-contract-1794715327261-off-schedule-materialize.md",
+        "completedPath": "TaskNotes/Tasks/P7-contract-1794715327261-off-schedule-materialize.md",
+        "completionFingerprint": "member:TaskNotes/Tasks/P7-contract-1794715327261-off-schedule-materialize.md",
+        "capturedDay": "2026-11-14",
+        "firstObservedAt": 1794730565579,
+        "completedAt": 1794730565579,
+        "membershipEvidence": {
+          "staged": "2026-11-14"
+        },
+        "stillCompleted": false
+      },
+      {
+        "kind": "observation",
+        "sourcePath": "TaskNotes/Tasks/P7-contract-1794715327261-off-schedule.md",
+        "completedPath": "TaskNotes/Tasks/P7-contract-1794715327261-off-schedule.md",
+        "completionFingerprint": "member:TaskNotes/Tasks/P7-contract-1794715327261-off-schedule.md",
+        "capturedDay": "2026-11-14",
+        "firstObservedAt": 1794730565579,
+        "completedAt": 1794730565579,
+        "membershipEvidence": {
+          "staged": "2026-11-14"
+        },
+        "stillCompleted": false
+      },
+      {
+        "kind": "observation",
+        "sourcePath": "TaskNotes/Tasks/P7-contract-1794715327261-off-schedule.md",
+        "completedPath": "TaskNotes/Tasks/P7-contract-1794715327261-off-schedule.md",
+        "resolvedDate": "2026-11-09",
+        "completionFingerprint": "observed:[\"TaskNotes/Tasks/P7-contract-1794715327261-off-schedule.md\",\"2026-11-09\"]",
+        "capturedDay": "2026-11-09",
+        "firstObservedAt": 1794730565579,
+        "completedAt": 1794730565579,
+        "membershipEvidence": {
+          "staged": "2026-11-14"
+        },
+        "stillCompleted": true
+      },
+      {
+        "kind": "observation",
+        "sourcePath": "TaskNotes/Tasks/P7-contract-1794715327261-off-schedule.md",
+        "completedPath": "TaskNotes/Tasks/P7-contract-1794715327261-off-schedule.md",
+        "resolvedDate": "2026-11-16",
+        "completionFingerprint": "observed:[\"TaskNotes/Tasks/P7-contract-1794715327261-off-schedule.md\",\"2026-11-16\"]",
+        "capturedDay": "2026-11-16",
+        "firstObservedAt": 1794730565579,
+        "completedAt": 1794730565579,
+        "membershipEvidence": {
+          "staged": "2026-11-14"
+        },
+        "stillCompleted": true
+      },
+      {
+        "kind": "observation",
+        "sourcePath": "TaskNotes/Tasks/P7-contract-1794715327261-pomodoro.md",
+        "completedPath": "TaskNotes/Tasks/P7-contract-1794715327261-pomodoro.md",
+        "completionFingerprint": "member:TaskNotes/Tasks/P7-contract-1794715327261-pomodoro.md",
+        "capturedDay": "2026-11-14",
+        "firstObservedAt": 1794730565579,
+        "completedAt": 1794730565579,
+        "membershipEvidence": {
+          "staged": "2026-11-14"
+        },
+        "stillCompleted": false
+      },
+      {
+        "kind": "observation",
+        "sourcePath": "TaskNotes/Tasks/P7-contract-1794715327261-pomodoro.md",
+        "completedPath": "TaskNotes/Tasks/P7-contract-1794715327261-pomodoro.md",
+        "resolvedDate": "2026-11-09",
+        "completionFingerprint": "observed:[\"TaskNotes/Tasks/P7-contract-1794715327261-pomodoro.md\",\"2026-11-09\"]",
+        "capturedDay": "2026-11-09",
+        "firstObservedAt": 1794730565579,
+        "completedAt": 1794730565579,
+        "membershipEvidence": {
+          "staged": "2026-11-14"
+        },
+        "stillCompleted": true
+      },
+      {
+        "kind": "observation",
+        "sourcePath": "TaskNotes/Tasks/P7-contract-1794715327261-off-schedule-materialize-2.md",
+        "completedPath": "TaskNotes/Tasks/P7-contract-1794715327261-off-schedule-materialize-2.md",
+        "completionFingerprint": "member:TaskNotes/Tasks/P7-contract-1794715327261-off-schedule-materialize-2.md",
+        "capturedDay": "2026-11-14",
+        "firstObservedAt": 1794730565579,
+        "completedAt": 1794730565579,
+        "membershipEvidence": {
+          "staged": "2026-11-14"
+        },
+        "stillCompleted": false
+      },
+      {
+        "kind": "observation",
+        "sourcePath": "TaskNotes/Tasks/P7-contract-1794715327261-existing.md",
+        "completedPath": "TaskNotes/Tasks/P7-contract-1794715327261-existing.md",
+        "completionFingerprint": "member:TaskNotes/Tasks/P7-contract-1794715327261-existing.md",
+        "capturedDay": "2026-11-14",
+        "firstObservedAt": 1794730565579,
+        "completedAt": 1794730565579,
+        "membershipEvidence": {
+          "staged": "2026-11-14"
+        },
+        "stillCompleted": false
+      },
+      {
+        "kind": "observation",
+        "sourcePath": "TaskNotes/Tasks/P7-contract-1794715327261-existing-next.md",
+        "completedPath": "TaskNotes/Tasks/P7-contract-1794715327261-existing-next.md",
+        "completionFingerprint": "member:TaskNotes/Tasks/P7-contract-1794715327261-existing-next.md",
+        "capturedDay": "2026-11-14",
+        "firstObservedAt": 1794730565579,
+        "completedAt": 1794730565579,
+        "membershipEvidence": {
+          "staged": "2026-11-14"
+        },
+        "stillCompleted": false
+      },
+      {
+        "kind": "observation",
+        "sourcePath": "TaskNotes/Tasks/P7-contract-1794715327261-existing-next-3.md",
+        "completedPath": "TaskNotes/Tasks/P7-contract-1794715327261-existing-next-3.md",
+        "resolvedDate": "2026-11-14",
+        "completionFingerprint": "observed:[\"TaskNotes/Tasks/P7-contract-1794715327261-existing-next-3.md\",\"2026-11-14\"]",
+        "capturedDay": "2026-11-14",
+        "firstObservedAt": 1794730565579,
+        "completedAt": 1794730565579,
+        "membershipEvidence": {
+          "staged": "2026-11-14"
+        },
+        "stillCompleted": true
+      },
+      {
+        "kind": "observation",
+        "sourcePath": "TaskNotes/Tasks/P7-contract-1794715327261-existing-next-3.md",
+        "completedPath": "TaskNotes/Tasks/P7-contract-1794715327261-existing-next-3.md",
+        "completionFingerprint": "member:TaskNotes/Tasks/P7-contract-1794715327261-existing-next-3.md",
+        "capturedDay": "2026-11-14",
+        "firstObservedAt": 1794730565579,
+        "completedAt": 1794730565579,
+        "membershipEvidence": {
+          "staged": "2026-11-14"
+        },
+        "stillCompleted": false
+      },
+      {
+        "kind": "observation",
+        "sourcePath": "TaskNotes/Tasks/P7-contract-1794715327261-exact.md",
+        "completedPath": "TaskNotes/Tasks/P7-contract-1794715327261-exact.md",
+        "completionFingerprint": "member:TaskNotes/Tasks/P7-contract-1794715327261-exact.md",
+        "capturedDay": "2026-11-14",
+        "firstObservedAt": 1794730565579,
+        "completedAt": 1794730565579,
+        "membershipEvidence": {
+          "staged": "2026-11-14"
+        },
+        "stillCompleted": false
+      },
+      {
+        "kind": "observation",
+        "sourcePath": "TaskNotes/Tasks/P7-contract-1794715327261-existing-2.md",
+        "completedPath": "TaskNotes/Tasks/P7-contract-1794715327261-existing-2.md",
+        "completionFingerprint": "member:TaskNotes/Tasks/P7-contract-1794715327261-existing-2.md",
+        "capturedDay": "2026-11-14",
+        "firstObservedAt": 1794730565579,
+        "completedAt": 1794730565579,
+        "membershipEvidence": {
+          "staged": "2026-11-14"
+        },
+        "stillCompleted": false
+      },
+      {
+        "kind": "observation",
+        "sourcePath": "TaskNotes/Tasks/P7-contract-1794715327261-coordinator-existing-2.md",
+        "completedPath": "TaskNotes/Tasks/P7-contract-1794715327261-coordinator-existing-2.md",
+        "completionFingerprint": "member:TaskNotes/Tasks/P7-contract-1794715327261-coordinator-existing-2.md",
+        "capturedDay": "2026-11-14",
+        "firstObservedAt": 1794730565579,
+        "completedAt": 1794730565579,
+        "membershipEvidence": {
+          "staged": "2026-11-14"
+        },
+        "stillCompleted": false
+      },
+      {
+        "kind": "observation",
+        "sourcePath": "TaskNotes/Tasks/P7-contract-1794715327261-coordinator-existing-2.md",
+        "completedPath": "TaskNotes/Tasks/P7-contract-1794715327261-coordinator-existing-2.md",
+        "resolvedDate": "2026-11-14",
+        "completionFingerprint": "observed:[\"TaskNotes/Tasks/P7-contract-1794715327261-coordinator-existing-2.md\",\"2026-11-14\"]",
+        "capturedDay": "2026-11-14",
+        "firstObservedAt": 1794730565579,
+        "completedAt": 1794730565579,
+        "membershipEvidence": {
+          "staged": "2026-11-14"
+        },
+        "stillCompleted": true
+      },
+      {
+        "kind": "observation",
+        "sourcePath": "TaskNotes/Tasks/P7-contract-1794715327261-completion-anchor.md",
+        "completedPath": "TaskNotes/Tasks/P7-contract-1794715327261-completion-anchor.md",
+        "completionFingerprint": "member:TaskNotes/Tasks/P7-contract-1794715327261-completion-anchor.md",
+        "capturedDay": "2026-11-14",
+        "firstObservedAt": 1794730565579,
+        "completedAt": 1794730565579,
+        "membershipEvidence": {
+          "staged": "2026-11-14"
+        },
+        "stillCompleted": false
+      },
+      {
+        "kind": "observation",
+        "sourcePath": "TaskNotes/Tasks/P7-contract-1794715327261-completion-anchor.md",
+        "completedPath": "TaskNotes/Tasks/P7-contract-1794715327261-completion-anchor.md",
+        "resolvedDate": "2026-11-14",
+        "completionFingerprint": "observed:[\"TaskNotes/Tasks/P7-contract-1794715327261-completion-anchor.md\",\"2026-11-14\"]",
+        "capturedDay": "2026-11-14",
+        "firstObservedAt": 1794730565579,
+        "completedAt": 1794730565579,
+        "membershipEvidence": {
+          "staged": "2026-11-14"
+        },
+        "stillCompleted": true
+      },
+      {
+        "kind": "observation",
+        "sourcePath": "TaskNotes/Tasks/P7-contract-1794715327261-auto-3.md",
+        "completedPath": "TaskNotes/Tasks/P7-contract-1794715327261-auto-3.md",
+        "completionFingerprint": "member:TaskNotes/Tasks/P7-contract-1794715327261-auto-3.md",
+        "capturedDay": "2026-11-14",
+        "firstObservedAt": 1794730565579,
+        "completedAt": 1794730565579,
+        "membershipEvidence": {
+          "staged": "2026-11-14"
+        },
+        "stillCompleted": false
+      },
+      {
+        "kind": "observation",
+        "sourcePath": "TaskNotes/Tasks/P7-contract-1794715327261-auto.md",
+        "completedPath": "TaskNotes/Tasks/P7-contract-1794715327261-auto-3.md",
+        "resolvedDate": "2026-11-14",
+        "completionFingerprint": "observed:[\"TaskNotes/Tasks/P7-contract-1794715327261-auto-3.md\",\"2026-11-14\"]",
+        "capturedDay": "2026-11-14",
+        "firstObservedAt": 1794730565579,
+        "completedAt": 1794730565579,
+        "membershipEvidence": {
+          "staged": "2026-11-14"
+        },
+        "stillCompleted": true
+      },
+      {
+        "kind": "observation",
+        "sourcePath": "TaskNotes/Tasks/P7-contract-1794715327261-auto.md",
+        "completedPath": "TaskNotes/Tasks/P7-contract-1794715327261-auto.md",
+        "completionFingerprint": "member:TaskNotes/Tasks/P7-contract-1794715327261-auto.md",
+        "capturedDay": "2026-11-14",
+        "firstObservedAt": 1794730565579,
+        "completedAt": 1794730565579,
+        "membershipEvidence": {
+          "staged": "2026-11-14"
+        },
+        "stillCompleted": false
+      },
+      {
+        "kind": "observation",
+        "sourcePath": "TaskNotes/Tasks/P7-contract-1794730767443-exact.md",
+        "completedPath": "TaskNotes/Tasks/P7-contract-1794730767443-exact.md",
+        "completionFingerprint": "member:TaskNotes/Tasks/P7-contract-1794730767443-exact.md",
+        "capturedDay": "2026-11-14",
+        "firstObservedAt": 1794730767728,
+        "completedAt": 1794730767728,
+        "membershipEvidence": {
+          "staged": "2026-11-14"
+        },
+        "stillCompleted": false
+      },
+      {
+        "kind": "observation",
+        "sourcePath": "TaskNotes/Tasks/P7-contract-1794730767443-off-schedule.md",
+        "completedPath": "TaskNotes/Tasks/P7-contract-1794730767443-off-schedule.md",
+        "completionFingerprint": "member:TaskNotes/Tasks/P7-contract-1794730767443-off-schedule.md",
+        "capturedDay": "2026-11-14",
+        "firstObservedAt": 1794730768085,
+        "completedAt": 1794730768085,
+        "membershipEvidence": {
+          "staged": "2026-11-14"
+        },
+        "stillCompleted": false
+      },
+      {
+        "kind": "observation",
+        "sourcePath": "TaskNotes/Tasks/P7-contract-1794730767443-completion-anchor.md",
+        "completedPath": "TaskNotes/Tasks/P7-contract-1794730767443-completion-anchor.md",
+        "completionFingerprint": "member:TaskNotes/Tasks/P7-contract-1794730767443-completion-anchor.md",
+        "capturedDay": "2026-11-14",
+        "firstObservedAt": 1794730768489,
+        "completedAt": 1794730768489,
+        "membershipEvidence": {
+          "staged": "2026-11-14"
+        },
+        "stillCompleted": false
+      },
+      {
+        "kind": "observation",
+        "sourcePath": "TaskNotes/Tasks/P7-contract-1794730767443-off-schedule.md",
+        "completedPath": "TaskNotes/Tasks/P7-contract-1794730767443-off-schedule.md",
+        "resolvedDate": "2026-11-09",
+        "completionFingerprint": "observed:[\"TaskNotes/Tasks/P7-contract-1794730767443-off-schedule.md\",\"2026-11-09\"]",
+        "capturedDay": "2026-11-14",
+        "firstObservedAt": 1794730768489,
+        "completedAt": 1794730768489,
+        "membershipEvidence": {
+          "staged": "2026-11-14"
+        },
+        "stillCompleted": true
+      },
+      {
+        "kind": "observation",
+        "sourcePath": "TaskNotes/Tasks/P7-contract-1794730767443-off-schedule.md",
+        "completedPath": "TaskNotes/Tasks/P7-contract-1794730767443-off-schedule.md",
+        "resolvedDate": "2026-11-16",
+        "completionFingerprint": "observed:[\"TaskNotes/Tasks/P7-contract-1794730767443-off-schedule.md\",\"2026-11-16\"]",
+        "capturedDay": "2026-11-14",
+        "firstObservedAt": 1794730768489,
+        "completedAt": 1794730768489,
+        "membershipEvidence": {
+          "staged": "2026-11-14"
+        },
+        "stillCompleted": true
+      },
+      {
+        "kind": "observation",
+        "sourcePath": "TaskNotes/Tasks/P7-contract-1794730767443-existing.md",
+        "completedPath": "TaskNotes/Tasks/P7-contract-1794730767443-existing.md",
+        "completionFingerprint": "member:TaskNotes/Tasks/P7-contract-1794730767443-existing.md",
+        "capturedDay": "2026-11-14",
+        "firstObservedAt": 1794730768906,
+        "completedAt": 1794730768906,
+        "membershipEvidence": {
+          "staged": "2026-11-14"
+        },
+        "stillCompleted": false
+      },
+      {
+        "kind": "observation",
+        "sourcePath": "TaskNotes/Tasks/P7-contract-1794730767443-completion-anchor.md",
+        "completedPath": "TaskNotes/Tasks/P7-contract-1794730767443-completion-anchor.md",
+        "resolvedDate": "2026-11-14",
+        "completionFingerprint": "observed:[\"TaskNotes/Tasks/P7-contract-1794730767443-completion-anchor.md\",\"2026-11-14\"]",
+        "capturedDay": "2026-11-14",
+        "firstObservedAt": 1794730768906,
+        "completedAt": 1794730768906,
+        "membershipEvidence": {
+          "staged": "2026-11-14"
+        },
+        "stillCompleted": true
+      },
+      {
+        "kind": "observation",
+        "sourcePath": "TaskNotes/Tasks/P7-contract-1794730767443-existing-2.md",
+        "completedPath": "TaskNotes/Tasks/P7-contract-1794730767443-existing-2.md",
+        "completionFingerprint": "member:TaskNotes/Tasks/P7-contract-1794730767443-existing-2.md",
+        "capturedDay": "2026-11-14",
+        "firstObservedAt": 1794730769249,
+        "completedAt": 1794730769249,
+        "membershipEvidence": {
+          "staged": "2026-11-14"
+        },
+        "stillCompleted": false
+      },
+      {
+        "kind": "observation",
+        "sourcePath": "TaskNotes/Tasks/P7-contract-1794730767443-existing.md",
+        "completedPath": "TaskNotes/Tasks/P7-contract-1794730767443-existing-2.md",
+        "resolvedDate": "2026-11-09",
+        "completionFingerprint": "observed:[\"TaskNotes/Tasks/P7-contract-1794730767443-existing-2.md\",\"2026-11-09\"]",
+        "capturedDay": "2026-11-14",
+        "firstObservedAt": 1794730769541,
+        "completedAt": 1794730769541,
+        "membershipEvidence": {
+          "staged": "2026-11-14"
+        },
+        "stillCompleted": false
+      },
+      {
+        "kind": "observation",
+        "sourcePath": "TaskNotes/Tasks/P7-contract-1794730767443-auto-3.md",
+        "completedPath": "TaskNotes/Tasks/P7-contract-1794730767443-auto-3.md",
+        "completionFingerprint": "member:TaskNotes/Tasks/P7-contract-1794730767443-auto-3.md",
+        "capturedDay": "2026-11-14",
+        "firstObservedAt": 1794730770315,
+        "completedAt": 1794730770315,
+        "membershipEvidence": {
+          "staged": "2026-11-14"
+        },
+        "stillCompleted": false
+      },
+      {
+        "kind": "observation",
+        "sourcePath": "TaskNotes/Tasks/P7-contract-1794730767443-auto.md",
+        "completedPath": "TaskNotes/Tasks/P7-contract-1794730767443-auto-3.md",
+        "resolvedDate": "2026-11-14",
+        "completionFingerprint": "observed:[\"TaskNotes/Tasks/P7-contract-1794730767443-auto-3.md\",\"2026-11-14\"]",
+        "capturedDay": "2026-11-15",
+        "firstObservedAt": 1794730770315,
+        "completedAt": 1794730770315,
+        "membershipEvidence": {
+          "staged": "2026-11-14"
+        },
+        "stillCompleted": true
+      },
+      {
+        "kind": "observation",
+        "sourcePath": "TaskNotes/Tasks/P7-contract-1794730767443-auto.md",
+        "completedPath": "TaskNotes/Tasks/P7-contract-1794730767443-auto.md",
+        "completionFingerprint": "member:TaskNotes/Tasks/P7-contract-1794730767443-auto.md",
+        "capturedDay": "2026-11-14",
+        "firstObservedAt": 1794730770315,
+        "completedAt": 1794730770315,
+        "membershipEvidence": {
+          "staged": "2026-11-14"
+        },
+        "stillCompleted": false
+      },
+      {
+        "kind": "observation",
+        "sourcePath": "TaskNotes/Tasks/P7-contract-1794730767443-existing-next.md",
+        "completedPath": "TaskNotes/Tasks/P7-contract-1794730767443-existing-next.md",
+        "completionFingerprint": "member:TaskNotes/Tasks/P7-contract-1794730767443-existing-next.md",
+        "capturedDay": "2026-11-14",
+        "firstObservedAt": 1794730770840,
+        "completedAt": 1794730770840,
+        "membershipEvidence": {
+          "staged": "2026-11-14"
+        },
+        "stillCompleted": false
+      },
+      {
+        "kind": "observation",
+        "sourcePath": "TaskNotes/Tasks/P7-contract-1794730767443-off-schedule-materialize.md",
+        "completedPath": "TaskNotes/Tasks/P7-contract-1794730767443-off-schedule-materialize.md",
+        "completionFingerprint": "member:TaskNotes/Tasks/P7-contract-1794730767443-off-schedule-materialize.md",
+        "capturedDay": "2026-11-14",
+        "firstObservedAt": 1794730771677,
+        "completedAt": 1794730771677,
+        "membershipEvidence": {
+          "staged": "2026-11-14"
+        },
+        "stillCompleted": false
+      },
+      {
+        "kind": "observation",
+        "sourcePath": "TaskNotes/Tasks/P7-contract-1794730767443-existing-next-3.md",
+        "completedPath": "TaskNotes/Tasks/P7-contract-1794730767443-existing-next-3.md",
+        "completionFingerprint": "member:TaskNotes/Tasks/P7-contract-1794730767443-existing-next-3.md",
+        "capturedDay": "2026-11-14",
+        "firstObservedAt": 1794730771677,
+        "completedAt": 1794730771677,
+        "membershipEvidence": {
+          "staged": "2026-11-14"
+        },
+        "stillCompleted": false
+      },
+      {
+        "kind": "observation",
+        "sourcePath": "TaskNotes/Tasks/P7-contract-1794730767443-existing-next.md",
+        "completedPath": "TaskNotes/Tasks/P7-contract-1794730767443-existing-next-3.md",
+        "resolvedDate": "2026-11-14",
+        "completionFingerprint": "observed:[\"TaskNotes/Tasks/P7-contract-1794730767443-existing-next-3.md\",\"2026-11-14\"]",
+        "capturedDay": "2026-11-14",
+        "firstObservedAt": 1794730771677,
+        "completedAt": 1794730771677,
+        "membershipEvidence": {
+          "staged": "2026-11-14"
+        },
+        "stillCompleted": true
+      },
+      {
+        "kind": "observation",
+        "sourcePath": "TaskNotes/Tasks/P7-contract-1794730767443-regular-timing.md",
+        "completedPath": "TaskNotes/Tasks/P7-contract-1794730767443-regular-timing.md",
+        "completionFingerprint": "member:TaskNotes/Tasks/P7-contract-1794730767443-regular-timing.md",
+        "capturedDay": "2026-11-14",
+        "firstObservedAt": 1794730772418,
+        "completedAt": 1794730772418,
+        "membershipEvidence": {
+          "staged": "2026-11-14"
+        },
+        "stillCompleted": false
+      },
+      {
+        "kind": "observation",
+        "sourcePath": "TaskNotes/Tasks/P7-contract-1794730767443-regular-timing.md",
+        "completedPath": "TaskNotes/Tasks/P7-contract-1794730767443-regular-timing.md",
+        "resolvedDate": "2026-11-09",
+        "completionFingerprint": "observed:[\"TaskNotes/Tasks/P7-contract-1794730767443-regular-timing.md\",\"2026-11-09\"]",
+        "capturedDay": "2026-11-09",
+        "firstObservedAt": 1794730772418,
+        "completedAt": 1794730772418,
+        "membershipEvidence": {
+          "staged": "2026-11-14"
+        },
+        "stillCompleted": true
+      },
+      {
+        "kind": "observation",
+        "sourcePath": "TaskNotes/Tasks/P7-contract-1794730767443-off-schedule-materialize-2.md",
+        "completedPath": "TaskNotes/Tasks/P7-contract-1794730767443-off-schedule-materialize-2.md",
+        "completionFingerprint": "member:TaskNotes/Tasks/P7-contract-1794730767443-off-schedule-materialize-2.md",
+        "capturedDay": "2026-11-14",
+        "firstObservedAt": 1794730772418,
+        "completedAt": 1794730772418,
+        "membershipEvidence": {
+          "staged": "2026-11-14"
+        },
+        "stillCompleted": false
+      },
+      {
+        "kind": "observation",
+        "sourcePath": "TaskNotes/Tasks/P7-contract-1794730767443-pomodoro.md",
+        "completedPath": "TaskNotes/Tasks/P7-contract-1794730767443-pomodoro.md",
+        "completionFingerprint": "member:TaskNotes/Tasks/P7-contract-1794730767443-pomodoro.md",
+        "capturedDay": "2026-11-14",
+        "firstObservedAt": 1794730772984,
+        "completedAt": 1794730772984,
+        "membershipEvidence": {
+          "staged": "2026-11-14"
+        },
+        "stillCompleted": false
+      },
+      {
+        "kind": "observation",
+        "sourcePath": "TaskNotes/Tasks/P7-contract-1794730767443-pomodoro.md",
+        "completedPath": "TaskNotes/Tasks/P7-contract-1794730767443-pomodoro.md",
+        "resolvedDate": "2026-11-09",
+        "completionFingerprint": "observed:[\"TaskNotes/Tasks/P7-contract-1794730767443-pomodoro.md\",\"2026-11-09\"]",
+        "capturedDay": "2026-11-14",
+        "firstObservedAt": 1794730773666,
+        "completedAt": 1794730773666,
+        "membershipEvidence": {
+          "staged": "2026-11-14"
+        },
+        "stillCompleted": true
+      },
+      {
+        "kind": "observation",
+        "sourcePath": "TaskNotes/Tasks/P7-contract-1794730767443-ordinary-callback.md",
+        "completedPath": "TaskNotes/Tasks/P7-contract-1794730767443-ordinary-callback.md",
+        "completionFingerprint": "member:TaskNotes/Tasks/P7-contract-1794730767443-ordinary-callback.md",
+        "capturedDay": "2026-11-14",
+        "firstObservedAt": 1794730774715,
+        "completedAt": 1794730774715,
+        "membershipEvidence": {
+          "staged": "2026-11-14"
+        },
+        "stillCompleted": false
+      },
+      {
+        "kind": "observation",
+        "sourcePath": "TaskNotes/Tasks/P7-contract-1794730767443-coordinator-virtual.md",
+        "completedPath": "TaskNotes/Tasks/P7-contract-1794730767443-coordinator-virtual.md",
+        "completionFingerprint": "member:TaskNotes/Tasks/P7-contract-1794730767443-coordinator-virtual.md",
+        "capturedDay": "2026-11-14",
+        "firstObservedAt": 1794730775528,
+        "completedAt": 1794730775528,
+        "membershipEvidence": {
+          "staged": "2026-11-14"
+        },
+        "stillCompleted": false
+      },
+      {
+        "kind": "observation",
+        "sourcePath": "TaskNotes/Tasks/P7-contract-1794730767443-coordinator-on_completion.md",
+        "completedPath": "TaskNotes/Tasks/P7-contract-1794730767443-coordinator-on_completion.md",
+        "completionFingerprint": "member:TaskNotes/Tasks/P7-contract-1794730767443-coordinator-on_completion.md",
+        "capturedDay": "2026-11-14",
+        "firstObservedAt": 1794730776459,
+        "completedAt": 1794730776459,
+        "membershipEvidence": {
+          "staged": "2026-11-14"
+        },
+        "stillCompleted": false
+      },
+      {
+        "kind": "observation",
+        "sourcePath": "TaskNotes/Tasks/P7-contract-1794730767443-coordinator-existing.md",
+        "completedPath": "TaskNotes/Tasks/P7-contract-1794730767443-coordinator-existing.md",
+        "completionFingerprint": "member:TaskNotes/Tasks/P7-contract-1794730767443-coordinator-existing.md",
+        "capturedDay": "2026-11-14",
+        "firstObservedAt": 1794730777542,
+        "completedAt": 1794730777542,
+        "membershipEvidence": {
+          "staged": "2026-11-14"
+        },
+        "stillCompleted": false
+      },
+      {
+        "kind": "observation",
+        "sourcePath": "TaskNotes/Tasks/P7-contract-1794730767443-coordinator-existing-2.md",
+        "completedPath": "TaskNotes/Tasks/P7-contract-1794730767443-coordinator-existing-2.md",
+        "completionFingerprint": "member:TaskNotes/Tasks/P7-contract-1794730767443-coordinator-existing-2.md",
+        "capturedDay": "2026-11-14",
+        "firstObservedAt": 1794730777829,
+        "completedAt": 1794730777829,
+        "membershipEvidence": {
+          "staged": "2026-11-14"
+        },
+        "stillCompleted": false
+      },
+      {
+        "kind": "observation",
+        "sourcePath": "TaskNotes/Tasks/P7-contract-1794730767443-coordinator-existing-next.md",
+        "completedPath": "TaskNotes/Tasks/P7-contract-1794730767443-coordinator-existing-next.md",
+        "completionFingerprint": "member:TaskNotes/Tasks/P7-contract-1794730767443-coordinator-existing-next.md",
+        "capturedDay": "2026-11-14",
+        "firstObservedAt": 1794730778592,
+        "completedAt": 1794730778592,
+        "membershipEvidence": {
+          "staged": "2026-11-14"
+        },
+        "stillCompleted": false
+      },
+      {
+        "kind": "observation",
+        "sourcePath": "TaskNotes/Tasks/P7-contract-1794730767443-protected-pomodoro.md",
+        "completedPath": "TaskNotes/Tasks/P7-contract-1794730767443-protected-pomodoro.md",
+        "completionFingerprint": "member:TaskNotes/Tasks/P7-contract-1794730767443-protected-pomodoro.md",
+        "capturedDay": "2026-11-14",
+        "firstObservedAt": 1794730779811,
+        "completedAt": 1794730779811,
+        "membershipEvidence": {
+          "staged": "2026-11-14"
+        },
+        "stillCompleted": false
+      },
+      {
+        "kind": "observation",
+        "sourcePath": "TaskNotes/Tasks/P7-upgrade-safe-1794730914616.md",
+        "completedPath": "TaskNotes/Tasks/P7-upgrade-safe-1794730914616.md",
+        "completionFingerprint": "member:TaskNotes/Tasks/P7-upgrade-safe-1794730914616.md",
+        "capturedDay": "2026-11-14",
+        "firstObservedAt": 1794730995794,
+        "completedAt": 1794730995794,
+        "membershipEvidence": {
+          "staged": "2026-11-14"
+        },
+        "stillCompleted": false
+      }
+    ],
+    "completionStatus": "done",
+    "rolloverHour": 6,
+    "pauseRecordsVersion": 1,
+    "pauseRecords": [
+      {
+        "state": "paused",
+        "taskPath": "TaskNotes/Tasks/P7-upgrade-safe-1794730914616.md",
+        "title": "P7-upgrade-safe-1794730914616",
+        "sessionStartedAt": "2026-11-15T08:21:55.016Z",
+        "accumulatedMs": 1344,
+        "pausedAt": "2026-11-15T08:21:56.360Z",
+        "lastEntryStart": "2026-11-15T08:21:55.016Z"
+      }
+    ],
+    "cardOrder": [
+      "TaskNotes/Tasks/Staging spike scratch.md\u00002026-11-13T20:05:31.448Z",
+      "TaskNotes/Tasks/Staging spike weekly.md\u00002026-11-13T20:05:31.459Z"
+    ],
+    "stagedOrder": [
+      "TaskNotes/Tasks/P7-upgrade-safe-1794730914616.md",
+      "TaskNotes/Tasks/P7-contract-1794715327261-exact.md",
+      "TaskNotes/Tasks/P7-contract-1794715327261-off-schedule.md",
+      "TaskNotes/Tasks/P7-contract-1794715327261-completion-anchor.md",
+      "TaskNotes/Tasks/P7-contract-1794715327261-existing.md",
+      "TaskNotes/Tasks/P7-contract-1794715327261-existing-2.md",
+      "TaskNotes/Tasks/P7-contract-1794715327261-auto.md",
+      "TaskNotes/Tasks/P7-contract-1794715327261-existing-next.md",
+      "TaskNotes/Tasks/P7-contract-1794715327261-off-schedule-materialize.md",
+      "TaskNotes/Tasks/P7-contract-1794715327261-off-schedule-materialize-2.md",
+      "TaskNotes/Tasks/P7-contract-1794715327261-regular-timing.md",
+      "TaskNotes/Tasks/P7-contract-1794715327261-pomodoro.md",
+      "TaskNotes/Tasks/P7-contract-1794715327261-ordinary-callback.md",
+      "TaskNotes/Tasks/P7-contract-1794715327261-coordinator-virtual.md",
+      "TaskNotes/Tasks/P7-contract-1794715327261-coordinator-on_completion.md",
+      "TaskNotes/Tasks/P7-contract-1794715327261-coordinator-existing-next.md",
+      "TaskNotes/Tasks/P7-contract-1794715327261-protected-pomodoro.md",
+      "TaskNotes/Tasks/P7-contract-1794725038353-exact.md",
+      "TaskNotes/Tasks/P7-contract-1794725038353-off-schedule.md",
+      "TaskNotes/Tasks/P7-contract-1794725038353-completion-anchor.md",
+      "TaskNotes/Tasks/P7-contract-1794725038353-existing.md",
+      "TaskNotes/Tasks/P7-contract-1794725038353-existing-2.md",
+      "TaskNotes/Tasks/P7-contract-1794725038353-existing-next.md",
+      "TaskNotes/Tasks/P7-contract-1794725038353-off-schedule-materialize.md",
+      "TaskNotes/Tasks/P7-contract-1794725038353-off-schedule-materialize-2.md",
+      "TaskNotes/Tasks/P7-contract-1794725038353-regular-timing.md",
+      "TaskNotes/Tasks/P7-contract-1794725038353-pomodoro.md",
+      "TaskNotes/Tasks/P7-contract-1794725038353-ordinary-callback.md",
+      "TaskNotes/Tasks/P7-contract-1794725038353-coordinator-on_completion.md",
+      "TaskNotes/Tasks/P7-contract-1794725038353-coordinator-existing.md",
+      "TaskNotes/Tasks/P7-contract-1794725038353-coordinator-existing-next.md",
+      "TaskNotes/Tasks/P7-contract-1794725038353-protected-pomodoro.md",
+      "TaskNotes/Tasks/P7-contract-1794725038353-auto.md",
+      "TaskNotes/Tasks/P7-contract-1794725143104-exact.md",
+      "TaskNotes/Tasks/P7-contract-1794725143104-existing-2.md",
+      "TaskNotes/Tasks/P7-contract-1794725143104-existing-next.md",
+      "TaskNotes/Tasks/P7-contract-1794725143104-existing.md",
+      "TaskNotes/Tasks/P7-contract-1794725143104-off-schedule-materialize-2.md",
+      "TaskNotes/Tasks/P7-contract-1794725143104-off-schedule-materialize.md",
+      "TaskNotes/Tasks/P7-contract-1794725143104-pomodoro.md",
+      "TaskNotes/Tasks/P7-contract-1794725143104-protected-pomodoro.md",
+      "TaskNotes/Tasks/P7-contract-1794725143104-regular-timing.md",
+      "TaskNotes/Tasks/P7-contract-1794730767443-exact.md",
+      "TaskNotes/Tasks/P7-contract-1794730767443-off-schedule.md",
+      "TaskNotes/Tasks/P7-contract-1794730767443-completion-anchor.md",
+      "TaskNotes/Tasks/P7-contract-1794730767443-existing.md",
+      "TaskNotes/Tasks/P7-contract-1794730767443-existing-2.md",
+      "TaskNotes/Tasks/P7-contract-1794730767443-existing-next.md",
+      "TaskNotes/Tasks/P7-contract-1794730767443-off-schedule-materialize.md",
+      "TaskNotes/Tasks/P7-contract-1794730767443-off-schedule-materialize-2.md",
+      "TaskNotes/Tasks/P7-contract-1794730767443-regular-timing.md",
+      "TaskNotes/Tasks/P7-contract-1794730767443-pomodoro.md",
+      "TaskNotes/Tasks/P7-contract-1794730767443-ordinary-callback.md",
+      "TaskNotes/Tasks/P7-contract-1794730767443-coordinator-virtual.md",
+      "TaskNotes/Tasks/P7-contract-1794730767443-coordinator-on_completion.md",
+      "TaskNotes/Tasks/P7-contract-1794730767443-coordinator-existing.md",
+      "TaskNotes/Tasks/P7-contract-1794730767443-coordinator-existing-next.md"
+    ]
+  },
+  "leaves": [
+    {
+      "id": "c88f9ce6849cf981",
+      "type": "tasknotes-timer-pane",
+      "state": {
+        "tab": "timers"
+      },
+      "name": "TaskNotes Task Control",
+      "text": "Staged 36Timers 0StageP7-upgrade-safe-1794730914616Scheduled: TodayOpen P7-upgrade-safe-1794730914616Nov 14 · todaySession0:00:01PausedTotal0:00:01ResumeStop timerComplete✕P7-contract-1794715327261-exactScheduled: Nov 16Recurring: Weekly on MondayOpen P7-contract-1794715327261-exactNov 14 · todaySessionPausedTotalStartStop timerComplete✕P7-contract-1794715327261-existingScheduled: Nov 16Recurring: Weekly on MondayOpen P7-contract-1794715327261-existingNov 14 · todaySessionPausedTotalStartStop timerComplete✕P7-contract-1794715327261-existingOccurrence: Nov 9Scheduled: Nov 9 (past)Open P7-contract-1794715327261-existingNov 14 · todaySessionPausedTotalStartStop timerComplete✕P7-contract-1794715327261-existing-nextScheduled: Nov 16Recurring: Weekly on MondayOpen P7-contract-1794715327261-existing-nextNov 14 · todaySessionPausedTotalStartStop timerComplete✕P7-contract-1794715327261-off-schedule-materializeScheduled: Nov 9 (past)Recurring: Weekly on MondayOpen P7-contract-1794715327261-off-schedule-materializeNov 14 · todaySessionPausedTotalStartStop timerComplete✕P7-contract-1794715327261-off-schedule-materializeOccurrence: Nov 14Scheduled: Nov 14 (past)Open P7-contract-1794715327261-off-schedule-materializeNov 14 · todaySessionPausedTotalStartStop timerComplete✕P7-contract-1794715327261-regular-timingScheduled: Nov 16Recurring: Weekly on MondayOpen P7-contract-1794715327261-regular-timingNov 14 · todaySessionPausedTotalStartStop timerComplete✕P7-contract-1794715327261-pomodoroScheduled: Nov 16Recurring: Weekly on MondayOpen P7-contract-1794715327261-pomodoroNov 14 · todaySessionPausedTotalStartStop timerComplete✕P7-contract-1794715327261-protected-pomodoroScheduled: Nov 9 (past)Recurring: Weekly on MondayOpen P7-contract-1794715327261-protected-pomodoroNov 14 · todaySessionPausedTotalStartStop timerComplete✕P7-contract-1794725038353-exactScheduled: Nov 16Recurring: Weekly on MondayOpen P7-contract-1794725038353-exactNov 14 · todaySessionPausedTotalStartStop timerComplete✕P7-contract-1794725038353-existingScheduled: Nov 16Recurring: Weekly on MondayOpen P7-contract-1794725038353-existingNov 14 · todaySessionPausedTotalStartStop timerComplete✕P7-contract-1794725038353-existingOccurrence: Nov 9Scheduled: Nov 9 (past)Open P7-contract-1794725038353-existingNov 14 · todaySessionPausedTotalStartStop timerComplete✕P7-contract-1794725038353-existing-nextScheduled: Nov 16Recurring: Weekly on MondayOpen P7-contract-1794725038353-existing-nextNov 14 · todaySessionPausedTotalStartStop timerComplete✕P7-contract-1794725038353-off-schedule-materializeScheduled: Nov 9 (past)Recurring: Weekly on MondayOpen P7-contract-1794725038353-off-schedule-materializeNov 14 · todaySessionPausedTotalStartStop timerComplete✕P7-contract-1794725038353-off-schedule-materializeOccurrence: Nov 14Scheduled: Nov 14 (past)Open P7-contract-1794725038353-off-schedule-materializeNov 14 · todaySessionPausedTotalStartStop timerComplete✕P7-contract-1794725038353-regular-timingScheduled: Nov 16Recurring: Weekly on MondayOpen P7-contract-1794725038353-regular-timingNov 14 · todaySessionPausedTotalStartStop timerComplete✕P7-contract-1794725038353-pomodoroScheduled: Nov 16Recurring: Weekly on MondayOpen P7-contract-1794725038353-pomodoroNov 14 · todaySessionPausedTotalStartStop timerComplete✕P7-contract-1794725038353-protected-pomodoroScheduled: Nov 9 (past)Recurring: Weekly on MondayOpen P7-contract-1794725038353-protected-pomodoroNov 14 · todaySessionPausedTotalStartStop timerComplete✕P7-contract-1794725038353-autoScheduled: Nov 16Recurring: Weekly on MondayOpen P7-contract-1794725038353-autoNov 14 · todaySessionPausedTotalStartStop timerComplete✕P7-contract-1794725143104-exactScheduled: Nov 16Recurring: Weekly on MondayOpen P7-contract-1794725143104-exactNov 14 · todaySessionPausedTotalStartStop timerComplete✕P7-contract-1794725143104-existingOccurrence: Nov 9Scheduled: Nov 9 (past)Open P7-contract-1794725143104-existingNov 14 · todaySessionPausedTotalStartStop timerComplete✕P7-contract-1794725143104-existing-nextScheduled: Nov 16Recurring: Weekly on MondayOpen P7-contract-1794725143104-existing-nextNov 14 · todaySessionPausedTotalStartStop timerComplete✕P7-contract-1794725143104-existingScheduled: Nov 16Recurring: Weekly on MondayOpen P7-contract-1794725143104-existingNov 14 · todaySessionPausedTotalStartStop timerComplete✕P7-contract-1794725143104-off-schedule-materializeOccurrence: Nov 14Scheduled: Nov 14 (past)Open P7-contract-1794725143104-off-schedule-materializeNov 14 · todaySessionPausedTotalStartStop timerComplete✕P7-contract-1794725143104-off-schedule-materializeScheduled: Nov 9 (past)Recurring: Weekly on MondayOpen P7-contract-1794725143104-off-schedule-materializeNov 14 · todaySessionPausedTotalStartStop timerComplete✕P7-contract-1794725143104-pomodoroScheduled: Nov 16Recurring: Weekly on MondayOpen P7-contract-1794725143104-pomodoroNov 14 · todaySessionPausedTotalStartStop timerComplete✕P7-contract-1794725143104-protected-pomodoroScheduled: Nov 9 (past)Recurring: Weekly on MondayOpen P7-contract-1794725143104-protected-pomodoroNov 14 · todaySessionPausedTotalStartStop timerComplete✕P7-contract-1794725143104-regular-timingScheduled: Nov 16Recurring: Weekly on MondayOpen P7-contract-1794725143104-regular-timingNov 14 · todaySessionPausedTotalStartStop timerComplete✕P7-contract-1794730767443-exactScheduled: Nov 16Recurring: Weekly on MondayOpen P7-contract-1794730767443-exactNov 14 · todaySessionPausedTotalStartStop timerComplete✕P7-contract-1794730767443-existingScheduled: Nov 16Recurring: Weekly on MondayOpen P7-contract-1794730767443-existingNov 14 · todaySessionPausedTotalStartStop timerComplete✕P7-contract-1794730767443-existingOccurrence: Nov 9Scheduled: Nov 9 (past)Open P7-contract-1794730767443-existingNov 14 · todaySessionPausedTotalStartStop timerComplete✕P7-contract-1794730767443-off-schedule-materializeScheduled: Nov 9 (past)Recurring: Weekly on MondayOpen P7-contract-1794730767443-off-schedule-materializeNov 14 · todaySessionPausedTotalStartStop timerComplete✕P7-contract-1794730767443-off-schedule-materializeOccurrence: Nov 14Scheduled: Nov 14 (past)Open P7-contract-1794730767443-off-schedule-materializeNov 14 · todaySessionPausedTotalStartStop timerComplete✕P7-contract-1794730767443-regular-timingScheduled: Nov 16Recurring: Weekly on MondayOpen P7-contract-1794730767443-regular-timingNov 14 · todaySessionPausedTotalStartStop timerComplete✕P7-contract-1794730767443-protected-pomodoroScheduled: Nov 9 (past)Recurring: Weekly on MondayOpen P7-contract-1794730767443-protected-pomodoroNov 14 · todaySessionPausedTotalStartStop timerComplete✕RetryDone todayNothing completed yetP7-contract-1794730767443-coordinator-existing-nextOccurrence: Nov 14Scheduled: Nov 14Open P7-contract-1794730767443-coordinator-existing-nextP7-contract-1794730767443-coordinator-existingOccurrence: Nov 14Scheduled: Nov 14Open P7-contract-1794730767443-coordinator-existingP7-contract-1794730767443-coordinator-on_completionOccurrence: Nov 14Scheduled: Nov 14Open P7-contract-1794730767443-coordinator-on_completionP7-contract-1794730767443-coordinator-virtualScheduled: Nov 16Recurring: Weekly on MondayOpen P7-contract-1794730767443-coordinator-virtualP7-contract-1794730767443-ordinary-callbackScheduled: Nov 9Open P7-contract-1794730767443-ordinary-callbackP7-contract-1794730767443-pomodoroScheduled: Nov 16Recurring: Weekly on MondayOpen P7-contract-1794730767443-pomodoroP7-contract-1794730767443-existing-nextOccurrence: Nov 14Scheduled: Nov 14Open P7-contract-1794730767443-existing-nextP7-contract-1794730767443-completion-anchorScheduled: Nov 16Recurring: Every 2 daysOpen P7-contract-1794730767443-completion-anchorP7-contract-1794730767443-off-scheduleScheduled: Nov 23Recurring: Weekly on MondayOpen P7-contract-1794730767443-off-scheduleP7-contract-1794730767443-off-scheduleScheduled: Nov 23Recurring: Weekly on MondayOpen P7-contract-1794730767443-off-scheduleP7-contract-1794715327261-autoOccurrence: Nov 14Scheduled: Nov 14Open P7-contract-1794715327261-autoP7-contract-1794715327261-completion-anchorScheduled: Nov 16Recurring: Every 2 daysOpen P7-contract-1794715327261-completion-anchorP7-contract-1794715327261-coordinator-existingOccurrence: Nov 14Scheduled: Nov 14Open P7-contract-1794715327261-coordinator-existingP7-contract-1794715327261-existing-nextOccurrence: Nov 14Scheduled: Nov 14Open P7-contract-1794715327261-existing-nextP7-contract-1794725038353-completion-anchorScheduled: Nov 16Recurring: Every 2 daysOpen P7-contract-1794725038353-completion-anchorP7-contract-1794725143104-completion-anchorScheduled: Nov 16Recurring: Every 2 daysOpen P7-contract-1794725143104-completion-anchorStart taskPause allResume allStop allCan't check Pomodoro. Showing all timers.P7-upgrade-safe-1794730914616Scheduled: TodayOpen P7-upgrade-safe-1794730914616StagedSession0:00:01PausedTotal0:00:01ResumeStop timerComplete✕Connecting to TaskNotes…Check for TaskNotes"
+    },
+    {
+      "id": "c2a2a844402f0a8e",
+      "type": "tasknotes-timer-pane",
+      "state": {
+        "tab": "timers"
+      },
+      "name": "TaskNotes Task Control",
+      "text": "Staged 36Timers 0StageP7-upgrade-safe-1794730914616Scheduled: TodayOpen P7-upgrade-safe-1794730914616Nov 14 · todaySession0:00:01PausedTotal0:00:01ResumeStop timerComplete✕P7-contract-1794715327261-exactScheduled: Nov 16Recurring: Weekly on MondayOpen P7-contract-1794715327261-exactNov 14 · todaySessionPausedTotalStartStop timerComplete✕P7-contract-1794715327261-existingScheduled: Nov 16Recurring: Weekly on MondayOpen P7-contract-1794715327261-existingNov 14 · todaySessionPausedTotalStartStop timerComplete✕P7-contract-1794715327261-existingOccurrence: Nov 9Scheduled: Nov 9 (past)Open P7-contract-1794715327261-existingNov 14 · todaySessionPausedTotalStartStop timerComplete✕P7-contract-1794715327261-existing-nextScheduled: Nov 16Recurring: Weekly on MondayOpen P7-contract-1794715327261-existing-nextNov 14 · todaySessionPausedTotalStartStop timerComplete✕P7-contract-1794715327261-off-schedule-materializeScheduled: Nov 9 (past)Recurring: Weekly on MondayOpen P7-contract-1794715327261-off-schedule-materializeNov 14 · todaySessionPausedTotalStartStop timerComplete✕P7-contract-1794715327261-off-schedule-materializeOccurrence: Nov 14Scheduled: Nov 14 (past)Open P7-contract-1794715327261-off-schedule-materializeNov 14 · todaySessionPausedTotalStartStop timerComplete✕P7-contract-1794715327261-regular-timingScheduled: Nov 16Recurring: Weekly on MondayOpen P7-contract-1794715327261-regular-timingNov 14 · todaySessionPausedTotalStartStop timerComplete✕P7-contract-1794715327261-pomodoroScheduled: Nov 16Recurring: Weekly on MondayOpen P7-contract-1794715327261-pomodoroNov 14 · todaySessionPausedTotalStartStop timerComplete✕P7-contract-1794715327261-protected-pomodoroScheduled: Nov 9 (past)Recurring: Weekly on MondayOpen P7-contract-1794715327261-protected-pomodoroNov 14 · todaySessionPausedTotalStartStop timerComplete✕P7-contract-1794725038353-exactScheduled: Nov 16Recurring: Weekly on MondayOpen P7-contract-1794725038353-exactNov 14 · todaySessionPausedTotalStartStop timerComplete✕P7-contract-1794725038353-existingScheduled: Nov 16Recurring: Weekly on MondayOpen P7-contract-1794725038353-existingNov 14 · todaySessionPausedTotalStartStop timerComplete✕P7-contract-1794725038353-existingOccurrence: Nov 9Scheduled: Nov 9 (past)Open P7-contract-1794725038353-existingNov 14 · todaySessionPausedTotalStartStop timerComplete✕P7-contract-1794725038353-existing-nextScheduled: Nov 16Recurring: Weekly on MondayOpen P7-contract-1794725038353-existing-nextNov 14 · todaySessionPausedTotalStartStop timerComplete✕P7-contract-1794725038353-off-schedule-materializeScheduled: Nov 9 (past)Recurring: Weekly on MondayOpen P7-contract-1794725038353-off-schedule-materializeNov 14 · todaySessionPausedTotalStartStop timerComplete✕P7-contract-1794725038353-off-schedule-materializeOccurrence: Nov 14Scheduled: Nov 14 (past)Open P7-contract-1794725038353-off-schedule-materializeNov 14 · todaySessionPausedTotalStartStop timerComplete✕P7-contract-1794725038353-regular-timingScheduled: Nov 16Recurring: Weekly on MondayOpen P7-contract-1794725038353-regular-timingNov 14 · todaySessionPausedTotalStartStop timerComplete✕P7-contract-1794725038353-pomodoroScheduled: Nov 16Recurring: Weekly on MondayOpen P7-contract-1794725038353-pomodoroNov 14 · todaySessionPausedTotalStartStop timerComplete✕P7-contract-1794725038353-protected-pomodoroScheduled: Nov 9 (past)Recurring: Weekly on MondayOpen P7-contract-1794725038353-protected-pomodoroNov 14 · todaySessionPausedTotalStartStop timerComplete✕P7-contract-1794725038353-autoScheduled: Nov 16Recurring: Weekly on MondayOpen P7-contract-1794725038353-autoNov 14 · todaySessionPausedTotalStartStop timerComplete✕P7-contract-1794725143104-exactScheduled: Nov 16Recurring: Weekly on MondayOpen P7-contract-1794725143104-exactNov 14 · todaySessionPausedTotalStartStop timerComplete✕P7-contract-1794725143104-existingOccurrence: Nov 9Scheduled: Nov 9 (past)Open P7-contract-1794725143104-existingNov 14 · todaySessionPausedTotalStartStop timerComplete✕P7-contract-1794725143104-existing-nextScheduled: Nov 16Recurring: Weekly on MondayOpen P7-contract-1794725143104-existing-nextNov 14 · todaySessionPausedTotalStartStop timerComplete✕P7-contract-1794725143104-existingScheduled: Nov 16Recurring: Weekly on MondayOpen P7-contract-1794725143104-existingNov 14 · todaySessionPausedTotalStartStop timerComplete✕P7-contract-1794725143104-off-schedule-materializeOccurrence: Nov 14Scheduled: Nov 14 (past)Open P7-contract-1794725143104-off-schedule-materializeNov 14 · todaySessionPausedTotalStartStop timerComplete✕P7-contract-1794725143104-off-schedule-materializeScheduled: Nov 9 (past)Recurring: Weekly on MondayOpen P7-contract-1794725143104-off-schedule-materializeNov 14 · todaySessionPausedTotalStartStop timerComplete✕P7-contract-1794725143104-pomodoroScheduled: Nov 16Recurring: Weekly on MondayOpen P7-contract-1794725143104-pomodoroNov 14 · todaySessionPausedTotalStartStop timerComplete✕P7-contract-1794725143104-protected-pomodoroScheduled: Nov 9 (past)Recurring: Weekly on MondayOpen P7-contract-1794725143104-protected-pomodoroNov 14 · todaySessionPausedTotalStartStop timerComplete✕P7-contract-1794725143104-regular-timingScheduled: Nov 16Recurring: Weekly on MondayOpen P7-contract-1794725143104-regular-timingNov 14 · todaySessionPausedTotalStartStop timerComplete✕P7-contract-1794730767443-exactScheduled: Nov 16Recurring: Weekly on MondayOpen P7-contract-1794730767443-exactNov 14 · todaySessionPausedTotalStartStop timerComplete✕P7-contract-1794730767443-existingScheduled: Nov 16Recurring: Weekly on MondayOpen P7-contract-1794730767443-existingNov 14 · todaySessionPausedTotalStartStop timerComplete✕P7-contract-1794730767443-existingOccurrence: Nov 9Scheduled: Nov 9 (past)Open P7-contract-1794730767443-existingNov 14 · todaySessionPausedTotalStartStop timerComplete✕P7-contract-1794730767443-off-schedule-materializeScheduled: Nov 9 (past)Recurring: Weekly on MondayOpen P7-contract-1794730767443-off-schedule-materializeNov 14 · todaySessionPausedTotalStartStop timerComplete✕P7-contract-1794730767443-off-schedule-materializeOccurrence: Nov 14Scheduled: Nov 14 (past)Open P7-contract-1794730767443-off-schedule-materializeNov 14 · todaySessionPausedTotalStartStop timerComplete✕P7-contract-1794730767443-regular-timingScheduled: Nov 16Recurring: Weekly on MondayOpen P7-contract-1794730767443-regular-timingNov 14 · todaySessionPausedTotalStartStop timerComplete✕P7-contract-1794730767443-protected-pomodoroScheduled: Nov 9 (past)Recurring: Weekly on MondayOpen P7-contract-1794730767443-protected-pomodoroNov 14 · todaySessionPausedTotalStartStop timerComplete✕RetryDone todayNothing completed yetP7-contract-1794730767443-coordinator-existing-nextOccurrence: Nov 14Scheduled: Nov 14Open P7-contract-1794730767443-coordinator-existing-nextP7-contract-1794730767443-coordinator-existingOccurrence: Nov 14Scheduled: Nov 14Open P7-contract-1794730767443-coordinator-existingP7-contract-1794730767443-coordinator-on_completionOccurrence: Nov 14Scheduled: Nov 14Open P7-contract-1794730767443-coordinator-on_completionP7-contract-1794730767443-coordinator-virtualScheduled: Nov 16Recurring: Weekly on MondayOpen P7-contract-1794730767443-coordinator-virtualP7-contract-1794730767443-ordinary-callbackScheduled: Nov 9Open P7-contract-1794730767443-ordinary-callbackP7-contract-1794730767443-pomodoroScheduled: Nov 16Recurring: Weekly on MondayOpen P7-contract-1794730767443-pomodoroP7-contract-1794730767443-existing-nextOccurrence: Nov 14Scheduled: Nov 14Open P7-contract-1794730767443-existing-nextP7-contract-1794730767443-completion-anchorScheduled: Nov 16Recurring: Every 2 daysOpen P7-contract-1794730767443-completion-anchorP7-contract-1794730767443-off-scheduleScheduled: Nov 23Recurring: Weekly on MondayOpen P7-contract-1794730767443-off-scheduleP7-contract-1794730767443-off-scheduleScheduled: Nov 23Recurring: Weekly on MondayOpen P7-contract-1794730767443-off-scheduleP7-contract-1794715327261-autoOccurrence: Nov 14Scheduled: Nov 14Open P7-contract-1794715327261-autoP7-contract-1794715327261-completion-anchorScheduled: Nov 16Recurring: Every 2 daysOpen P7-contract-1794715327261-completion-anchorP7-contract-1794715327261-coordinator-existingOccurrence: Nov 14Scheduled: Nov 14Open P7-contract-1794715327261-coordinator-existingP7-contract-1794715327261-existing-nextOccurrence: Nov 14Scheduled: Nov 14Open P7-contract-1794715327261-existing-nextP7-contract-1794725038353-completion-anchorScheduled: Nov 16Recurring: Every 2 daysOpen P7-contract-1794725038353-completion-anchorP7-contract-1794725143104-completion-anchorScheduled: Nov 16Recurring: Every 2 daysOpen P7-contract-1794725143104-completion-anchorStart taskPause allResume allStop allCan't check Pomodoro. Showing all timers.P7-upgrade-safe-1794730914616Scheduled: TodayOpen P7-upgrade-safe-1794730914616StagedSession0:00:01PausedTotal0:00:01ResumeStop timerComplete✕Connecting to TaskNotes…Check for TaskNotes"
+    }
+  ],
+  "active": []
+}

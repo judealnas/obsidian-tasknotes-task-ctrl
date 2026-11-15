@@ -1,0 +1,22 @@
+{
+  "at": "2026-11-15T08:15:43.236Z",
+  "authorization": "User explicitly authorized resetting dev-vault completion history after explanation of recovery loss.",
+  "scope": "dev-vault only; completionRecordsVersion and completionRecords only",
+  "backup": ".planning\\phases\\07-complete-roll-over-release-0-3-0\\07-completion-reset-before.json",
+  "beforeSha256": "4fae65faa80cf28e004ad4b4b218fb91215903a7ef07fb0caaa4ccf8f60fa9fc",
+  "afterSha256": "7899ee45ee0f1df9536a9a5a48854ba8a0e7daba7fdb77ebb421d71bbf6178b2",
+  "previousVersion": "recovery-required",
+  "previousRecordCount": 15,
+  "newVersion": 1,
+  "newRecordCount": 0,
+  "otherFieldsPreserved": true,
+  "runtimeVerified": true,
+  "runtime": {
+    "at": "2026-11-15T08:16:31.658Z",
+    "vault": "C:\\Users\\ja384\\Home\\obsidian-tasknotes-timer-pane\\dev-vault",
+    "completionAvailable": true,
+    "attemptCount": 0,
+    "version": 1,
+    "observationCount": 69
+  }
+}

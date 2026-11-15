@@ -1,0 +1,35 @@
+{
+  "at": "2026-11-15T08:21:56.399Z",
+  "product": {
+    "id": "tasknotes-timer-pane",
+    "name": "TaskNotes Timer Pane",
+    "version": "0.2.0",
+    "minAppVersion": "1.12.2",
+    "description": "Sidebar pane to watch, start, pause, stop and complete TaskNotes time tracking.",
+    "author": "Jude Alnas",
+    "isDesktopOnly": false,
+    "dir": ".obsidian/plugins/tasknotes-timer-pane"
+  },
+  "fixturePath": "TaskNotes/Tasks/P7-upgrade-safe-1794730914616.md",
+  "pause": {
+    "state": "paused",
+    "taskPath": "TaskNotes/Tasks/P7-upgrade-safe-1794730914616.md",
+    "title": "P7-upgrade-safe-1794730914616",
+    "sessionStartedAt": "2026-11-15T08:21:55.016Z",
+    "accumulatedMs": 1344,
+    "pausedAt": "2026-11-15T08:21:56.360Z",
+    "lastEntryStart": "2026-11-15T08:21:55.016Z"
+  },
+  "leaves": [
+    {
+      "id": "c88f9ce6849cf981",
+      "state": {}
+    },
+    {
+      "id": "c2a2a844402f0a8e",
+      "state": {}
+    }
+  ],
+  "autoStop": true,
+  "activeCount": 0
+}

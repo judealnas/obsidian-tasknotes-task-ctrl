@@ -5,8 +5,8 @@ milestone_name: Staging Tasks
 current_phase: 07
 current_phase_name: Complete, Roll Over & Release 0.3.0
 status: executing
-stopped_at: 07-05 tasks 1-2 complete; native acceptance and dev-history recovery remain open
-last_updated: "2026-11-15T06:55:15.325Z"
+stopped_at: 07-05 native off-setting and upgrade passed; overnight, physical sleep and mobile remain open
+last_updated: "2026-11-15T08:25:13.976Z"
 last_activity: 2026-11-15
 last_activity_desc: Phase 07 execution started
 state_head: bc988d080db5e75a05dd57239f204cb428175cf7
@@ -31,11 +31,11 @@ See: .planning/PROJECT.md (updated 2026-11-13)
 
 Phase: 07 (Complete, Roll Over & Release 0.3.0) — EXECUTING
 Plan: 5 of 6 — tasks 1–2 implemented; task 3 native acceptance incomplete
-Status: Awaiting native acceptance and dev-vault completion-history recovery
+Status: Awaiting real overnight, physical sleep/wake and mobile acceptance
 Note: Phase 4 complete: UAT 6/6, VERIFICATION passed, SECURITY 19/19 closed. 04-01 spike cleanup done (`staged:` null line confirmed, `spikedefault` removed).
 Last activity: 2026-11-15 — Phase 07 execution started
 
-Progress (v0.3): 17/19 plans complete (89%). Phase 7 plans 01–04 have summaries. Plan 05 version/display/tests are committed, but native overnight, physical sleep, mobile and full upgrade acceptance remain open. Plan 06 publication has not started. Milestone verification remains open; no release was tagged or published.
+Progress (v0.3): 17/19 plans complete (89%). Phase 7 plans 01–04 have summaries. Plan 05 version/display/tests are committed; disabled-auto-stop and full native upgrade now pass. Native overnight, physical sleep and mobile acceptance remain open. Plan 06 publication has not started. Milestone verification remains open; no release was tagged or published.
 
 ## Performance Metrics
 
@@ -186,14 +186,16 @@ Items acknowledged and deferred at milestone close, most recent first:
 
 ## Session Continuity
 
-Last session: 2026-11-15T06:55:15.084Z
-Stopped at: 07-05 tasks 1-2 complete; native acceptance and dev-history recovery remain open
+Last session: 2026-11-15T08:25:13.976Z
+Stopped at: 07-05 disabled-auto-stop matrix and cold upgrade passed; physical acceptance remains open
 Resume file: .planning/phases/07-complete-roll-over-release-0-3-0/.continue-here.md
 
 ## Operator Next Steps
 
-- Resume Plan 07-05 task 3 from `.planning/phases/07-complete-roll-over-release-0-3-0/.continue-here.md`. Review dev-vault recovery before any new completion/rehearsal writes.
+- [2026-11-15 recovery disposition]: User authorized dev-vault completion-history reset. Verified backup is `07-completion-reset-before.json`; hash/runtime evidence is `07-completion-reset.json` in the Phase 7 directory. Reset changed only completion records/version. Native startup confirms completion available and zero prior attempts; refresh added 69 new fixture observations. UAT stopped. Recovery/reset gate is resolved; remaining native acceptance and publication gates stay open. Older quarantine descriptions below are historical.
+
+- Resume Plan 07-05 task 3 from `.planning/phases/07-complete-roll-over-release-0-3-0/.continue-here.md`. Recovery/reset, disabled-auto-stop and native upgrade gates are resolved; physical acceptance remains open.
 - Canonical verification for Phases 4–6 is stale; refresh with execute-phase before claiming milestone completion.
 - Current branch: gsd/phase-07-complete-roll-over-release-0-3-0. Local 0.3.0 candidate is prepared; 725 automated tests pass.
-- Two final native recurrence matrices ran 16 cases each with auto-stop on. The off-labelled repeat was corrected; earlier 13-case auto-stop-off evidence remains historical. Final-candidate off-setting, real overnight/sleep, physical mobile and full upgrade acceptance remain open; publication requires later explicit approval.
-- Dev-vault rehearsal incident: exact pre-rehearsal data bytes were lost during a failed cleanup. Recorded settings/orders and 15 completion attempts were recovered; completion history is quarantined (`completionRecordsVersion: recovery-required`). Personal Vault was not touched. See 07-NATIVE-EVIDENCE.md and 07-dev-data-recovery.json. UAT is stopped.
+- Two final native recurrence matrices ran 16 cases each with auto-stop on. The off-labelled repeat was corrected; earlier 13-case auto-stop-off evidence remains historical. The final-candidate off-setting matrix now passes all 16 cases; cold native upgrade passes 15 checks. Real overnight/sleep and physical mobile remain open; publication requires later explicit approval.
+- Dev-vault rehearsal incident: exact pre-rehearsal data bytes were lost during a failed cleanup. Recorded settings/orders and 15 completion attempts were recovered; completion history was quarantined, then explicitly reset with user approval and a verified backup. Personal Vault was not touched. See 07-NATIVE-EVIDENCE.md and 07-dev-data-recovery.json. UAT is stopped.
