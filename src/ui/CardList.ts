@@ -3,6 +3,7 @@ import { moveKey, moveKeyBy } from "../model/cardOrder";
 export interface CardListCard {
 	card: HTMLElement;
 	handle: HTMLButtonElement;
+	setPosition?: (index: number, count: number, move: (delta: -1 | 1) => void) => void;
 }
 export interface CardListOptions<K, C extends CardListCard> {
 	key: (model: K) => string;
@@ -10,6 +11,7 @@ export interface CardListOptions<K, C extends CardListCard> {
 	update: (card: C, model: K) => void;
 	dispose: (card: C) => void;
 	commitOrder: (keys: string[]) => void;
+	onMove?: (card: C, position: number, count: number) => void;
 }
 
 /** Independent keyed instances and local drag authority. Sorting belongs to the caller. */
@@ -19,6 +21,19 @@ export class CardList<K, C extends CardListCard = CardListCard> {
 	private disposed = false;
 	constructor(private readonly parent: HTMLElement, private readonly options: CardListOptions<K, C>) {}
 	values(): IterableIterator<C> { return this.cards.values(); }
+	moveBy(key: string, delta: -1 | 1): boolean {
+		if (this.disposed || !this.cards.has(key)) return false;
+		return this.commitMove(moveKeyBy([...this.cards.keys()], key, delta), key);
+	}
+	private commitMove(keys: string[], key: string): boolean {
+		const before = [...this.cards.keys()];
+		if (keys.every((value, index) => value === before[index])) return false;
+		const card = this.cards.get(key);
+		if (!card) return false;
+		this.options.commitOrder(keys);
+		this.options.onMove?.(card, keys.indexOf(key) + 1, keys.length);
+		return true;
+	}
 	reconcile(models: readonly K[]): void {
 		if (this.disposed) return;
 		const next = new Map<string, C>();
@@ -41,6 +56,10 @@ export class CardList<K, C extends CardListCard = CardListCard> {
 			if (this.parent.children[i] !== card.card) this.parent.insertBefore(card.card, this.parent.children[i] ?? null);
 			i++;
 		}
+		i = 0;
+		for (const [key, card] of next) card.setPosition?.(i++, next.size, delta => {
+			if (!this.disposed && this.cards.get(key) === card) this.moveBy(key, delta);
+		});
 	}
 	dispose(): void {
 		if (this.disposed) return;
@@ -64,7 +83,7 @@ export class CardList<K, C extends CardListCard = CardListCard> {
 		handle.addEventListener("keydown", evt => {
 			if (!current() || (evt.key !== "ArrowUp" && evt.key !== "ArrowDown")) return;
 			evt.preventDefault();
-			this.options.commitOrder(moveKeyBy([...this.cards.keys()], key, evt.key === "ArrowUp" ? -1 : 1));
+			this.moveBy(key, evt.key === "ArrowUp" ? -1 : 1);
 			if (handle.ownerDocument.activeElement !== handle) handle.focus();
 		});
 		handle.addEventListener("dragstart", evt => {
@@ -96,7 +115,7 @@ export class CardList<K, C extends CardListCard = CardListCard> {
 			const after = evt.clientY > rect.top + rect.height / 2;
 			this.dragKey = null;
 			this.clearDragMarks();
-			this.options.commitOrder(moveKey([...this.cards.keys()], dragKey, key, after));
+			this.commitMove(moveKey([...this.cards.keys()], dragKey, key, after), dragKey);
 		});
 	}
 }

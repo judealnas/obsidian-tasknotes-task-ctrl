@@ -48,6 +48,7 @@ export class Component {}
 export class ItemView extends Component {}
 export class SuggestModal {}
 export const Keymap = {};
+export const Platform = { isMobile: false };
 export const MarkdownRenderer = {};
 export function setIcon(): void {}
 export function setTooltip(): void {}

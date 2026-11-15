@@ -57,6 +57,16 @@ test("keyboard reorders the mounted list and retains handle focus", () => {
 	expect(s.root.children[1]).toBe(s.created[0]!.card);
 	event(handle, "keydown", { key: "ArrowUp" }); expect(s.commit).toHaveBeenLastCalledWith(["a", "b"]); s.list.dispose();
 });
+test("moveBy uses live keys and rejects missing, removed, boundary and disposed moves", () => {
+ const s = setup(); s.list.reconcile([]);
+ expect(s.list.moveBy("a", 1)).toBe(false);
+ s.list.reconcile([a]); expect(s.list.moveBy("a", -1)).toBe(false); expect(s.list.moveBy("a", 1)).toBe(false);
+ s.list.reconcile([a, b]); expect(s.list.moveBy("a", 1)).toBe(true);
+ expect(s.commit).toHaveBeenCalledExactlyOnceWith(["b", "a"]);
+ expect(s.list.moveBy("a", -1)).toBe(true);
+ s.list.reconcile([b]); expect(s.list.moveBy("a", 1)).toBe(false);
+ s.list.dispose(); expect(s.list.moveBy("b", -1)).toBe(false);
+});
 test("only a local handle drag authorizes reorder, independent across two lists", () => {
 	const one = setup(); const two = setup(); one.list.reconcile([a, b]); two.list.reconcile([a, b]);
 	const dataTransfer = transfer(); dataTransfer.setData("application/x-tntp-card", "a");

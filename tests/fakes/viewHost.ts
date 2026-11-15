@@ -123,6 +123,7 @@ export class ItemView extends Component {
 }
 export class SuggestModal {}
 export const Keymap = { isModEvent: (event: HostEvent) => event.button === 1 ? "tab" : event.ctrlKey || event.metaKey };
+export const Platform = { isMobile: false };
 export const MarkdownRenderer = {
 	render: (_app: unknown, markdown: string, wrapper: Element, _source: string, component: Component) => new Promise<void>((resolve, reject) => {
 		viewHost.renders.push({ wrapper, component, markdown, reject, resolve: (mode = "link") => {
@@ -136,6 +137,7 @@ export function setIcon(el: Element, name: string): void { el.setAttribute("data
 export function setTooltip(el: Element, text: string): void { el.setAttribute("aria-label", text); }
 export class Notice {}
 export function resetViewHost(): void {
+	Platform.isMobile = false;
 	viewHost.components = []; viewHost.renders = []; workspace.openLinkText.mockClear(); workspace.requestSaveLayout.mockReset();
 	hostDocument.activeElement = null; hostDocument.visibilityState = "visible"; hostDocument.listeners.clear(); hostWindow.listeners.clear();
 	vi.stubGlobal("createDiv", (options?: ConstructorParameters<typeof Element>[1]) => new Element("div", options));

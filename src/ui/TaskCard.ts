@@ -1,4 +1,4 @@
-import { Component, setIcon, setTooltip, type App } from "obsidian";
+import { Component, Platform, setIcon, setTooltip, type App } from "obsidian";
 import { TaskTitle } from "./TaskTitle";
 import { formatHms, timerSessionMs, totalMs, type OpenTimer } from "../model/timeMath";
 import type { TimerPaneServices } from "./TimerPaneView";
@@ -63,6 +63,9 @@ export class TaskCard extends Component {
  private availabilityKey: string | null = null;
  private availabilityResult: { available: boolean; reason: string } | null = null;
  private stopping = new Set<string>();
+ private reorder: ((delta: -1 | 1) => void) | null = null;
+ private moveUp: HTMLButtonElement | null = null;
+ private moveDown: HTMLButtonElement | null = null;
  private get app(): App { return this.options.app; }
  private isBusy(): boolean { return this.options.isBusy?.() ?? this.options.controller.isBusy(); }
  constructor(parent: HTMLElement, timer: TaskCardModel, private readonly options: TaskCardOptions) {
@@ -73,6 +76,12 @@ export class TaskCard extends Component {
  get card(): HTMLElement { return this.elements.card; }
  get handle(): HTMLButtonElement { return this.elements.handle; }
  get currentModel(): TaskCardModel { return this.elements.timer; }
+ setPosition(index: number, count: number, move: (delta: -1 | 1) => void): void {
+  if (this.disposed) return;
+  this.reorder = move;
+  if (this.moveUp) this.moveUp.disabled = index === 0;
+  if (this.moveDown) this.moveDown.disabled = index === count - 1;
+ }
  update(timer: TaskCardModel, completionReady: boolean): void {
   if (this.disposed) return;
   const card = this.elements;
@@ -123,6 +132,21 @@ export class TaskCard extends Component {
  }
 	private buildCard(parent: HTMLElement, key: string, timer: TaskCardModel): CardElements {
 		const card = parent.createDiv({ cls: "tntp-card" });
+		if (Platform.isMobile) {
+			card.addClass("tntp-card--mobile");
+			const column = card.createDiv({ cls: "tntp-reorder" });
+			this.moveUp = column.createEl("button", { cls: "tntp-reorder__up", text: "▲", attr: { "aria-label": "Move task up" } });
+			this.moveDown = column.createEl("button", { cls: "tntp-reorder__down", text: "▼", attr: { "aria-label": "Move task down" } });
+			this.moveUp.disabled = true; this.moveDown.disabled = true;
+			for (const [button, delta] of [[this.moveUp, -1], [this.moveDown, 1]] as const) button.addEventListener("click", () => {
+				if (this.disposed || button.disabled || !this.reorder) return;
+				this.reorder(delta);
+				if (this.disposed) return;
+				const other = delta === -1 ? this.moveDown : this.moveUp;
+				const focus = !button.disabled ? button : other && !other.disabled ? other : this.elements.handle;
+				focus.focus();
+			});
+		}
 		const handle = card.createEl("button", { cls: "tntp-handle", attr: { "aria-label": "Reorder card", draggable: "true" } });
 		setIcon(handle, "grip-vertical");
 		setTooltip(handle, "Drag to reorder, or use Up and Down arrow keys");
