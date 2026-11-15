@@ -1,0 +1,233 @@
+diff --git a/docs/releases/unreleased.md b/docs/releases/unreleased.md
+index 121110a..d324799 100644
+--- a/docs/releases/unreleased.md
++++ b/docs/releases/unreleased.md
+@@ -31,3 +31,7 @@ When a change has user-facing documentation, include a canonical tasknotes.dev l
+ ```
+ 
+ -->
++
++## Fixed
++
++- Fixed the tracked-task status bar showing stopped tasks, delaying new timers, or showing an old elapsed time after a rapid restart. Thanks to @judealnas for reporting the issue.
+diff --git a/e2e/issues/status-bar-tracking-refresh.spec.ts b/e2e/issues/status-bar-tracking-refresh.spec.ts
+new file mode 100644
+index 0000000..f69299b
+--- /dev/null
++++ b/e2e/issues/status-bar-tracking-refresh.spec.ts
+@@ -0,0 +1,46 @@
++import { test, expect } from "@playwright/test";
++import { launchObsidian, closeObsidian, ObsidianApp } from "../obsidian";
++
++// Regression reported by TaskNotes Task Control beta testing; no upstream issue number yet.
++test.describe("tracked-task status bar refresh", () => {
++	let app: ObsidianApp;
++	let path: string | undefined;
++
++	test.beforeAll(async () => { app = await launchObsidian(); });
++	test.afterAll(async () => {
++		if (app && path) await app.page.evaluate(async (taskPath) => {
++			const api = (window as any).app.plugins.getPlugin("tasknotes").api;
++			if ((await api.time.active()).some((item: any) => item.taskPath === taskPath)) {
++				await api.time.stop(taskPath);
++			}
++			await api.tasks.update(taskPath, { archived: true });
++		}, path);
++		if (app) await closeObsidian(app);
++	});
++
++	test("shows starts and hides stops inside the former five-second cache window", async () => {
++		path = await app.page.evaluate(async () => {
++			const api = (window as any).app.plugins.getPlugin("tasknotes").api;
++			await api.lifecycle.ready();
++			if ((await api.time.active()).length) throw new Error("Test vault has unrelated timers");
++			if (!api.settings.snapshot().showTrackedTasksInStatusBar) {
++				throw new Error("Enable tracked-task status display in the isolated test-vault fixture");
++			}
++			return (await api.tasks.create({ title: `status-bar-refresh-${Date.now()}`, status: "open" })).path;
++		});
++		const status = app.page.locator(".tasknotes-status-bar:not(.tasknotes-pomodoro-status)");
++		// Let task creation prime the old implementation's empty-result cache.
++		await app.page.waitForTimeout(350);
++		for (let cycle = 0; cycle < 2; cycle++) {
++			await app.page.evaluate(async (taskPath) => {
++				await (window as any).app.plugins.getPlugin("tasknotes").api.time.start(taskPath, {});
++			}, path);
++			await expect(status).toBeVisible({ timeout: 1500 });
++			await expect(status.locator(".tasknotes-status-text")).toHaveText(/\(0:0[01]\)$/);
++			await app.page.evaluate(async (taskPath) => {
++				await (window as any).app.plugins.getPlugin("tasknotes").api.time.stop(taskPath);
++			}, path);
++			await expect(status).toBeHidden({ timeout: 1500 });
++		}
++	});
++});
+diff --git a/src/ui/StatusBarService.ts b/src/ui/StatusBarService.ts
+index cb16587..98b341a 100644
+--- a/src/ui/StatusBarService.ts
++++ b/src/ui/StatusBarService.ts
+@@ -9,7 +9,6 @@ import {
+ 	PomodoroState,
+ 	TaskInfo,
+ } from "../types";
+-import { RequestDeduplicator } from "../utils/RequestDeduplicator";
+ import { EventRef, setIcon, setTooltip, TFile } from "obsidian";
+ import { openTaskSelector } from "../modals/TaskSelectorWithCreateModal";
+ import { formatPomodoroTime } from "../utils/pomodoroTime";
+@@ -21,7 +20,6 @@ export class StatusBarService {
+ 	private plugin: import("../main").default;
+ 	private statusBarElement: HTMLElement | null = null;
+ 	private pomodoroStatusBarElement: HTMLElement | null = null;
+-	private requestDeduplicator: RequestDeduplicator;
+ 	private updateTimeout: number | null = null;
+ 	private pomodoroUpdateTimeout: number | null = null;
+ 	private elapsedUpdateInterval: number | null = null;
+@@ -31,7 +29,6 @@ export class StatusBarService {
+ 
+ 	constructor(plugin: import("../main").default) {
+ 		this.plugin = plugin;
+-		this.requestDeduplicator = new RequestDeduplicator();
+ 	}
+ 
+ 	/**
+@@ -117,10 +114,9 @@ export class StatusBarService {
+ 		}
+ 
+ 		try {
+-			// Use request deduplicator to prevent excessive updates
+-			const trackedTasks = await this.requestDeduplicator.execute("update-status-bar", () =>
+-				this.getTrackedTasks()
+-			);
++			// requestUpdate already debounces events. Read current cached tasks here:
++			// retaining a fulfilled query can hide starts or keep stopped timers visible.
++			const trackedTasks = await this.getTrackedTasks();
+ 
+ 			this.renderStatusBar(trackedTasks);
+ 		} catch (error) {
+@@ -545,10 +541,6 @@ export class StatusBarService {
+ 		}
+ 		this.pomodoroEventRefs = [];
+ 
+-		if (this.requestDeduplicator) {
+-			this.requestDeduplicator.cancelAll();
+-		}
+-
+ 		// Status bar element is automatically cleaned up by Obsidian when plugin unloads
+ 		this.statusBarElement = null;
+ 		this.pomodoroStatusBarElement = null;
+diff --git a/tests/unit/issues/issue-1655-time-tracking-status-widget.test.ts b/tests/unit/issues/issue-1655-time-tracking-status-widget.test.ts
+index 1c442df..55c53b1 100644
+--- a/tests/unit/issues/issue-1655-time-tracking-status-widget.test.ts
++++ b/tests/unit/issues/issue-1655-time-tracking-status-widget.test.ts
+@@ -69,10 +69,11 @@ describe("Issue #1655: time tracking status widget", () => {
+ 		).toBe("timer");
+ 		expect(statusBarElement.getAttribute("data-tooltip")).toContain("Elapsed: 2:05");
+ 
++		const readsBeforeTick = plugin.cacheManager.getAllCachedTasks.mock.calls.length;
+ 		jest.advanceTimersByTime(1000);
+ 
+ 		expect(statusBarElement.textContent).toContain("Tracking: Timer task (2:06)");
+-		expect(plugin.cacheManager.getAllCachedTasks).toHaveBeenCalledTimes(1);
++		expect(plugin.cacheManager.getAllCachedTasks).toHaveBeenCalledTimes(readsBeforeTick);
+ 
+ 		service.destroy();
+ 	});
+diff --git a/tests/unit/issues/status-bar-tracking-refresh.test.ts b/tests/unit/issues/status-bar-tracking-refresh.test.ts
+new file mode 100644
+index 0000000..039afeb
+--- /dev/null
++++ b/tests/unit/issues/status-bar-tracking-refresh.test.ts
+@@ -0,0 +1,93 @@
++jest.mock("../../../src/modals/TaskSelectorWithCreateModal", () => ({
++	openTaskSelector: jest.fn(),
++}));
++import { StatusBarService } from "../../../src/ui/StatusBarService";
++
++describe("status bar refresh after time tracking changes", () => {
++	let service: StatusBarService;
++	let element: HTMLElement;
++	let tasks: Array<{ title: string; path: string; timeEntries: Array<{ startTime: string }> }>;
++	let readTasks: jest.Mock;
++	const tracked = (startTime = new Date().toISOString()) => ({
++		title: "Tracking fixture",
++		path: "Tasks/tracking-fixture.md",
++		timeEntries: [{ startTime }],
++	});
++	const flush = async () => {
++		await Promise.resolve();
++		await Promise.resolve();
++		await Promise.resolve();
++	};
++	const refresh = async () => {
++		service.requestUpdate();
++		await jest.advanceTimersByTimeAsync(100);
++		await flush();
++	};
++	const visible = () => !element.classList.contains("tn-static-display-none-6b99de8b");
++
++	beforeEach(() => {
++		jest.useFakeTimers();
++		jest.setSystemTime(new Date("2026-11-15T12:00:00Z"));
++		tasks = [];
++		element = document.createElement("div");
++		Object.assign(element, {
++			addClass: (...classes: string[]) => element.classList.add(...classes),
++		});
++		readTasks = jest.fn(() => tasks);
++		service = new StatusBarService({
++			settings: { showTrackedTasksInStatusBar: true, showPomodoroInStatusBar: false },
++			i18n: { translate: () => "Stop active time tracking" },
++			addStatusBarItem: () => element,
++			cacheManager: { getAllCachedTasks: readTasks },
++			getActiveTimeSession: (task: ReturnType<typeof tracked>) => task.timeEntries[0] ?? null,
++		} as never);
++	});
++
++	afterEach(() => {
++		service.destroy();
++		jest.useRealTimers();
++	});
++
++	it("shows a newly started timer even when the previous empty result is less than five seconds old", async () => {
++		service.initialize();
++		await flush();
++		expect(visible()).toBe(false);
++		tasks = [tracked()];
++		await refresh();
++		expect(visible()).toBe(true);
++		expect(element.textContent).toContain("Tracking: Tracking fixture");
++	});
++
++	it("hides tracking immediately after the last timer stops", async () => {
++		tasks = [tracked()];
++		service.initialize();
++		await flush();
++		expect(visible()).toBe(true);
++		tasks = [];
++		await refresh();
++		expect(visible()).toBe(false);
++		await jest.advanceTimersByTimeAsync(1000);
++		expect(visible()).toBe(false);
++	});
++
++	it("uses the new active entry timestamp after a rapid restart", async () => {
++		tasks = [tracked("2026-11-15T11:59:00Z")];
++		service.initialize();
++		await flush();
++		expect(element.textContent).toContain("1:00");
++		tasks = [tracked()];
++		await refresh();
++		expect(element.textContent).toContain("(0:00)");
++	});
++
++	it("continues to debounce a burst of refresh requests into one fresh task read", async () => {
++		service.initialize();
++		await flush();
++		readTasks.mockClear();
++		service.requestUpdate();
++		service.requestUpdate();
++		service.requestUpdate();
++		await jest.advanceTimersByTimeAsync(100);
++		expect(readTasks).toHaveBeenCalledTimes(1);
++	});
++});

@@ -1,0 +1,38 @@
+{
+  "run": "statusbar-start-delay-1794770255080",
+  "vaultPath": "C:/Users/ja384/Home/obsidian-tasknotes-timer-pane/dev-vault",
+  "tasknotes": "4.18.2",
+  "samples": [
+    {
+      "label": "empty-status-cache-primed",
+      "at": 1794770261315,
+      "active": 0,
+      "visible": false,
+      "text": "Tracking: statusbar-debug-1794770156638 (0:00)"
+    },
+    {
+      "label": "start-after-cached-empty-list",
+      "at": 1794770261992,
+      "active": 1,
+      "visible": true,
+      "text": "Tracking: statusbar-start-delay-17947702... (0:00)"
+    },
+    {
+      "label": "after-former-cache-expiry",
+      "at": 1794770267500,
+      "active": 1,
+      "visible": true,
+      "text": "Tracking: statusbar-start-delay-17947702... (0:05)"
+    },
+    {
+      "label": "after-later-task-event",
+      "at": 1794770268166,
+      "active": 1,
+      "visible": true,
+      "text": "Tracking: statusbar-start-delay-17947702... (0:06)"
+    }
+  ],
+  "fixture": "TaskNotes/Tasks/statusbar-start-delay-1794770255080.md",
+  "remainingFixtureTimers": 0,
+  "validation": true
+}

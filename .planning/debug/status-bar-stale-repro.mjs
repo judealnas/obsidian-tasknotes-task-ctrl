@@ -2,12 +2,14 @@ import { spawnSync } from "node:child_process";
 import { writeFileSync } from "node:fs";
 
 const expression = String.raw`(async () => {
+ const vaultPath=app.vault.adapter.getBasePath().replaceAll('\\','/');
+ if(vaultPath!=='C:/Users/ja384/Home/obsidian-tasknotes-timer-pane/dev-vault')throw new Error('Unexpected vault; refusing reproduction');
  const api = app.plugins.getPlugin('tasknotes').api;
  await api.lifecycle.ready();
  if ((await api.time.active()).length) throw new Error('Existing active timers; refusing to touch them');
  const run='statusbar-debug-'+Date.now();
  const context={source:'timer-pane-statusbar-debug',reason:'disposable status-bar reproduction',correlationId:run};
- const result={run,at:new Date().toISOString(),tasknotes:app.plugins.getPlugin('tasknotes').manifest.version,events:[],samples:[]};
+ const result={run,vaultPath,at:new Date().toISOString(),tasknotes:app.plugins.getPlugin('tasknotes').manifest.version,events:[],samples:[]};
  window.__statusBarDebug=result;
  const wait=ms=>new Promise(r=>setTimeout(r,ms));
  const refs=['task.updated','time.started','time.stopped'].map(name=>api.events.on(name,()=>result.events.push({name,at:Date.now()})));
@@ -58,6 +60,12 @@ const expression = String.raw`(async () => {
 const response=spawnSync(process.execPath,['scripts/uat/cdp.mjs','eval','--timeout-ms','60000','--expr',expression],{encoding:'utf8',timeout:65000,maxBuffer:5_000_000});
 if(response.status!==0)throw new Error(response.stderr||response.stdout);
 const result=JSON.parse(response.stdout);
-writeFileSync('.planning/debug/status-bar-stale-native.json',JSON.stringify(result,null,2)+'\n');
+if(process.argv.includes('--fixed')) {
+ const restart=result.samples.find(sample=>sample.label==='direct-public-api-restart-old-status-time');
+ const elapsed=restart?.statusText?.match(/\((\d+):(\d+)\)/);
+ const displayedMs=elapsed?(Number(elapsed[1])*60+Number(elapsed[2]))*1000:null;
+ result.validation={stateMatches:result.samples.every(sample=>sample.statusVisible===(sample.active.length>0)),restartTimeMatches:displayedMs!==null&&Math.abs(displayedMs-restart.fixtureElapsedMs)<1500};
+}
+writeFileSync(process.argv.includes('--fixed')?'.planning/debug/status-bar-fixed-native.json':'.planning/debug/status-bar-stale-native.json',JSON.stringify(result,null,2)+'\n');
 console.log(JSON.stringify({run:result.run,error:result.error,cleanup:result.cleanup,samples:result.samples.map(({label,active,fixtureElapsedMs,statusVisible,statusText,notices})=>({label,activeCount:active.length,fixtureElapsedMs,statusVisible,statusText,notices}))}));
-if(result.error)process.exitCode=1;
+if(result.error||(result.validation&&Object.values(result.validation).some(value=>!value)))process.exitCode=1;
