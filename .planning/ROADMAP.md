@@ -167,7 +167,27 @@ Plans:
   4. On mobile, ▲▼ buttons let the user reorder cards on both the Staged and Timers tabs.
   5. The plugin shows as "TaskNotes Task Control". The plugin id `tasknotes-timer-pane`, view type, command ids and saved data are unchanged, and upgrading from 0.2.0 through BRAT to the 0.3.0 release keeps the existing pause records and order.
 
-**Plans**: TBD
+**Plans**: 6 plans across 6 execution waves
+
+Plans:
+**Wave 1**
+- [ ] 07-01-PLAN.md — Ordinary staged completion tracer and durable recovery (wave 1)
+
+**Wave 2** *(blocked on Wave 1 completion)*
+- [ ] 07-02-PLAN.md — Native recurrence contract, materialized completion and retries (wave 2)
+
+**Wave 3** *(blocked on Wave 2 completion)*
+- [ ] 07-03-PLAN.md — Done today and quiet cached rollover (wave 3)
+
+**Wave 4** *(blocked on Wave 3 completion)*
+- [ ] 07-04-PLAN.md — Accessible mobile reorder arrows on both tabs (wave 4)
+
+**Wave 5** *(blocked on Wave 4 completion)*
+- [ ] 07-05-PLAN.md — Rename/version candidate, review and native acceptance evidence (wave 5)
+
+**Wave 6** *(blocked on Wave 5 completion)*
+- [ ] 07-06-PLAN.md — Explicit publication approval, released assets and BRAT upgrade (wave 6)
+
 **UI hint**: yes
 **Notes**:
 - **Research flag:** run `/gsd-plan-phase --research-phase 7` before planning. It needs to cover:
@@ -206,4 +226,3 @@ Phases execute in numeric order: 4 → 5 → 6 → 7 (Phases 4 and 5 are indepen
 **Deferred at:** 2026-11-13 during /gsd-verify-work 4 session completion
 **Follow-ups:**
 - [ ] Test 6: Pausing a task that is already completed drops its card: pauseLedger reconcile rule 4 (Phase 3 D-12 'completed elsewhere') deletes paused records for any completed-type status, even if completed before the pause. Make rule 4 drop only records completed after pausedAt (or block pause / hide completed tasks in the picker), plus a regression test. Pre-existing since v0.2. Debug: .planning/debug/pause-removes-card.md (deferred 2026-11-13)
-
