@@ -8,8 +8,31 @@ An Obsidian plugin that adds a dockable pane for monitoring and controlling Task
 
 ## Requirements
 
-- Obsidian 1.12.2 or later. Verified on desktop only.
-- TaskNotes 4.10.0 or later, installed and enabled. The pane is a companion to TaskNotes and does nothing on its own. If TaskNotes is missing, disabled or too old, the pane says so and connects by itself once TaskNotes is ready.
+- Obsidian 1.12.2 or later. Desktop use is verified; mobile is not.
+- TaskNotes 4.10.0 or later, installed and enabled. The pane is a companion to TaskNotes. If TaskNotes is missing, disabled or too old, the pane explains the issue and connects when TaskNotes becomes ready.
+
+## Installation
+
+### Install with BRAT (recommended)
+
+1. In Obsidian, open **Settings → Community plugins → Browse**, find **TaskNotes**, install it, and enable it.
+2. In the same Browse view, find **BRAT**, install it, and enable it.
+3. Open the command palette and run **BRAT: Add a beta plugin for testing**.
+4. Enter `judealnas/obsidian-tasknotes-timer-pane` and add the plugin.
+5. In **Settings → BRAT**, choose which release to track:
+   - **Latest** follows the newest version and can include prereleases. It currently selects `0.3.0-beta.2`.
+   - **Frozen version** stays on one release tag. Use `0.2.0` to stay on stable or `0.3.0-beta.2` to test the current beta.
+6. Open **Settings → Community plugins** and enable **TaskNotes Task Control**.
+
+See the [BRAT guide](https://github.com/TfTHacker/obsidian42-brat/blob/main/BRAT-DEVELOPER-GUIDE.md) for details about latest and frozen versions. The [0.3.0-beta.2 release notes](docs/releases/0.3.0-beta.2.md) list the beta's outstanding acceptance checks.
+
+### Manual install
+
+1. Download `main.js`, `manifest.json` and `styles.css` from the [release you want](https://github.com/judealnas/obsidian-tasknotes-timer-pane/releases).
+2. Put the files in `<vault>/.obsidian/plugins/tasknotes-timer-pane/`.
+3. In **Settings → Community plugins**, enable **TaskNotes Task Control**.
+
+To build from source, run `npm install` and `npm run build`, then copy the same three files from the repository root.
 
 ## Using the pane
 
@@ -52,22 +75,6 @@ Differences from TaskNotes' own displays, all expected:
 - Totals are summed to the second from the raw time entries. TaskNotes rounds each entry down to whole minutes, so the pane's total can be up to a minute per entry higher than TaskNotes' total.
 - The pane always shows H:MM:SS. TaskNotes' status bar shows M:SS under an hour, so `0:42:17` in the pane is `42:17` in the status bar.
 - TaskNotes' status bar hides timers on archived tasks. The pane does not.
-
-## Install with BRAT
-
-1. Install BRAT from Settings → Community plugins → Browse, and enable it.
-2. Run the command "BRAT: Add a beta plugin for testing" (or use the button in BRAT's settings).
-3. Enter `judealnas/obsidian-tasknotes-timer-pane` and add the plugin.
-4. Enable "TaskNotes Task Control" in Settings → Community plugins.
-
-BRAT can install a specific release or track the latest available version, including prereleases. Select `0.3.0-beta.2` to test the staging beta, or pin `0.2.0` to stay on stable. See the [beta release notes](docs/releases/0.3.0-beta.2.md) for outstanding acceptance checks.
-
-## Manual install
-
-1. Download `main.js`, `manifest.json` and `styles.css` from the latest release at https://github.com/judealnas/obsidian-tasknotes-timer-pane/releases.
-2. Put them in `<vault>/.obsidian/plugins/tasknotes-timer-pane/`, then enable "TaskNotes Task Control" in Settings → Community plugins.
-
-To build from source instead, run `npm install` and `npm run build`, then copy the same three files from the repo root.
 
 ## Development
 
@@ -113,4 +120,4 @@ The instance listens for DevTools connections on port 9333. That port is localho
 1. `npm version patch` (or `minor` / `major`) bumps `package.json`, `manifest.json` and `versions.json`, commits, and tags the version without a `v` prefix.
 2. `git push --follow-tags` pushes the commit and tag. The release workflow runs `npm run check`, confirms the tag matches `manifest.json`, and publishes a GitHub release with `main.js`, `manifest.json` and `styles.css`.
 
-For a beta, use a version such as `0.3.0-beta.1` consistently in package/lock/manifest metadata and a matching tag without a `v` prefix. Tags containing a hyphen are published as GitHub prereleases and do not replace GitHub's Latest release. Release notes come from `docs/releases/<tag>.md` when present. BRAT's latest tracking may still select prereleases. Beta publication does not close outstanding stable-release acceptance checks.
+For a beta, use the same prerelease version in `package.json`, `package-lock.json`, `manifest.json`, and the matching tag without a `v` prefix (for example, `0.3.0-beta.2`). Tags containing a hyphen are published as GitHub prereleases and do not replace GitHub's Latest release. Release notes come from `docs/releases/<tag>.md` when present. BRAT's latest tracking may still select prereleases. Beta publication does not close outstanding stable-release acceptance checks.
