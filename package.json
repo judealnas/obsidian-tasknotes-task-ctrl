@@ -1,8 +1,8 @@
 {
   "name": "tasknotes-timer-pane",
-  "version": "0.3.0-beta.1",
+  "version": "0.3.0-beta.2",
   "private": true,
-  "description": "Stage daily tasks, control regular task timers, and review completed work.",
+  "description": "Stage tasks and control regular task timers.",
   "type": "module",
   "main": "main.js",
   "scripts": {

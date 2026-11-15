@@ -60,7 +60,7 @@ Differences from TaskNotes' own displays, all expected:
 3. Enter `judealnas/obsidian-tasknotes-timer-pane` and add the plugin.
 4. Enable "TaskNotes Task Control" in Settings → Community plugins.
 
-BRAT can install a specific release or track the latest available version, including prereleases. Select `0.3.0-beta.1` to test the staging beta, or pin `0.2.0` to stay on stable. See the [beta release notes](docs/releases/0.3.0-beta.1.md) for outstanding acceptance checks.
+BRAT can install a specific release or track the latest available version, including prereleases. Select `0.3.0-beta.2` to test the staging beta, or pin `0.2.0` to stay on stable. See the [beta release notes](docs/releases/0.3.0-beta.2.md) for outstanding acceptance checks.
 
 ## Manual install
 
