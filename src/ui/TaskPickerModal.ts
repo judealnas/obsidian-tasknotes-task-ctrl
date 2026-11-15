@@ -1,4 +1,4 @@
-import { Component, MarkdownRenderer, Notice, SuggestModal, type App } from "obsidian";
+import { Component, MarkdownRenderer, Notice, setTooltip, SuggestModal, type App } from "obsidian";
 import { filterAndSortTasks } from "../model/taskPicker";
 import { taskWikilink } from "../model/taskLink";
 import { normalizeTimerPath, type Ownership } from "../model/pomodoroOwnership";
@@ -7,11 +7,20 @@ import type { TaskInfo } from "../tasknotes/runtime-api.types";
 import { isStageReserved } from "../model/staging";
 import type { StagingController } from "../state/StagingController";
 import type { TimerController } from "../state/TimerController";
+import type { TaskCreationCoordinator } from "../state/TaskCreationCoordinator";
+
+interface TaskCreationAction {
+ coordinator: TaskCreationCoordinator;
+ destinationAvailability: () => { available: boolean; reason: string };
+ subscribeDestination: (listener: () => void) => () => void;
+ onCreated: (task: TaskInfo) => void | Promise<void>;
+}
 
 /** Each opening reads once; keystrokes rank the local snapshot through public SuggestModal. */
 interface PickerBase {
  gateway: TaskNotesGateway;
  onClose: () => void;
+ creation?: TaskCreationAction;
 }
 export type TaskPickerOptions = PickerBase & (
  /** Legacy constructor shape; callers must use add mode for selection. */
@@ -34,8 +43,11 @@ export class TaskPickerModal extends SuggestModal<TaskInfo> {
  private chosen = false;
  private components = new Set<Component>();
  private offState: (() => void) | null = null;
+ private offCreation: (() => void) | null = null;
+ private offDestination: (() => void) | null = null;
  private pending = false;
  private inlineError: HTMLElement | null = null;
+ private createButton: HTMLButtonElement | null = null;
 
  constructor(app: App, options: TaskPickerOptions) {
   super(app);
@@ -51,6 +63,14 @@ export class TaskPickerModal extends SuggestModal<TaskInfo> {
   this.opened = true;
   this.chosen = false;
   this.pending = false;
+  if (this.options.creation) {
+   const action = this.contentEl.createDiv({ cls: "tntp-picker-create" });
+   this.createButton = action.createEl("button", { text: "Create new task" });
+   this.createButton.addEventListener("click", () => this.createTask());
+   this.offCreation = this.options.creation.coordinator.subscribe(() => this.updateCreateAction());
+   this.offDestination = this.options.creation.subscribeDestination(() => this.updateCreateAction());
+   this.updateCreateAction();
+  }
   if (this.options.mode === "stage") this.inlineError = this.contentEl.createDiv({ cls: "tntp-picker-error", attr: { role: "status", "aria-live": "polite" } });
   const generation = ++this.opening;
   this.offState = this.gateway.onState(() => {
@@ -128,19 +148,41 @@ export class TaskPickerModal extends SuggestModal<TaskInfo> {
  }
 
  selectSuggestion(task: TaskInfo, event: MouseEvent | KeyboardEvent): void {
-  if (!this.opened || this.chosen || this.pending || this.options.controller.isBusy() || !this.available()) return;
+  if (!this.opened || this.chosen || this.pending || this.actionBusy() || !this.available()) return;
   if (this.options.mode === "stage") { void this.stageSelection(task); return; }
   super.selectSuggestion(task, event);
  }
 
  onChooseSuggestion(task: TaskInfo): void {
   // SuggestModal may close before invoking this callback, so closed is not a veto.
-  if (this.options.mode !== "add" || this.chosen || this.options.controller.isBusy() || !this.available()) return;
+  if (this.options.mode !== "add" || this.chosen || this.actionBusy() || !this.available()) return;
   this.chosen = true;
   void this.options.controller.add(task);
  }
 
  private available(): boolean { return this.options.mode === "start" ? false : (this.options.mode === "stage" ? this.gateway.stagingAvailability() : this.options.controller.availability()).available; }
+ private actionBusy(): boolean { return this.options.controller.isBusy() || !!this.options.creation?.coordinator.isBusy(); }
+ private updateCreateAction(): void {
+  const button = this.createButton;
+  const creation = this.options.creation;
+  if (!button || !creation) return;
+  const destination = creation.destinationAvailability();
+  const coordinator = creation.coordinator.availability();
+  const gate = destination.available ? coordinator : destination;
+  button.disabled = !gate.available;
+  setTooltip(button, gate.reason);
+ }
+ private createTask(): void {
+  const creation = this.options.creation;
+  if (!this.opened || !creation || this.chosen) return;
+  const destination = creation.destinationAvailability();
+  const coordinator = creation.coordinator.availability();
+  if (!destination.available || !coordinator.available) { this.updateCreateAction(); return; }
+  const document = this.containerEl.ownerDocument;
+  this.chosen = true;
+  this.close();
+  creation.coordinator.start(document, creation.onCreated);
+ }
  private async stageSelection(task: TaskInfo): Promise<void> {
   if (this.options.mode !== "stage") return;
   this.pending = true;
@@ -167,8 +209,11 @@ export class TaskPickerModal extends SuggestModal<TaskInfo> {
   this.clearRows();
   this.tasks = [];
   this.inlineError = null;
+  this.createButton = null;
   this.pomodoroPath = null;
   this.offState?.(); this.offState = null;
+  this.offCreation?.(); this.offCreation = null;
+  this.offDestination?.(); this.offDestination = null;
   this.didClose();
   super.onClose();
  }

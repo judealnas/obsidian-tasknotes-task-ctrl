@@ -80,8 +80,15 @@ export type TaskNotesRuntimeLifecycleEventName =
 	| "unloading";
 
 export type TaskNotesRuntimeTaskEventName = "task.updated" | "task.deleted";
+export type TaskNotesRuntimeCreationEventName = "task.created";
 /** Only the public time/Pomodoro event names used by this companion. */
 export type TaskNotesRuntimeEventName = TaskNotesRuntimeTaskEventName | "time.started" | "time.stopped" | "pomodoro.started" | "pomodoro.completed" | "pomodoro.interrupted";
+
+/** Minimal public Runtime API payload used to capture a task saved by TaskNotes' creation modal. */
+export interface TaskNotesTaskCreatedPayload {
+	event: "task.created";
+	task?: TaskInfo;
+}
 
 /** Payload passed to `lifecycle.on` handlers (the settings field is omitted). */
 export interface TaskNotesRuntimeLifecyclePayload {

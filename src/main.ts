@@ -16,6 +16,7 @@ import { StagedOrderStore, loadStagedOrder } from "./state/StagedOrderStore";
 import { CompletionController } from "./state/CompletionController";
 import { CompletionStore } from "./state/CompletionStore";
 import { IdleCardStore } from "./state/IdleCardStore";
+import { TaskCreationCoordinator } from "./state/TaskCreationCoordinator";
 
 /** The data.json keys this plugin owns; everything else is kept as found. */
 const OWNED_KEYS = new Set(["completionStatus", "rolloverHour", "pauseRecordsVersion", "pauseRecords", "cardOrder", "stagedOrder", "completionRecordsVersion", "completionRecords", "idleTaskPathsVersion", "idleTaskPaths"]);
@@ -125,6 +126,7 @@ export default class TaskNotesTimerPanePlugin extends Plugin {
 		const notify = (message: string) => {
 			new Notice(message);
 		};
+		const taskCreation = new TaskCreationCoordinator({ app: this.app, gateway: bridge, notify, log });
 		const newCorrelationId = () => crypto.randomUUID();
 		const controller = new TimerController({ gateway: bridge, store, queue, notify, newCorrelationId, log, pauses,
 			getSettings: () => this.paneSettings, settingsReady: () => this.settingsReady });
@@ -147,6 +149,7 @@ export default class TaskNotesTimerPanePlugin extends Plugin {
   controller.setCompletionHandler(target => completion.complete({ sourcePath: target.taskPath, title: target.title,
    entry: target.startTime ? { taskPath: target.taskPath, startTime: target.startTime } : undefined }));
 		this.register(() => {
+			taskCreation.dispose();
 			idleCards.dispose();
 			store.dispose();
 			staging.dispose();
@@ -154,7 +157,7 @@ export default class TaskNotesTimerPanePlugin extends Plugin {
 		});
 
 		// Registered synchronously so Obsidian can restore a saved pane leaf (PANE-03).
-		this.registerView(VIEW_TYPE_TIMER_PANE, (leaf) => new TimerPaneView(leaf, { gateway: bridge, store, controller, completion, completions, cardOrder, stagedOrder, staging, stagingController, idleCards }));
+		this.registerView(VIEW_TYPE_TIMER_PANE, (leaf) => new TimerPaneView(leaf, { gateway: bridge, store, controller, completion, completions, cardOrder, stagedOrder, staging, stagingController, idleCards, taskCreation }));
 		this.settingsReady = this.loadData().then((data: unknown) => {
 			this.dataReadable = true;
 			if (typeof data === "object" && data !== null && "rolloverHour" in data) this.legacyRollover = { rolloverHour: data.rolloverHour };

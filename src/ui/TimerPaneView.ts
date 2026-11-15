@@ -6,6 +6,7 @@
  */
 import {
 	ItemView,
+	Notice,
 	setTooltip,
 	type WorkspaceLeaf,
 	type ViewStateResult,
@@ -33,6 +34,8 @@ import { TaskPickerModal } from "./TaskPickerModal";
 import type { CompletionController } from "../state/CompletionController";
 import type { CompletionStore } from "../state/CompletionStore";
 import { idleCardKey, type IdleCardStore } from "../state/IdleCardStore";
+import type { TaskCreationCoordinator } from "../state/TaskCreationCoordinator";
+import type { TaskInfo } from "../tasknotes/runtime-api.types";
 
 const timerCardKey = (timer: TaskCardModel): string => timer.state === "idle" ? idleCardKey(timer.taskPath) : timer.sessionKey;
 
@@ -49,6 +52,7 @@ export interface TimerPaneServices {
 	staging?: StagingStore;
 	stagingController?: StagingController;
 	stagedOrder?: StagedOrderStore;
+	taskCreation?: TaskCreationCoordinator;
 }
 
 const PANE_STATES: readonly PaneState[] = ["running", "idle", "loading", "missing", "incompatible"];
@@ -226,6 +230,7 @@ export class TimerPaneView extends ItemView {
 		if (this.services.staging) this.register(this.services.staging.subscribe(() => this.render()));
 		if (this.services.completions) this.register(this.services.completions.subscribe(() => this.render()));
 		if (this.services.stagingController) this.register(this.services.stagingController.subscribeBusy(() => this.render()));
+		if (this.services.taskCreation) this.register(this.services.taskCreation.subscribe(() => this.render()));
 		this.register(gateway.onState(() => { this.render(); void this.refreshCompletion(); }));
 		this.register(this.services.controller.subscribeBusy(() => this.render()));
 		// Keeps two open panes in the same order.
@@ -326,22 +331,71 @@ export class TimerPaneView extends ItemView {
 	}
 
 	private openPicker(): void {
-  const { gateway, idleCards } = this.services;
+  const { gateway, idleCards, taskCreation } = this.services;
   if (this.picker || this.isBusy() || !idleCards?.availability().available) return;
-  const modal = new TaskPickerModal(this.app, { mode: "add", gateway, controller: idleCards, onClose: () => {
+  const creation = taskCreation ? {
+   coordinator: taskCreation,
+   destinationAvailability: () => this.services.controller.isBusy() || idleCards.isBusy()
+    ? { available: false, reason: "Another task action is in progress" }
+    : idleCards.availability(),
+   subscribeDestination: (listener: () => void) => {
+    const offs = [idleCards.subscribe(listener), this.services.controller.subscribeBusy(listener)];
+    return () => { for (const off of offs) off(); };
+   },
+   onCreated: (task: TaskInfo) => this.addCreatedTask(task),
+  } : undefined;
+  const modal = new TaskPickerModal(this.app, { mode: "add", gateway, controller: idleCards, creation, onClose: () => {
    if (this.picker === modal) this.picker = null;
   } });
   this.picker = modal;
   modal.open();
  }
 
-	private isBusy(): boolean { return this.services.controller.isBusy() || !!this.services.stagingController?.isBusy() || !!this.services.idleCards?.isBusy(); }
+	private isBusy(): boolean { return this.services.controller.isBusy() || !!this.services.stagingController?.isBusy() || !!this.services.idleCards?.isBusy() || !!this.services.taskCreation?.isBusy(); }
 
 	private openStagePicker(beforePath?: string | null): void {
-		const { gateway, staging, stagingController } = this.services;
+		const { gateway, staging, stagingController, taskCreation } = this.services;
 		if (this.picker || !stagingController || !staging?.getSnapshot().canStage || stagingController.isBusy() || this.services.controller.isBusy()) return;
-		const modal = new TaskPickerModal(this.app, { mode: "stage", gateway, controller: stagingController, beforePath, onClose: () => { if (this.picker === modal) this.picker = null; } });
+		const creation = taskCreation ? {
+			coordinator: taskCreation,
+			destinationAvailability: () => {
+				if (!staging.getSnapshot().canStage) return { available: false, reason: "Staging is unavailable" };
+				if (stagingController.isBusy() || this.services.controller.isBusy()) return { available: false, reason: "Another task action is in progress" };
+				return gateway.stagingAvailability();
+			},
+			subscribeDestination: (listener: () => void) => {
+				const offs = [staging.subscribe(listener), stagingController.subscribeBusy(listener), this.services.controller.subscribeBusy(listener)];
+				return () => { for (const off of offs) off(); };
+			},
+			onCreated: (task: TaskInfo) => this.stageCreatedTask(task, beforePath),
+		} : undefined;
+		const modal = new TaskPickerModal(this.app, { mode: "stage", gateway, controller: stagingController, beforePath, creation, onClose: () => { if (this.picker === modal) this.picker = null; } });
 		this.picker = modal; modal.open();
+	}
+
+	private async addCreatedTask(task: TaskInfo): Promise<void> {
+		const idleCards = this.services.idleCards;
+		if (!idleCards) { this.creationNotice("The task was created, but added tasks are unavailable."); return; }
+		const gate = idleCards.availability();
+		if (!gate.available) { this.creationNotice("The task was created, but it couldn't be added: " + gate.reason); return; }
+		await idleCards.add(task);
+		if (!idleCards.models().some(model => normalizeTimerPath(model.taskPath) === normalizeTimerPath(task.path))) {
+			this.creationNotice("The task was created, but it couldn't be added to Timers.");
+		}
+	}
+
+	private async stageCreatedTask(task: TaskInfo, beforePath?: string | null): Promise<void> {
+		const controller = this.services.stagingController;
+		if (!controller) { this.creationNotice("The task was created, but staging is unavailable."); return; }
+		const outcome = await controller.stage({ taskPath: task.path, title: task.title, beforePath });
+		if (outcome.kind !== "staged" && outcome.kind !== "already-staged") {
+			this.creationNotice(outcome.message ?? "The task was created, but it couldn't be staged.");
+		} else if (outcome.warning) this.creationNotice(outcome.warning);
+	}
+
+	private creationNotice(message: string): void {
+		try { new Notice(message); }
+		catch (error) { console.error("[tasknotes-timer-pane] Showing the task creation result failed", error); }
 	}
 
 	/** Every open timer in display order (the saved order, new timers on top); none unless running. */

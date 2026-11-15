@@ -16,8 +16,10 @@ import type {
 	TaskNotesTaskPatch,
 	TaskNotesUserField,
 	TaskNotesRuntimeApiV1,
+	TaskNotesRuntimeCreationEventName,
 	TaskNotesRuntimeLifecycleEventName,
 	TaskNotesRuntimeEventName,
+	TaskNotesTaskCreatedPayload,
 } from "./runtime-api.types";
 
 export const TASKNOTES_PLUGIN_ID = "tasknotes";
@@ -171,6 +173,8 @@ export class TaskNotesBridge implements TaskNotesGateway {
 	private disposed = false;
 	private readonly stateListeners = new Set<(state: BridgeState) => void>();
 	private readonly dataListeners = new Set<() => void>();
+	/** Request-scoped TaskNotes subscriptions, released on request end or bridge detach. */
+	private readonly transientOffs = new Set<() => void>();
 
 	constructor(deps: TaskNotesBridgeDeps) {
 		this.lookupPlugin = deps.lookupPlugin;
@@ -195,6 +199,44 @@ export class TaskNotesBridge implements TaskNotesGateway {
 		return () => {
 			this.dataListeners.delete(listener);
 		};
+	}
+
+	taskCreationAvailability(): { available: boolean; reason: string } {
+		try {
+			const api = this.connectedApi();
+			if (!api.hasCapability("tasks.events")) return { available: false, reason: "TaskNotes is missing tasks.events" };
+			if (typeof api.events?.on !== "function" || typeof api.events?.off !== "function") {
+				return { available: false, reason: "TaskNotes does not provide task events" };
+			}
+			return { available: true, reason: "Create a new TaskNotes task" };
+		} catch {
+			return { available: false, reason: "TaskNotes is not connected" };
+		}
+	}
+
+	onTaskCreated(listener: (task: TaskInfo) => void): () => void {
+		const api = this.featureApi("tasks.events", "events.on", candidate => typeof candidate.events?.on === "function" && typeof candidate.events?.off === "function");
+		let active = true;
+		const events = api.events as typeof api.events & {
+			on(event: TaskNotesRuntimeCreationEventName, handler: (payload: TaskNotesTaskCreatedPayload) => void): ReturnType<typeof api.events.on>;
+		};
+		const ref = events.on("task.created", value => {
+			if (!active || this.api !== api) return;
+			const payload = value as Partial<TaskNotesTaskCreatedPayload>;
+			const task = payload.event === "task.created" ? payload.task : undefined;
+			if (!task || typeof task.path !== "string" || task.path === "" || typeof task.title !== "string" ||
+				typeof task.status !== "string" || typeof task.archived !== "boolean") return;
+			listener(task);
+		});
+		const off = () => {
+			if (!active) return;
+			active = false;
+			this.transientOffs.delete(off);
+			try { api.events.off(ref); }
+			catch (error) { this.log("Releasing a task creation subscription failed: " + describeError(error)); }
+		};
+		this.transientOffs.add(off);
+		return off;
 	}
 
 	/** Re-evaluates TaskNotes availability. Safe to call at any time and as often as needed. */
@@ -553,6 +595,9 @@ export class TaskNotesBridge implements TaskNotesGateway {
 
 	/** Releases every TaskNotes ref, each in its own try/catch so a dead emitter cannot throw out. */
 	private detach(): void {
+		const transientOffs = [...this.transientOffs];
+		this.transientOffs.clear();
+		for (const off of transientOffs) off();
 		const offs = this.offs;
 		this.offs = [];
 		this.api = null;
