@@ -102,7 +102,7 @@ export default class TaskNotesTimerPanePlugin extends Plugin {
 		this.cardOrder = cardOrder;
 		const stagedOrder = new StagedOrderStore({ log, persist: () => this.persistAll() });
 		this.stagedOrder = stagedOrder;
-  const completions = new CompletionStore({ persist: () => this.persistAll() });
+  const completions = new CompletionStore({ persist: () => this.persistAll(), log });
   this.completions = completions;
 		// The vault can only tell a deleted note from one not yet indexed once the layout is ready (Pitfall 2).
 		let layoutReady = false;
@@ -115,7 +115,7 @@ export default class TaskNotesTimerPanePlugin extends Plugin {
 		});
 		// The one serial queue every pane write goes through.
 		const queue = new WriteQueue();
-		const staging = new StagingStore({ gateway: bridge, log, schedule, getRolloverHour: () => this.paneSettings.rolloverHour, ready: () => this.settingsReady, order: stagedOrder,
+		const staging = new StagingStore({ gateway: bridge, log, schedule, completions, resolveLink: (reference, sourcePath) => this.app.metadataCache.getFirstLinkpathDest(reference.replace(/^\[\[|\]\]$/g, "").split("|")[0]!.split("#")[0]!, sourcePath)?.path ?? null, getRolloverHour: () => this.paneSettings.rolloverHour, ready: () => this.settingsReady, order: stagedOrder,
 			fileCheck: () => (layoutReady ? (path: string) => this.app.vault.getFileByPath(path) !== null : null) });
 		// The only place the plugin creates Notices; state and model code receive this function.
 		const notify = (message: string) => {
@@ -143,7 +143,7 @@ export default class TaskNotesTimerPanePlugin extends Plugin {
 		});
 
 		// Registered synchronously so Obsidian can restore a saved pane leaf (PANE-03).
-		this.registerView(VIEW_TYPE_TIMER_PANE, (leaf) => new TimerPaneView(leaf, { gateway: bridge, store, controller, completion, cardOrder, stagedOrder, staging, stagingController }));
+		this.registerView(VIEW_TYPE_TIMER_PANE, (leaf) => new TimerPaneView(leaf, { gateway: bridge, store, controller, completion, completions, cardOrder, stagedOrder, staging, stagingController }));
 		this.settingsReady = this.loadData().then((data: unknown) => {
 			this.paneSettings = loadSettings(data);
 			this.fileSettings = { ...this.paneSettings };
@@ -161,6 +161,7 @@ export default class TaskNotesTimerPanePlugin extends Plugin {
 				await this.settingsReady;
 				await this.persistAll(settings);
 				this.paneSettings = { ...settings };
+    staging.checkDay();
 				await store.refreshNow();
 				await staging.refreshNow();
 			},

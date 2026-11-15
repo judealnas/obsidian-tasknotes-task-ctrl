@@ -31,10 +31,14 @@ import type { TimerStore } from "../state/TimerStore";
 import type { TaskNotesGateway } from "../tasknotes/TaskNotesBridge";
 import { TaskPickerModal } from "./TaskPickerModal";
 import type { CompletionController } from "../state/CompletionController";
+import type { CompletionStore } from "../state/CompletionStore";
+import { TaskTitle } from "./TaskTitle";
+import { stagingDay } from "../model/stagingDay";
 
 export const VIEW_TYPE_TIMER_PANE = "tasknotes-timer-pane";
 
 export interface TimerPaneServices {
+ completions?: CompletionStore;
  completion?: CompletionController;
 	gateway: TaskNotesGateway;
 	store: TimerStore;
@@ -94,6 +98,9 @@ export class TimerPaneView extends ItemView {
 	private completionReady = false;
 	private completionGeneration = 0;
 	private closed = true;
+	private doneRows = new Map<string, { row: HTMLElement; title: TaskTitle }>();
+	private doneList: HTMLElement | null = null;
+	private doneEmpty: HTMLElement | null = null;
 
 	constructor(leaf: WorkspaceLeaf, services: TimerPaneServices) {
 		super(leaf);
@@ -157,6 +164,10 @@ export class TimerPaneView extends ItemView {
 		const stagedBody = stagedMessage.createDiv({ cls: "tntp-message__body" });
 		const stagedMeta = stagedMessage.createDiv({ cls: "tntp-message__meta" });
 		const stagedRetry = stagedMessage.createEl("button", { cls: "tntp-message__retry", text: "Check for TaskNotes" });
+		const done = stagedPanel.createEl("section", { cls: "tntp-done-today", attr: { "aria-label": "Done today" } });
+		done.createEl("h3", { text: "Done today" });
+		this.doneEmpty = done.createDiv({ cls: "tntp-done-today__empty", text: "Nothing completed yet" });
+		this.doneList = done.createDiv({ cls: "tntp-done-today__list" });
 		this.registerDomEvent(stagedRetry, "click", () => { gateway.probe(); void this.services.staging?.refreshNow(); });
 		this.registerDomEvent(stagedButton, "click", () => this.selectTab("staged"));
 		this.registerDomEvent(timersButton, "click", () => this.selectTab("timers"));
@@ -214,6 +225,7 @@ export class TimerPaneView extends ItemView {
 
 		this.register(store.subscribe(() => { this.render(); void this.refreshCompletion(); }));
 		if (this.services.staging) this.register(this.services.staging.subscribe(() => this.render()));
+		if (this.services.completions) this.register(this.services.completions.subscribe(() => this.render()));
 		if (this.services.stagingController) this.register(this.services.stagingController.subscribeBusy(() => this.render()));
 		this.register(gateway.onState(() => { this.render(); void this.refreshCompletion(); }));
 		this.register(this.services.controller.subscribeBusy(() => this.render()));
@@ -249,6 +261,8 @@ export class TimerPaneView extends ItemView {
 		this.picker = null;
 		this.cards?.dispose();
 		this.stagedCards?.dispose();
+		for (const { title, row } of this.doneRows.values()) { title.dispose(); row.detach(); }
+		this.doneRows.clear(); this.doneList = null; this.doneEmpty = null;
 		this.stagedCards = null;
 		this.els = null;
 		this.cards = null;
@@ -343,6 +357,7 @@ export class TimerPaneView extends ItemView {
 		if (!els) return;
 		const { state, timers } = this.currentTimers();
 		const connected = state === "running" || state === "idle";
+		this.renderDoneToday(connected);
 		const gate = this.services.gateway.startAvailability();
 		els.start.disabled = !connected || !gate.available || this.isBusy();
 		setTooltip(els.start, gate.reason);
@@ -405,6 +420,34 @@ export class TimerPaneView extends ItemView {
 		this.renderMessage(els, state);
 	}
 
+	private renderDoneToday(connected: boolean): void {
+		if (!this.doneList || !this.doneEmpty) return;
+		const day = this.services.staging?.currentDay ?? stagingDay(Date.now(), 4);
+		const items = connected ? this.services.completions?.getDoneToday(day) ?? [] : [];
+		const live = new Set(items.map(item => item.id));
+		for (const [id, owner] of this.doneRows) if (!live.has(id)) {
+			owner.title.dispose(); owner.row.detach(); this.doneRows.delete(id);
+		}
+		this.doneEmpty.toggleClass("tntp-hidden", items.length > 0);
+		if (items.length) this.doneEmpty.setAttribute("hidden", "");
+		else this.doneEmpty.removeAttribute("hidden");
+		for (const item of items) {
+			const model = { taskPath: item.completedPath, title: displayTitle(item.title, item.completedPath), displayKey: item.displayKey };
+			let owner = this.doneRows.get(item.id);
+			if (!owner) {
+				const row = this.doneList.createDiv({ cls: "tntp-done-today__row" });
+				owner = { row, title: new TaskTitle(row, model, { app: this.app, gateway: this.services.gateway }) };
+				this.doneRows.set(item.id, owner);
+			} else owner.title.update(model);
+		}
+		let cursor = this.doneList.firstElementChild;
+		for (const item of items) {
+			const row = this.doneRows.get(item.id)!.row;
+			if (row !== cursor) this.doneList.insertBefore(row, cursor);
+			cursor = row.nextElementSibling;
+		}
+	}
+
 	private async refreshCompletion(): Promise<void> {
 		const generation = ++this.completionGeneration;
 		this.completionReady = false;
@@ -461,6 +504,7 @@ export class TimerPaneView extends ItemView {
 	 */
 	private tick(): void {
 		const now = Date.now();
+		this.services.staging?.checkDay(now);
 		const { store } = this.services;
 		// A wake or throttle gap: data may have changed while timers were suspended.
 		if (detectWakeGap(this.lastTickMs, now)) { store.requestRefresh(); this.services.staging?.requestRefresh(); }
