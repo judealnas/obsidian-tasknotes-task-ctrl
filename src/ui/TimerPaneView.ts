@@ -140,6 +140,8 @@ export class TimerPaneView extends ItemView {
 		this.stagedCards?.dispose();
 		this.cards = null;
 		const root = this.contentEl.createDiv({ cls: ["tntp-pane", "tntp-pane--loading"] });
+		const reorderStatus = root.createDiv({ cls: ["tntp-visually-hidden", "tntp-reorder-status"], attr: { role: "status", "aria-live": "polite", "aria-atomic": "true" } });
+		const announceMove = (card: TaskCard, position: number, count: number) => reorderStatus.setText(`${card.currentModel.title}, position ${position} of ${count}`);
 		const strip = root.createDiv({ cls: "tntp-tabs", attr: { role: "tablist", "aria-label": "Task views" } });
 		const stagedButton = strip.createEl("button", { text: "Staged", cls: "tntp-tabs__tab" });
 		const timersButton = strip.createEl("button", { text: "Timers", cls: "tntp-tabs__tab" });
@@ -158,6 +160,7 @@ export class TimerPaneView extends ItemView {
 			update: (card, timer) => card.update(timer, false),
 			dispose: card => card.dispose(),
 			commitOrder: order => this.services.stagedOrder?.reorder(order),
+			onMove: announceMove,
 		});
 		const stagedMessage = stagedPanel.createDiv({ cls: "tntp-message", attr: { "aria-live": "polite" } });
 		const stagedHeading = stagedMessage.createDiv({ cls: "tntp-message__heading" });
@@ -196,6 +199,7 @@ export class TimerPaneView extends ItemView {
 			update: (card, timer) => card.update(timer, this.completionReady),
 			dispose: card => card.dispose(),
 			commitOrder: order => this.services.cardOrder.set(order),
+			onMove: announceMove,
 		});
 
 		const message = timersPanel.createDiv({ cls: "tntp-message", attr: { "aria-live": "polite" } });

@@ -30,7 +30,7 @@ import { CompletionStore } from "../src/state/CompletionStore";
 import { CompletionController } from "../src/state/CompletionController";
 import type { ActiveTimeEntry, TaskInfo } from "../src/tasknotes/runtime-api.types";
 import { createFakeGateway } from "./fakes/fakeGateway";
-import { Element, event, flush, resetViewHost, viewHost, transfer, hostDocument, hostWindow, HostEvent, workspace } from "./fakes/viewHost";
+import { Element, event, flush, resetViewHost, viewHost, transfer, hostDocument, hostWindow, HostEvent, workspace, Platform } from "./fakes/viewHost";
 
 export function timer(patch: Partial<OpenTimer> = {}): OpenTimer {
 	return { taskPath: "A.md", title: "Task A", startTime: "2026-11-13T12:00:00Z", startMs: 0, state: "running", sessionStartedAt: "2026-11-13T12:00:00Z", sessionKey: "a", sortMs: 0, accumulatedMs: 0, segmentStartMs: Date.parse("2026-11-13T12:00:00Z"), totalKnown: true, entries: [], displayKey: "", ...patch };
@@ -57,6 +57,55 @@ export function setup(initial: OpenTimer[] = [timer()], cardOrder = new CardOrde
 }
 beforeEach(() => { vi.useFakeTimers(); vi.setSystemTime(new Date("2026-11-13T12:01:00Z")); resetViewHost(); pickerHost.instances = []; });
 afterEach(() => { vi.clearAllTimers(); vi.useRealTimers(); vi.unstubAllGlobals(); });
+
+test("mobile arrows reorder both owning lists, announce once and retain boundary focus", async () => {
+ Platform.isMobile = true;
+ const s = setup([timer(), timer({ taskPath: "B.md", sessionKey: "b", state: "paused", title: "Task B", segmentStartMs: null })], undefined, true);
+ s.gateway.listTasks = () => Promise.resolve(["A", "B", "C"].map(name => ({ path: `${name}.md`, title: `Task ${name}`, status: "open", archived: false, staged: "2026-11-12" })));
+ await s.view.onOpen(); await s.staging.refreshNow(); await flush();
+ const staged = s.root.querySelector(".tntp-panel--staged")!;
+ const timers = s.root.querySelector(".tntp-panel--timers")!;
+ const cards = staged.querySelectorAll(".tntp-card");
+ expect(cards).toHaveLength(3);
+ expect(cards.every(card => card.querySelector(".tntp-reorder")!.children.map(button => button.textContent).join("") === "▲▼")).toBe(true);
+ expect(timers.querySelectorAll(".tntp-reorder")).toHaveLength(2);
+ expect(cards[0]!.querySelector(".tntp-reorder__up")!.disabled).toBe(true);
+ expect(cards[2]!.querySelector(".tntp-reorder__down")!.disabled).toBe(true);
+ const status = s.root.querySelector(".tntp-reorder-status")!;
+ const speak = vi.spyOn(status, "setText");
+ const down = cards[0]!.querySelector(".tntp-reorder__down")!;
+ down.focus(); event(down, "click");
+ expect(s.stagedOrder.get()).toEqual(["B.md", "A.md", "C.md"]);
+ expect(hostDocument.activeElement).toBe(down);
+ expect(status.textContent).toBe("Task A, position 2 of 3"); expect(speak).toHaveBeenCalledTimes(1);
+ event(down, "click");
+ expect(staged.querySelectorAll(".tntp-card")[2]).toBe(cards[0]);
+ expect(hostDocument.activeElement).toBe(cards[0]!.querySelector(".tntp-reorder__up"));
+ expect(status.textContent).toBe("Task A, position 3 of 3"); expect(speak).toHaveBeenCalledTimes(2);
+ event(down, "click"); expect(speak).toHaveBeenCalledTimes(2);
+ await s.staging.refreshNow(); expect(speak).toHaveBeenCalledTimes(2);
+ const stageOrder = s.stagedOrder.get();
+ const timerDown = timers.querySelector(".tntp-reorder__down")!; event(timerDown, "click");
+ expect(s.cardOrder.get()).toEqual(["b", "a"]); expect(s.stagedOrder.get()).toEqual(stageOrder);
+ expect(s.gateway.updateCalls).toEqual([]); expect(s.gateway.stopCalls).toEqual([]);
+ await s.view.onClose(); s.view.unload();
+ const calls = speak.mock.calls.length; event(down, "click"); expect(speak).toHaveBeenCalledTimes(calls);
+});
+
+test("empty and single mobile lists have no possible move and desktop creates no arrows", async () => {
+ Platform.isMobile = true;
+ const mobile = setup([timer()]); await mobile.view.onOpen(); await flush();
+ const up = mobile.root.querySelector(".tntp-reorder__up")!;
+ const down = mobile.root.querySelector(".tntp-reorder__down")!;
+ expect(up.disabled).toBe(true); expect(down.disabled).toBe(true);
+ event(up, "click"); event(down, "click"); expect(mobile.cardOrder.get()).toEqual([]);
+ mobile.set([]); expect(mobile.root.querySelectorAll(".tntp-reorder")).toEqual([]);
+ await mobile.view.onClose(); mobile.view.unload();
+ Platform.isMobile = false;
+ const desktop = setup(); await desktop.view.onOpen(); await flush();
+ expect(desktop.root.querySelectorAll(".tntp-reorder")).toEqual([]);
+ await desktop.view.onClose(); desktop.view.unload();
+});
 
 test("Done today shares title-only rows across leaves and disposes late renderers on reopen", async () => {
  const s = setup([], undefined, true);
