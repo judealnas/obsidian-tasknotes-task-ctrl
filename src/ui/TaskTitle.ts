@@ -6,7 +6,7 @@ interface TitleElements { timer: TaskTitleModel; title: HTMLElement; titleLabel:
 let titleLabelSeq = 0;
 function titleRenderKey(timer: TaskTitleModel): string { return [timer.taskPath, timer.title, timer.displayKey].join('\0'); }
 
-/** Shared safe task title owner for cards and Done today rows. */
+/** Safe task title owner shared by both card lists. */
 export class TaskTitle extends Component {
  private elements: TitleElements;
  private disposed = false;

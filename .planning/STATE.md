@@ -5,7 +5,7 @@ milestone_name: Staging Tasks
 current_phase: 07
 current_phase_name: Complete, Roll Over & Release 0.3.0
 status: executing
-stopped_at: 07-05 native off-setting and upgrade passed; overnight, physical sleep and mobile remain open
+stopped_at: Beta feedback implemented; Done today and custom rollover removed; mobile and BRAT acceptance open
 last_updated: "2026-11-15T08:25:13.976Z"
 last_activity: 2026-11-15
 last_activity_desc: Phase 07 execution started
@@ -31,11 +31,11 @@ See: .planning/PROJECT.md (updated 2026-11-13)
 
 Phase: 07 (Complete, Roll Over & Release 0.3.0) — EXECUTING
 Plan: 5 of 6 — tasks 1–2 implemented; task 3 native acceptance incomplete
-Status: Awaiting real overnight, physical sleep/wake and mobile acceptance
+Status: Beta feedback revision; physical mobile and actual BRAT upgrade acceptance remain open
 Note: Phase 4 complete: UAT 6/6, VERIFICATION passed, SECURITY 19/19 closed. 04-01 spike cleanup done (`staged:` null line confirmed, `spikedefault` removed).
 Last activity: 2026-11-15 — Phase 07 execution started
 
-Progress (v0.3): 17/19 plans complete (89%). Phase 7 plans 01–04 have summaries. Plan 05 version/display/tests are committed; disabled-auto-stop and full native upgrade now pass. Native overnight, physical sleep and mobile acceptance remain open. Stable Plan 06 publication has not started. Milestone verification remains open. Separately authorized beta `0.3.0-beta.1` was published from milestone-v0.3 on 2026-11-15; stable 0.3.0 is not published.
+Progress (v0.3): 17/19 plans complete (89%). Phase 7 plans 01–04 have summaries. Plan 05 version/display/tests are committed; disabled-auto-stop and full native upgrade now pass. User removed Done today/custom rollover on 2026-11-15; those overnight/sleep acceptance checks are superseded. Physical mobile and actual BRAT upgrade acceptance remain open. Stable Plan 06 publication has not started. Milestone verification remains open. Separately authorized beta `0.3.0-beta.1` was published from milestone-v0.3 on 2026-11-15; stable 0.3.0 is not published.
 
 ## Performance Metrics
 
@@ -192,6 +192,9 @@ Stopped at: 07-05 disabled-auto-stop matrix and cold upgrade passed; physical ac
 Resume file: .planning/phases/07-complete-roll-over-release-0-3-0/.continue-here.md
 
 ## Operator Next Steps
+
+- [2026-11-15 beta feedback scope revision]: Done today, external history collection and configurable rollover are removed by explicit user direction. Staging and recurring requests now use local calendar dates; unfinished tasks persist and calendar age refreshes without task writes. Completion safety/replay records remain. See quick task 261115-gpo for UI fixes, tests and native evidence. This supersedes older instructions below to wait for overnight/custom-rollover acceptance. Physical mobile/touch, actual BRAT upgrade and stable publication remain open. No new beta publication was requested.
+
 
 - [2026-11-15 beta publication]: User explicitly authorized beta publication from milestone-v0.3 with physical acceptance still open. Published `0.3.0-beta.1` at `bdc5f0f53f060c10180dd2446bfb67556deb1ec1`; GitHub Release workflow 43735538641 passed full checks. Downloaded assets verified; GitHub Latest remains 0.2.0. See quick task 261115-fup for hashes and release URL. BRAT installation/update to this beta has not been exercised. This beta authorization does not close Phase 7 acceptance or authorize stable 0.3.0 publication. Older no-publication/candidate-version descriptions below are historical.
 

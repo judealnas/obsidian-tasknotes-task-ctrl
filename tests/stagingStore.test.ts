@@ -26,7 +26,7 @@ test("a completion saved during a task read invalidates that read before observi
  const read = s.store.refreshNow(); for (let i = 0; i < 5; i++) await Promise.resolve();
  await completions.saveRecord({ attemptId: "one", sourcePath: "A.md", completedPath: "A.md", requestDay: "2026-11-14", requestedAt: 10, completedAt: 10, beforeEvidence: { status: "open", staged: "2026-11-12", title: "A", completedStatus: "done" }, phase: "confirmed", pendingCleanupPaths: [] });
  release([stagedTask()]); await read;
- expect(reads).toBe(2); expect(completions.getDoneToday("2026-11-14")[0]?.completedAt).toBe(10);
+ expect(reads).toBe(2); expect(completions.records()[0]?.completedAt).toBe(10);
  s.store.dispose();
 });
 
@@ -39,15 +39,13 @@ test("cached rename and successful Unstage survive day changes while offline", a
  expect(s.store.getSnapshot().items).toEqual([]); s.store.dispose();
 });
 
-test("cached rollover uses the exact boundary and changed hours even when reads fail", async () => {
- let now = new Date(2026, 10, 14, 3, 59, 59, 999).getTime(); let hour = 4;
- const { store, gateway } = stagingFixture({ now: () => now, getRolloverHour: () => hour }); await store.refreshNow();
+test("calendar midnight updates age offline without writes, custom rollover or clearing tasks", async () => {
+ let now = new Date(2026, 10, 13, 23, 59, 59, 999).getTime();
+ const { store, gateway } = stagingFixture({ now: () => now }); await store.refreshNow();
  expect(store.getSnapshot().items[0]?.age).toBe(1);
- const reads = vi.spyOn(gateway, "listTasks");
- const before = reads.mock.calls.length; reads.mockRejectedValue(new Error("offline"));
+ const reads = vi.spyOn(gateway, "listTasks").mockRejectedValue(new Error("offline")).mockClear();
  now++; expect(store.checkDay(now)).toBe(true); expect(store.getSnapshot().items[0]?.age).toBe(2);
- expect(store.checkDay(now)).toBe(false); expect(reads.mock.calls.length).toBe(before);
- hour = 6; expect(store.checkDay(now)).toBe(true); expect(store.getSnapshot().items[0]?.age).toBe(1);
+ expect(store.checkDay(now)).toBe(false); expect(reads).not.toHaveBeenCalled();
  now = new Date(2026, 10, 18, 12).getTime(); store.checkDay(now); expect(store.getSnapshot().items[0]?.age).toBe(6);
  expect(gateway.updateCalls).toEqual([]); expect(gateway.stopCalls).toEqual([]); store.dispose();
 });

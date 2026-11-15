@@ -49,6 +49,7 @@ export class Element extends EventTarget {
 	classes = new Set<string>();
 	private text = "";
 	disabled = false;
+	scrollTop = 0;
 	shown = true;
 	movements = 0;
 	ownerDocument = hostDocument;
@@ -82,7 +83,7 @@ export class Element extends EventTarget {
 	removeAttribute(key: string): void { this.attrs.delete(key); }
 	focus(): void { hostDocument.activeElement = this; }
 	isShown(): boolean { return this.shown; }
-	getBoundingClientRect(): { top: number; height: number } { return { top: 0, height: 100 }; }
+	getBoundingClientRect(): { top: number; bottom: number; height: number } { return { top: 0, bottom: 100, height: 100 }; }
 	querySelectorAll<T = Element>(selector: string): T[] {
 		const matches = (el: Element) => selector.startsWith(".") ? el.classes.has(selector.slice(1)) : selector.includes(".") ? el.tagName === selector.split(".")[0] && el.classes.has(selector.split(".")[1]!) : el.tagName === selector;
 		return this.children.flatMap(child => [...matches(child) ? [child as T] : [], ...child.querySelectorAll<T>(selector)]);
@@ -141,7 +142,7 @@ export function resetViewHost(): void {
 	viewHost.components = []; viewHost.renders = []; workspace.openLinkText.mockClear(); workspace.requestSaveLayout.mockReset();
 	hostDocument.activeElement = null; hostDocument.visibilityState = "visible"; hostDocument.listeners.clear(); hostWindow.listeners.clear();
 	vi.stubGlobal("createDiv", (options?: ConstructorParameters<typeof Element>[1]) => new Element("div", options));
-	vi.stubGlobal("window", Object.assign(hostWindow, { setInterval: schedule.setInterval }));
+	vi.stubGlobal("window", Object.assign(hostWindow, { setInterval: schedule.setInterval, clearInterval: schedule.clearInterval }));
 }
 export function dom(el: Element): HTMLElement { return el as unknown as HTMLElement; }
 export function event(el: Element, type: string, options?: Partial<HostEvent>): HostEvent { const evt = new HostEvent(type, options); el.dispatchEvent(evt); return evt; }

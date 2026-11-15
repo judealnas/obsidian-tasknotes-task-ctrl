@@ -5,6 +5,12 @@
 - ✅ **v0.2 MVP**: Phases 1-3 (shipped 2026-11-12). Full details: [milestones/v0.2-ROADMAP.md](milestones/v0.2-ROADMAP.md)
 - 🚧 **v0.3 Staging Tasks**: Phases 4-7 (in progress)
 
+## Beta feedback scope revision — 2026-11-15
+
+The user removed Done today and the configurable rollover feature. Staged tasks persist until completed or unstaged; age and recurring requests use local calendar dates. Midnight does not clear tasks or completion safety records. DONE-02 and ROLL-03 are removed, ROLL-01 is superseded by calendar dates, and ROLL-02 now means persistent staging with calendar age. Overnight/custom-rollover acceptance is no longer required for the removed feature. Physical mobile/touch and actual published BRAT-upgrade checks remain open.
+
+Quick task 261115-gpo also covers removing the Paused label, narrow-pane overflow, tab-count spacing, edge scrolling while dragging, and positional + insertion buttons. Historical completed-phase descriptions below record what beta.1 shipped; this revision governs the current source.
+
 ## Overview
 
 v0.3 adds a **Staged** tab beside the existing **Timers** tab and renames the plugin to "TaskNotes Task Control" (id unchanged). The user picks today's tasks, orders them, and works down the list. There are four phases:

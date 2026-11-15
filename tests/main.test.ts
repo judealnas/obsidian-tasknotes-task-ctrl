@@ -40,25 +40,25 @@ test.each([null, undefined, {}])("legacy empty data %j keeps defaults and stable
  expect(host.viewTypes).toEqual(["tasknotes-timer-pane"]);
  expect(host.commands).toEqual([{ id: "open-timer-pane", name: "Open timer pane" }]);
  expect(host.ribbonLabels).toEqual(["Open TaskNotes Task Control"]);
- expect(depsOf(host.tabs[0]).getSettings()).toEqual({ completionStatus: null, rolloverHour: 4 });
+ expect(depsOf(host.tabs[0]).getSettings()).toEqual({ completionStatus: null });
  expect(host.saved).toEqual([]);
 });
 
 test("populated 0.2 data round-trips through candidate settings saves without losing user state", async () => {
- host.data = { completionStatus: "done", rolloverHour: 6, pauseRecordsVersion: 1, pauseRecords: [PAUSED], cardOrder: ["a", "b"], stagedOrder: ["Tasks/A.md", "Tasks/B.md"], unknownExtension: { retained: true } };
+ host.data = { completionStatus: "done", pauseRecordsVersion: 1, pauseRecords: [PAUSED], cardOrder: ["a", "b"], stagedOrder: ["Tasks/A.md", "Tasks/B.md"], unknownExtension: { retained: true } };
  const old = structuredClone(host.data);
  const plugin = new TaskNotesTimerPanePlugin({} as App, {} as PluginManifest); plugin.onload(); await flush();
- await saveSettingsOf(host.tabs[0])({ completionStatus: "done", rolloverHour: 6 });
+ await saveSettingsOf(host.tabs[0])({ completionStatus: "done" });
  expect(host.saved[host.saved.length - 1]).toEqual(old);
  host.data = host.saved[host.saved.length - 1];
  const next = new TaskNotesTimerPanePlugin({} as App, {} as PluginManifest); next.onload(); await flush();
- expect(depsOf(host.tabs[1]).getSettings()).toEqual({ completionStatus: "done", rolloverHour: 6 });
+ expect(depsOf(host.tabs[1]).getSettings()).toEqual({ completionStatus: "done" });
  expect(orderOf(next).get()).toEqual(["a", "b"]);
  expect(stagedOrderOf(next).get()).toEqual(["Tasks/A.md", "Tasks/B.md"]);
 });
 
-test("no-pane safety resync and saved rollover-hour changes rederive cached tasks even offline", async () => {
- vi.setSystemTime(new Date(2026, 10, 14, 3, 59, 59));
+test("no-pane safety refresh updates calendar age across midnight even offline", async () => {
+ vi.setSystemTime(new Date(2026, 10, 13, 23, 59, 59));
  const plugin = new TaskNotesTimerPanePlugin({} as App, {} as PluginManifest); plugin.onload(); await flush();
  const staging = capturedStaging.stores[capturedStaging.stores.length - 1]!;
  const gateway = (staging as unknown as { deps: StagingStoreDeps }).deps.gateway;
@@ -71,10 +71,6 @@ test("no-pane safety resync and saved rollover-hour changes rederive cached task
  list.mockRejectedValue(new Error("offline"));
  await vi.advanceTimersByTimeAsync(30_000); await flush();
  expect(staging.getSnapshot().items[0]?.age).toBe(2);
- await saveSettingsOf(host.tabs[0])({ completionStatus: null, rolloverHour: 6 });
- expect(staging.getSnapshot().items[0]?.age).toBe(1);
- await saveSettingsOf(host.tabs[0])({ completionStatus: null, rolloverHour: 4 });
- expect(staging.getSnapshot().items[0]?.age).toBe(2);
  staging.dispose();
 });
 
@@ -84,8 +80,8 @@ test("completion history survives production saves, reloads and unrelated settin
  const plugin = new TaskNotesTimerPanePlugin({} as App, {} as PluginManifest); plugin.onload(); await flush();
  const store = (plugin as unknown as { completions: CompletionStore }).completions;
  expect(store.records()).toEqual([record]);
- await saveSettingsOf(host.tabs[0])({ completionStatus: "done", rolloverHour: 6 });
- expect(host.saved[host.saved.length - 1]).toMatchObject({ completionRecordsVersion: 1, completionRecords: [record], extra: "kept", stagedOrder: ["Tasks/a.md"], rolloverHour: 6 });
+ await saveSettingsOf(host.tabs[0])({ completionStatus: "done" });
+ expect(host.saved[host.saved.length - 1]).toMatchObject({ completionRecordsVersion: 1, completionRecords: [record], extra: "kept", stagedOrder: ["Tasks/a.md"] });
  host.data = host.saved[host.saved.length - 1];
  const next = new TaskNotesTimerPanePlugin({} as App, {} as PluginManifest); next.onload(); await flush();
  expect((next as unknown as { completions: CompletionStore }).completions.records()).toEqual([record]);
@@ -93,7 +89,7 @@ test("completion history survives production saves, reloads and unrelated settin
 test("future completion safety data is retained by production settings saves", async () => {
  host.data = { completionRecordsVersion: 99, completionRecords: { protected: true }, extra: "kept" };
  const plugin = new TaskNotesTimerPanePlugin({} as App, {} as PluginManifest); plugin.onload(); await flush();
- await saveSettingsOf(host.tabs[0])({ completionStatus: "done", rolloverHour: 4 });
+ await saveSettingsOf(host.tabs[0])({ completionStatus: "done" });
  expect(host.saved[host.saved.length - 1]).toMatchObject({ completionRecordsVersion: 99, completionRecords: { protected: true }, extra: "kept" });
  expect((plugin as unknown as { completions: CompletionStore }).completions.available()).toBe(false);
 });
@@ -129,9 +125,9 @@ test("loading failures keep the plugin usable and log a safe explanation", async
 	vi.spyOn(plugin, "loadData").mockRejectedValue(new Error("private/path"));
 	const log = vi.spyOn(console, "error").mockImplementation(() => undefined);
 	plugin.onload(); (host.tabs[0] as TimerPaneSettingTab).display(); await flush();
-	expect(host.settings).toHaveLength(2);
+	expect(host.settings).toHaveLength(1);
 	expect(log).toHaveBeenCalledWith("[tasknotes-timer-pane] Loading timer pane settings failed; using defaults.");
-	await saveSettingsOf(host.tabs[0])({ completionStatus: "done", rolloverHour: 4 });
+	await saveSettingsOf(host.tabs[0])({ completionStatus: "done" });
  expect(host.saved).toEqual([{ completionStatus: "done", pauseRecordsVersion: 1, pauseRecords: [], completionRecordsVersion: "unreadable", completionRecords: undefined }]);
 	log.mockRestore();
 });
@@ -140,7 +136,7 @@ test("stored pauses survive a restart and a settings save keeps them, the settin
 	host.data = { completionStatus: "x", pauseRecordsVersion: 1, pauseRecords: [PAUSED], extraKey: 1 };
 	const plugin = new TaskNotesTimerPanePlugin({} as App, {} as PluginManifest); plugin.onload();
 	await flush();
-	await saveSettingsOf(host.tabs[0])({ completionStatus: "done", rolloverHour: 4 });
+	await saveSettingsOf(host.tabs[0])({ completionStatus: "done" });
 	expect(host.saved).toEqual([{ extraKey: 1, completionStatus: "done", pauseRecordsVersion: 1, pauseRecords: [PAUSED] }]);
 });
 
@@ -159,9 +155,9 @@ test("back-to-back settings saves never overlap, run in order and end with the n
 	plugin.onload();
 	await flush();
 	const save = saveSettingsOf(host.tabs[0]);
-	const first = save({ completionStatus: "first", rolloverHour: 4 });
+	const first = save({ completionStatus: "first" });
 	await flush();
-	const second = save({ completionStatus: "second", rolloverHour: 4 });
+	const second = save({ completionStatus: "second" });
 	await flush();
 	expect(calls).toHaveLength(1);
 	releases[0]!();
@@ -180,9 +176,9 @@ test("a failed settings save rejects to the caller and does not break later save
 	await flush();
 	const save = saveSettingsOf(host.tabs[0]);
 	host.failSave = true;
-	await expect(save({ completionStatus: "lost", rolloverHour: 4 })).rejects.toThrow();
+	await expect(save({ completionStatus: "lost" })).rejects.toThrow();
 	host.failSave = false;
-	await save({ completionStatus: "kept", rolloverHour: 4 });
+	await save({ completionStatus: "kept" });
 	expect(host.saved).toEqual([{ completionStatus: "kept", pauseRecordsVersion: 1, pauseRecords: [] }]);
 });
 
@@ -198,7 +194,7 @@ test("a pause change writes data.json with the settings last saved, never an old
 	plugin.onload();
 	await flush();
 	const pauses = (plugin as unknown as { pauses: { set(record: unknown): void } }).pauses;
-	const settingsSave = saveSettingsOf(host.tabs[0])({ completionStatus: "newer", rolloverHour: 4 });
+	const settingsSave = saveSettingsOf(host.tabs[0])({ completionStatus: "newer" });
 	await flush();
 	// The settings write is in flight; this pause save queues behind it.
 	pauses.set(PAUSED);
@@ -269,12 +265,12 @@ const orderOf = (plugin: unknown) => (plugin as { cardOrder: OrderStore }).cardO
 const stagedOrderOf = (plugin: unknown) => (plugin as { stagedOrder: StagedOrderStore }).stagedOrder;
 
 test("Staged ordering round-trips through the production writer and preserves every other key", async () => {
-	host.data = { completionStatus: "x", rolloverHour: 6, pauseRecordsVersion: 1, pauseRecords: [PAUSED], cardOrder: ["timerA", "timerB"], stagedOrder: ["A.md", "B.md"], unknownKey: { keep: true } };
+	host.data = { completionStatus: "x", pauseRecordsVersion: 1, pauseRecords: [PAUSED], cardOrder: ["timerA", "timerB"], stagedOrder: ["A.md", "B.md"], unknownKey: { keep: true } };
 	const plugin = new TaskNotesTimerPanePlugin({} as App, {} as PluginManifest); plugin.onload(); await flush();
 	stagedOrderOf(plugin).set(["B.md", "A.md"]); orderOf(plugin).set(["timerB", "timerA"]);
-	await saveSettingsOf(host.tabs[0])({ rolloverHour: 7, completionStatus: "done" }); await flush();
+	await saveSettingsOf(host.tabs[0])({ completionStatus: "done" }); await flush();
 	const written = host.saved[host.saved.length - 1];
-	expect(written).toEqual({ completionStatus: "done", rolloverHour: 7, pauseRecordsVersion: 1, pauseRecords: [PAUSED], cardOrder: ["timerB", "timerA"], stagedOrder: ["B.md", "A.md"], unknownKey: { keep: true } });
+	expect(written).toEqual({ completionStatus: "done", pauseRecordsVersion: 1, pauseRecords: [PAUSED], cardOrder: ["timerB", "timerA"], stagedOrder: ["B.md", "A.md"], unknownKey: { keep: true } });
 	host.data = written; const restarted = new TaskNotesTimerPanePlugin({} as App, {} as PluginManifest); restarted.onload(); await flush();
 	expect(stagedOrderOf(restarted).get()).toEqual(["B.md", "A.md"]);
 	stagedOrderOf(restarted).set([]); await flush(); expect(host.saved[host.saved.length - 1]).not.toHaveProperty("stagedOrder");
@@ -284,7 +280,7 @@ test("a failed Staged order save does not poison the single writer's next save",
 	const plugin = new TaskNotesTimerPanePlugin({} as App, {} as PluginManifest); plugin.onload(); await flush();
 	const log = vi.spyOn(console, "error").mockImplementation(() => undefined);
 	host.failSave = true; stagedOrderOf(plugin).set(["B.md"]); await flush(); host.failSave = false;
-	await saveSettingsOf(host.tabs[0])({ rolloverHour: 4, completionStatus: "done" });
+	await saveSettingsOf(host.tabs[0])({ completionStatus: "done" });
 	expect(host.saved[host.saved.length - 1]).toMatchObject({ stagedOrder: ["B.md"], completionStatus: "done" }); log.mockRestore();
 });
 
@@ -300,7 +296,7 @@ test("a stored card order loads and a settings save keeps it", async () => {
 	const plugin = new TaskNotesTimerPanePlugin({} as App, {} as PluginManifest); plugin.onload();
 	await flush();
 	expect(orderOf(plugin).get()).toEqual(["a", "b"]);
-	await saveSettingsOf(host.tabs[0])({ completionStatus: "done", rolloverHour: 4 });
+	await saveSettingsOf(host.tabs[0])({ completionStatus: "done" });
 	expect(host.saved).toEqual([{ extraKey: 1, completionStatus: "done", pauseRecordsVersion: 1, pauseRecords: [], cardOrder: ["a", "b"] }]);
 });
 
@@ -317,7 +313,7 @@ test("no saved order means no cardOrder key is written", async () => {
 	host.data = { cardOrder: [] };
 	const plugin = new TaskNotesTimerPanePlugin({} as App, {} as PluginManifest); plugin.onload();
 	await flush();
-	await saveSettingsOf(host.tabs[0])({ completionStatus: "done", rolloverHour: 4 });
+	await saveSettingsOf(host.tabs[0])({ completionStatus: "done" });
 	expect(host.saved).toEqual([{ completionStatus: "done", pauseRecordsVersion: 1, pauseRecords: [] }]);
 });
 
@@ -342,22 +338,12 @@ test("a malformed card order loads empty; a load rejection keeps the plugin usab
 
 const depsOf = (tab: unknown) => (tab as { deps: { getSettings: () => TimerPaneSettings } }).deps;
 
-test("a rollover hour chosen in the settings tab reaches data.json beside every other key and loads back on the next onload", async () => {
-	host.data = { completionStatus: "x", pauseRecordsVersion: 1, pauseRecords: [PAUSED], cardOrder: ["a", "b"], extraKey: 1 };
-	const plugin = new TaskNotesTimerPanePlugin({} as App, {} as PluginManifest); plugin.onload();
-	await flush();
-	(host.tabs[0] as TimerPaneSettingTab).display(); await flush();
-	expect(host.settings[1]?.name).toBe("Rollover hour");
-	host.settings[1]!.dropdown.change("6"); await flush(); await flush();
-	const written = { extraKey: 1, completionStatus: "x", pauseRecordsVersion: 1, pauseRecords: [PAUSED], cardOrder: ["a", "b"], rolloverHour: 6 };
-	expect(host.saved[host.saved.length - 1]).toEqual(written);
-
-	host.data = written;
-	const restarted = new TaskNotesTimerPanePlugin({} as App, {} as PluginManifest); restarted.onload();
-	await flush();
-	const tab = host.tabs[1] as TimerPaneSettingTab;
-	expect(depsOf(tab).getSettings().rolloverHour).toBe(6);
-	tab.display(); await flush();
-	host.settings[0]!.dropdown.change("default"); await flush(); await flush();
-	expect(host.saved[host.saved.length - 1]).toEqual({ ...written, completionStatus: null });
+test("legacy rollover setting is retired on the next save without changing pauses or other data", async () => {
+ host.data = { completionStatus: "x", rolloverHour: 6, pauseRecordsVersion: 1, pauseRecords: [PAUSED], cardOrder: ["a", "b"], extraKey: 1 };
+ const plugin = new TaskNotesTimerPanePlugin({} as App, {} as PluginManifest); plugin.onload(); await flush();
+ expect(depsOf(host.tabs[0]).getSettings()).toEqual({ completionStatus: "x" });
+ await saveSettingsOf(host.tabs[0])({ completionStatus: null });
+ expect(host.saved[host.saved.length - 1]).toEqual({ completionStatus: null, pauseRecordsVersion: 1, pauseRecords: [PAUSED], cardOrder: ["a", "b"], extraKey: 1 });
+ (host.tabs[0] as TimerPaneSettingTab).display(); await flush();
+ expect(host.settings.map(s => s.name)).toEqual(["Completion status"]);
 });

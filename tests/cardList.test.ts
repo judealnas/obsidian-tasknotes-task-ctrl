@@ -7,9 +7,10 @@ type Model = { sessionKey: string; title: string; state?: string };
 type Card = { card: HTMLElement; handle: HTMLButtonElement; model: Model; dispose: () => void };
 const a = { sessionKey: "a", title: "Same title" };
 const b = { sessionKey: "b", title: "Same title" };
-function setup() {
+function setup(withInsertion = false) {
 	const root = new Element();
 	const created: Card[] = [];
+	const insert = vi.fn();
 	const commit = vi.fn((keys: string[]) => { list.reconcile(keys.map(key => created.find(card => card.model.sessionKey === key)!.model)); });
 	const list = new CardList<Model, Card>(dom(root), {
 		key: model => model.sessionKey,
@@ -21,11 +22,46 @@ function setup() {
 		update: (card, model) => { card.model = model; },
 		dispose: card => card.dispose(),
 		commitOrder: commit,
+		insert: withInsertion ? insert : undefined,
+		scrollContainer: dom(root),
 	});
-	return { root, list, created, commit };
+	return { root, list, created, commit, insert };
 }
 beforeEach(resetViewHost);
 afterEach(() => vi.unstubAllGlobals());
+
+test("insertion buttons cover every position, survive refreshes, and reject retained clicks after removal", () => {
+	const s = setup(true); s.list.reconcile([]);
+	expect(s.root.querySelectorAll(".tntp-insert")).toHaveLength(1);
+	s.list.reconcile([a, b]);
+	const buttons = s.root.querySelectorAll(".tntp-insert");
+	expect(buttons).toHaveLength(3);
+	buttons.forEach(button => event(button, "click"));
+	expect(s.insert.mock.calls).toEqual([["a"], ["b"], [null]]);
+	s.list.reconcile([b]); event(buttons[0]!, "click");
+	expect(s.insert).toHaveBeenCalledTimes(3);
+	s.list.dispose(); event(buttons[1]!, "click");
+	expect(s.insert).toHaveBeenCalledTimes(3);
+});
+
+test("dragging at scroll edges scrolls repeatedly and stops on drag end and disposal", async () => {
+	vi.useFakeTimers();
+	try {
+		const s = setup(); s.list.reconcile([a, b]);
+		const handle = s.created[0]!.handle as unknown as Element;
+		event(handle, "dragstart", { dataTransfer: transfer() });
+		event(s.root, "dragover", { clientY: 99 });
+		await vi.advanceTimersByTimeAsync(64);
+		expect(s.root.scrollTop).toBeGreaterThan(0);
+		event(handle, "dragend"); const stopped = s.root.scrollTop;
+		await vi.advanceTimersByTimeAsync(64); expect(s.root.scrollTop).toBe(stopped);
+		event(handle, "dragstart"); event(s.root, "dragover", { clientY: 1 });
+		await vi.advanceTimersByTimeAsync(32); expect(s.root.scrollTop).toBeLessThan(stopped);
+		s.list.dispose(); const disposed = s.root.scrollTop;
+		await vi.advanceTimersByTimeAsync(64); expect(s.root.scrollTop).toBe(disposed);
+		expect(vi.getTimerCount()).toBe(0);
+	} finally { vi.useRealTimers(); }
+});
 test("keys distinguish equal titles, deduplicate repeats and support empty/single input", () => {
 	const s = setup(); s.list.reconcile([]); expect(s.created).toHaveLength(0);
 	s.list.reconcile([a]); expect(s.root.children).toHaveLength(1);

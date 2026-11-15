@@ -46,7 +46,7 @@ export function setup(initial: OpenTimer[] = [timer()], cardOrder = new CardOrde
 	const stagedOrder = new StagedOrderStore({ log: vi.fn() }); stagedOrder.load([]);
 	const completions = new CompletionStore({ persist: () => Promise.resolve() }); completions.load({});
 	const staging = new StagingStore({ gateway, completions, order: stagedOrder, schedule: (fn, ms) => { const timers = { setTimeout, clearTimeout }; const id = timers.setTimeout(fn, ms); return () => timers.clearTimeout(id); }, log: vi.fn() });
-	const stagingController = new StagingController({ gateway, staging, store: { refreshNow: () => Promise.resolve() }, queue: new WriteQueue(), timerBusy: controller.isBusy, settingsReady: () => Promise.resolve(), getSettings: () => ({ rolloverHour: 4, completionStatus: null }), newCorrelationId: () => "test", log: vi.fn() });
+	const stagingController = new StagingController({ gateway, staging, store: { refreshNow: () => Promise.resolve() }, queue: new WriteQueue(), timerBusy: controller.isBusy, settingsReady: () => Promise.resolve(), getSettings: () => ({ completionStatus: null }), newCorrelationId: () => "test", log: vi.fn() });
 	const view = new TimerPaneView({} as WorkspaceLeaf, { gateway, controller, completions, store, cardOrder, stagedOrder, staging: withStaging ? staging : undefined, stagingController: withStaging ? stagingController : undefined } as unknown as TimerPaneServices);
 	view.register(() => staging.dispose());
 	const root = view.contentEl as unknown as Element;
@@ -61,6 +61,22 @@ test("product display name changes while saved pane identity stays unchanged", (
  const s = setup();
  expect(s.view.getDisplayText()).toBe("TaskNotes Task Control");
  expect(s.view.getViewType()).toBe("tasknotes-timer-pane"); s.view.unload();
+});
+
+test("staged insertion buttons open the shared picker at the corresponding card or end", async () => {
+	const s = setup([], undefined, true);
+	s.gateway.setUserFields([{ id: "s", key: "staged", displayName: "Staged", type: "date" }]);
+	s.gateway.listTasks = () => Promise.resolve(["A.md", "B.md"].map(path => ({ path, title: path, status: "open", archived: false, staged: "2026-11-12" })));
+	await s.view.onOpen(); await s.staging.refreshNow(); await flush();
+	const buttons = s.root.querySelector(".tntp-panel--staged")!.querySelectorAll(".tntp-insert");
+	expect(buttons).toHaveLength(3);
+	for (const [index, beforePath] of ["A.md", "B.md", null].entries()) {
+		event(buttons[index]!, "click");
+		const picker = pickerHost.instances[pickerHost.instances.length - 1]!;
+		expect(picker.options).toMatchObject({ mode: "stage", beforePath }); picker.close();
+	}
+	s.busy(true); expect(buttons.every(button => button.disabled)).toBe(true);
+	await s.view.onClose(); s.view.unload();
 });
 
 test("mobile arrows reorder both owning lists, announce once and retain boundary focus", async () => {
@@ -112,33 +128,20 @@ test("empty and single mobile lists have no possible move and desktop creates no
  await desktop.view.onClose(); desktop.view.unload();
 });
 
-test("Done today shares title-only rows across leaves and disposes late renderers on reopen", async () => {
- const s = setup([], undefined, true);
- let status = "open";
+test("external completion removes a staged card without creating a Done today section", async () => {
+ const s = setup([], undefined, true); let status = "open";
  s.gateway.statuses = () => Promise.resolve([{ value: "done", label: "Done", isCompleted: true }]);
- s.gateway.listTasks = () => Promise.resolve([{ path: "External.md", title: "<b>Safe title</b>", status, archived: false, staged: "2026-11-12" }]);
- const other = new TimerPaneView({} as WorkspaceLeaf, { gateway: s.gateway, store: s.store, controller: s.controller, completions: s.completions, cardOrder: s.cardOrder, staging: s.staging } as unknown as TimerPaneServices);
- await s.view.onOpen(); await other.onOpen(); await s.staging.refreshNow();
- const done = s.root.querySelector(".tntp-done-today")!;
- expect(done.querySelector(".tntp-done-today__empty")!.textContent).toBe("Nothing completed yet");
+ s.gateway.listTasks = () => Promise.resolve([{ path: "External.md", title: "Task", status, archived: false, staged: "2026-11-12" }]);
+ await s.view.onOpen(); await s.staging.refreshNow();
+ expect(s.root.querySelector(".tntp-panel--staged")!.querySelectorAll(".tntp-card")).toHaveLength(1);
  status = "done"; await s.staging.refreshNow(); await flush();
- const row = done.querySelector(".tntp-done-today__row")!;
- expect(row.querySelectorAll("button")).toEqual([]);
- expect(row.querySelector(".tntp-staged-metadata")).toBeNull();
- expect(row.querySelector(".tntp-title")!.textContent).toBe("<b>Safe title</b>");
- expect((other.contentEl as unknown as Element).querySelectorAll(".tntp-done-today__row")).toHaveLength(1);
- expect(s.root.querySelector(".tntp-panel--timers")!.querySelector(".tntp-done-today")).toBeNull();
- event(row.querySelector(".tntp-title")!, "click");
- expect(workspace.openLinkText).toHaveBeenCalledWith("External.md", "", false);
- const render = viewHost.renders[viewHost.renders.length - 1]!;
- status = "open"; await s.staging.refreshNow(); render.resolve("link"); await flush();
- expect(done.querySelectorAll(".tntp-done-today__row")).toEqual([]);
- expect(render.component.unloads).toBe(1);
- expect(s.gateway.updateCalls).toEqual([]); expect(s.gateway.stopCalls).toEqual([]); expect(s.gateway.toggleCalls).toEqual([]);
- await s.view.onClose(); s.view.unload(); await other.onClose(); other.unload();
+ expect(s.root.querySelector(".tntp-panel--staged")!.querySelectorAll(".tntp-card")).toHaveLength(0);
+ expect(s.root.querySelector(".tntp-done-today")).toBeNull();
+ expect(s.gateway.updateCalls).toEqual([]);
+ await s.view.onClose(); s.view.unload();
 });
 
-test("ordinary pane completion removes its staged card and quietly adds a Done today title", async () => {
+test("ordinary pane completion removes its staged card without history UI", async () => {
  const s = setup([], undefined, true);
  let task: TaskInfo & { staged?: unknown } = { path: "A.md", title: "A", status: "open", archived: false, staged: "2026-11-12" };
  s.gateway.statuses = () => Promise.resolve([{ value: "done", label: "Done", isCompleted: true }]);
@@ -151,7 +154,7 @@ test("ordinary pane completion removes its staged card and quietly adds a Done t
  const queue = new WriteQueue();
  const realStore = new TimerStore({ gateway: s.gateway, log: vi.fn(), schedule: () => () => undefined });
  const timerController = new TimerController({ gateway: s.gateway, store: realStore, queue, notify, log: vi.fn(), newCorrelationId: () => "test" });
- const completion = new CompletionController({ gateway: s.gateway, queue, timer: timerController, notify, log: vi.fn(), newCorrelationId: () => "test", settingsReady: () => Promise.resolve(), getSettings: () => ({ completionStatus: "done", rolloverHour: 4 }), getRecords: () => s.completions.records(), storageAvailable: () => s.completions.available(), saveRecord: record => s.completions.saveRecord(record), clearPause: () => undefined, refresh: () => s.staging.refreshNow() });
+ const completion = new CompletionController({ gateway: s.gateway, queue, timer: timerController, notify, log: vi.fn(), newCorrelationId: () => "test", settingsReady: () => Promise.resolve(), getSettings: () => ({ completionStatus: "done" }), getRecords: () => s.completions.records(), storageAvailable: () => s.completions.available(), saveRecord: record => s.completions.saveRecord(record), clearPause: () => undefined, refresh: () => s.staging.refreshNow() });
  s.controller.complete.mockImplementation(async (...args: unknown[]) => { const target = args[0] as { taskPath: string; title: string }; await completion.complete({ sourcePath: target.taskPath, title: target.title }); });
  // The production card callback routes through TimerController's shared handler.
  (s.view as unknown as { services: TimerPaneServices }).services.completion = completion;
@@ -160,26 +163,22 @@ test("ordinary pane completion removes its staged card and quietly adds a Done t
  expect(button.disabled).toBe(false); event(button, "click");
  for (let i = 0; i < 30; i++) await flush();
  expect(s.root.querySelector(".tntp-panel--staged")!.querySelectorAll(".tntp-card")).toHaveLength(0);
- expect(s.root.querySelector(".tntp-done-today__row")!.querySelector(".tntp-title")!.textContent).toBe("A");
+ expect(s.root.querySelector(".tntp-done-today")).toBeNull();
  expect(notify).not.toHaveBeenCalled();
  await s.view.onClose(); s.view.unload(); realStore.dispose();
 });
 
-test("a hidden pane rolls cached lists at the boundary before its tick early return", async () => {
- vi.setSystemTime(new Date(2026, 10, 14, 3, 59, 59));
+test("a hidden pane updates calendar age across midnight without clearing staged cards", async () => {
+ vi.setSystemTime(new Date(2026, 10, 13, 23, 59, 59));
  const s = setup([], undefined, true);
- s.gateway.statuses = () => Promise.resolve([{ value: "done", label: "Done", isCompleted: true }]);
- s.gateway.listTasks = () => Promise.resolve([
-  { path: "A.md", title: "A", status: "done", archived: false, staged: "2026-11-12", completedDate: "2026-11-13" },
-  { path: "B.md", title: "B", status: "open", archived: false, staged: "2026-11-12" },
- ]);
+ s.gateway.listTasks = () => Promise.resolve([{ path: "B.md", title: "B", status: "open", archived: false, staged: "2026-11-12" }]);
  await s.view.onOpen(); await s.staging.refreshNow(); await flush();
- expect(s.root.querySelectorAll(".tntp-done-today__row")).toHaveLength(1);
+ expect(s.staging.getSnapshot().items[0]?.age).toBe(1);
  (s.view.contentEl as unknown as Element).shown = false;
  s.gateway.listTasks = () => Promise.reject(new Error("offline"));
  await vi.advanceTimersByTimeAsync(1000); await flush();
- expect(s.root.querySelectorAll(".tntp-done-today__row")).toHaveLength(0);
  expect(s.staging.getSnapshot().items[0]?.age).toBe(2);
+ expect(s.staging.getSnapshot().items).toHaveLength(1);
  expect(s.gateway.updateCalls).toEqual([]);
  await s.view.onClose(); s.view.unload();
 });

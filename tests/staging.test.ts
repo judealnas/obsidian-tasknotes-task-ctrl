@@ -1,6 +1,6 @@
 import { expect, test } from "vitest";
 import { daysStaged, deriveStaged, formatStagedDate, isStageReserved, parseStagedValue, readStaged } from "../src/model/staging";
-import { stagingDay } from "../src/model/stagingDay";
+import { calendarDate } from "../src/model/calendarDate";
 import type { TaskInfo } from "../src/tasknotes/runtime-api.types";
 declare const process: { env: Record<string, string | undefined> };
 const task = (extra: object = {}): TaskInfo => ({ path: "A.md", title: "A", status: "open", archived: false, ...extra });
@@ -22,7 +22,7 @@ test("eligibility, reservation, existence and stable incoming ties are separate"
 	expect(ages.map(item => item.age)).toEqual([0, 1, 2]);
 	expect(ages.map(item => item.metadata.split(" · ")[1])).toEqual(["today", "1 day ago", "2 days ago"]);
 });
-test("calendar ages and date display survive DST and staging-day rollover", () => {
+test("calendar ages and date display survive DST and local midnight", () => {
 	const original = process.env.TZ;
 	try {
 		for (const zone of ["UTC", "America/New_York", "Europe/London", "Australia/Lord_Howe"]) {
@@ -30,8 +30,8 @@ test("calendar ages and date display survive DST and staging-day rollover", () =
 			expect(daysStaged("2026-03-07", "2026-03-09")).toBe(2);
 			expect(daysStaged("2026-10-31", "2026-11-02")).toBe(2);
 			expect(formatStagedDate("2026-11-14")).toContain("14");
-			const before = stagingDay(new Date(2026, 10, 14, 3, 59).getTime(), 4);
-			const at = stagingDay(new Date(2026, 10, 14, 4).getTime(), 4);
+			const before = calendarDate(new Date(2026, 10, 13, 23, 59).getTime());
+			const at = calendarDate(new Date(2026, 10, 14, 0).getTime());
 			expect(deriveStaged([task({ staged: "2026-11-14" })], new Set(), before)).toHaveLength(0);
 			expect(deriveStaged([task({ staged: "2026-11-14" })], new Set(), at)[0]!.age).toBe(0);
 		}

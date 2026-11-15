@@ -12,6 +12,9 @@ export interface CardListOptions<K, C extends CardListCard> {
 	dispose: (card: C) => void;
 	commitOrder: (keys: string[]) => void;
 	onMove?: (card: C, position: number, count: number) => void;
+	insert?: (beforeKey: string | null) => void;
+	canInsert?: () => boolean;
+	scrollContainer?: HTMLElement;
 }
 
 /** Independent keyed instances and local drag authority. Sorting belongs to the caller. */
@@ -19,7 +22,36 @@ export class CardList<K, C extends CardListCard = CardListCard> {
 	private cards = new Map<string, C>();
 	private dragKey: string | null = null;
 	private disposed = false;
-	constructor(private readonly parent: HTMLElement, private readonly options: CardListOptions<K, C>) {}
+	private insertions = new Map<string | null, HTMLButtonElement>();
+	private scrollTimer: number | null = null;
+	private scrollY = 0;
+	private lastDragOver = 0;
+	constructor(private readonly parent: HTMLElement, private readonly options: CardListOptions<K, C>) {
+		options.scrollContainer?.addEventListener("dragover", this.scrollDragOver);
+		options.scrollContainer?.addEventListener("drop", this.stopScrolling);
+		options.scrollContainer?.addEventListener("dragleave", this.scrollDragLeave);
+	}
+	private scrollDragOver = (event: DragEvent): void => {
+		if (this.disposed || this.dragKey === null) return;
+		event.preventDefault();
+		this.scrollY = event.clientY; this.lastDragOver = Date.now();
+		if (this.scrollTimer === null) this.scrollTimer = window.setInterval(() => {
+			const container = this.options.scrollContainer;
+			if (!container || this.dragKey === null || Date.now() - this.lastDragOver > 500) { this.stopScrolling(); return; }
+			const rect = container.getBoundingClientRect();
+			const edge = Math.min(48, rect.height / 3);
+			const distance = this.scrollY < rect.top + edge ? this.scrollY - rect.top - edge
+				: this.scrollY > rect.bottom - edge ? this.scrollY - rect.bottom + edge : 0;
+			container.scrollTop += Math.max(-18, Math.min(18, distance / 3));
+		}, 16);
+	};
+	private scrollDragLeave = (event: DragEvent): void => {
+		if (!event.relatedTarget || !this.options.scrollContainer?.contains(event.relatedTarget as Node)) this.stopScrolling();
+	};
+	private stopScrolling = (): void => {
+		if (this.scrollTimer !== null) window.clearInterval(this.scrollTimer);
+		this.scrollTimer = null;
+	};
 	values(): IterableIterator<C> { return this.cards.values(); }
 	moveBy(key: string, delta: -1 | 1): boolean {
 		if (this.disposed || !this.cards.has(key)) return false;
@@ -50,10 +82,29 @@ export class CardList<K, C extends CardListCard = CardListCard> {
 		}
 		for (const [key, card] of this.cards) if (!next.has(key)) this.options.dispose(card);
 		this.cards = next;
-		if (this.dragKey !== null && !next.has(this.dragKey)) { this.dragKey = null; this.clearDragMarks(); }
+		if (this.dragKey !== null && !next.has(this.dragKey)) { this.dragKey = null; this.stopScrolling(); this.clearDragMarks(); }
+		const nodes: HTMLElement[] = [];
+		const positions = new Set<string | null>([...next.keys(), null]);
+		for (const [key, button] of this.insertions) if (!positions.has(key)) { button.detach(); this.insertions.delete(key); }
+		const insertion = (beforeKey: string | null) => {
+			if (!this.options.insert) return;
+			let button = this.insertions.get(beforeKey);
+			if (!button) {
+				button = this.parent.createEl("button", { cls: "tntp-insert", text: "+", attr: { "aria-label": beforeKey === null ? "Stage tasks at the end" : "Stage tasks here" } });
+				this.insertions.set(beforeKey, button);
+				const current = button;
+				button.addEventListener("click", () => {
+					if (!this.disposed && this.insertions.get(beforeKey) === current && !current.disabled) this.options.insert?.(beforeKey);
+				});
+			}
+			button.disabled = !(this.options.canInsert?.() ?? true);
+			nodes.push(button);
+		};
+		for (const [key, card] of next) { insertion(key); nodes.push(card.card); }
+		insertion(null);
 		let i = 0;
-		for (const card of next.values()) {
-			if (this.parent.children[i] !== card.card) this.parent.insertBefore(card.card, this.parent.children[i] ?? null);
+		for (const node of nodes) {
+			if (this.parent.children[i] !== node) this.parent.insertBefore(node, this.parent.children[i] ?? null);
 			i++;
 		}
 		i = 0;
@@ -65,6 +116,12 @@ export class CardList<K, C extends CardListCard = CardListCard> {
 		if (this.disposed) return;
 		this.disposed = true;
 		this.dragKey = null;
+		this.stopScrolling();
+		this.options.scrollContainer?.removeEventListener("dragover", this.scrollDragOver);
+		this.options.scrollContainer?.removeEventListener("drop", this.stopScrolling);
+		this.options.scrollContainer?.removeEventListener("dragleave", this.scrollDragLeave);
+		for (const button of this.insertions.values()) button.detach();
+		this.insertions.clear();
 		this.clearDragMarks();
 		for (const card of this.cards.values()) this.options.dispose(card);
 		this.cards.clear();
@@ -96,7 +153,7 @@ export class CardList<K, C extends CardListCard = CardListCard> {
 			}
 			card.addClass("tntp-card--dragging");
 		});
-		handle.addEventListener("dragend", () => { if (current()) { this.dragKey = null; this.clearDragMarks(); } });
+		handle.addEventListener("dragend", () => { if (current()) { this.dragKey = null; this.stopScrolling(); this.clearDragMarks(); } });
 		card.addEventListener("dragover", evt => {
 			if (!current() || this.dragKey === null || this.dragKey === key) return;
 			evt.preventDefault();
@@ -114,6 +171,7 @@ export class CardList<K, C extends CardListCard = CardListCard> {
 			const rect = card.getBoundingClientRect();
 			const after = evt.clientY > rect.top + rect.height / 2;
 			this.dragKey = null;
+			this.stopScrolling();
 			this.clearDragMarks();
 			this.commitMove(moveKey([...this.cards.keys()], dragKey, key, after), dragKey);
 		});

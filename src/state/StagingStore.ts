@@ -1,7 +1,7 @@
 import { normalizeTimerPath } from "../model/pomodoroOwnership";
 import { fieldStatus, type FieldStatus } from "../model/stagedField";
 import { deriveStaged, type StagedItem } from "../model/staging";
-import { isRolloverHour, stagingDay } from "../model/stagingDay";
+import { calendarDate } from "../model/calendarDate";
 import type { CompletionStore } from "./CompletionStore";
 import type { Schedule, TaskNotesGateway } from "../tasknotes/TaskNotesBridge";
 import { REFRESH_DEBOUNCE_MS } from "./TimerStore";
@@ -25,7 +25,6 @@ export interface StagingStoreDeps {
 	gateway: TaskNotesGateway;
 	schedule: Schedule;
 	log: (message: string) => void;
-	getRolloverHour?: () => number;
 	now?: () => number;
 	ready?: () => Promise<void>;
 	order?: StagedOrderStore;
@@ -39,7 +38,6 @@ export class StagingStore {
  private cachedTasks: TaskInfo[] | null = null;
  private completedStatuses: Set<string> | null = null;
  private day: string | null = null;
- private hour: number | null = null;
 	private snapshot: StagingSnapshot = { items: [], loaded: false, supported: false, field: { kind: "unknown" }, canStage: false, warning: "", authoritativePaths: null };
 	private generation = 0;
 	private disposed = false;
@@ -58,21 +56,18 @@ export class StagingStore {
 	}
 	getSnapshot(): StagingSnapshot { return this.snapshot; }
 	get revision(): number { return this.generation; }
- get currentDay(): string { return this.day ?? stagingDay((this.deps.now ?? Date.now)(), this.deps.getRolloverHour?.() ?? 4); }
+ get currentDay(): string { return this.day ?? calendarDate((this.deps.now ?? Date.now)()); }
  checkDay(nowMs = (this.deps.now ?? Date.now)()): boolean {
-  const configured = this.deps.getRolloverHour?.() ?? 4;
-  const hour = isRolloverHour(configured) ? configured : 4;
-  const day = stagingDay(nowMs, hour);
-  if (day === this.day && hour === this.hour) return false;
-  this.day = day; this.hour = hour; this.generation++;
+  const day = calendarDate(nowMs);
+  if (day === this.day) return false;
+  this.day = day; this.generation++;
   if (this.inFlight) this.dirty = true;
-  this.deps.completions?.rollover(day, nowMs);
   this.rederiveCached();
   return true;
  }
  private rederiveCached(): void {
   if (this.disposed || !this.cachedTasks || !this.completedStatuses) return;
-  const items = deriveStaged(this.cachedTasks, this.completedStatuses, this.currentDay).filter(item => !this.deps.completions?.isCompletedSource(item.taskPath, item.date));
+  const items = deriveStaged(this.cachedTasks, this.completedStatuses, this.currentDay).filter(item => !this.deps.completions?.isCompletedSource(item.taskPath, item.date, this.currentDay));
   this.snapshot = { ...this.snapshot, items }; this.notify();
  }
 	/** Successful explicit null write only; refreshes never mutate TaskNotes. */
@@ -155,16 +150,16 @@ export class StagingStore {
    const completedStatuses = new Set(statuses.value.filter(status => status?.isCompleted === true && typeof status.value === "string").map(status => status.value));
    let observedRevision = this.deps.completions?.revision;
    try {
-    const observation = this.deps.completions?.observe(fullTasks, completedStatuses, this.currentDay, (this.deps.now ?? Date.now)());
+    const observation = this.deps.completions?.observe(fullTasks, completedStatuses);
     observedRevision = this.deps.completions?.revision;
     await observation;
    }
-   catch { warning = "Couldn't save completion history. Showing the last available tasks."; }
+   catch { warning = "Couldn't refresh completion state. Showing the last available tasks."; }
    this.checkDay();
    if (this.disposed || gateway.getState().kind !== "ready") return;
    if (generation !== this.generation || observedRevision !== this.deps.completions?.revision) { this.dirty = true; return; }
    this.cachedTasks = fullTasks; this.completedStatuses = completedStatuses;
-			items = deriveStaged(fullTasks, this.completedStatuses, this.currentDay).filter(item => !this.deps.completions?.isCompletedSource(item.taskPath, item.date));
+			items = deriveStaged(fullTasks, this.completedStatuses, this.currentDay).filter(item => !this.deps.completions?.isCompletedSource(item.taskPath, item.date, this.currentDay));
 			// Only known vault renames earn reindex-gap retention. Filtered existing tasks do not.
 			for (const previous of this.snapshot.items) if (!paths?.has(previous.taskPath) && this.remaps.some(({ to }) => under(previous.taskPath, to)) && (!exists || exists(previous.taskPath))) items = [...items, previous];
 			const rawPaths = new Set(rawTasks?.map(task => normalizeTimerPath(task.path)));

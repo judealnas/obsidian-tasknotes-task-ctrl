@@ -15,7 +15,7 @@ interface PickerBase {
 }
 export type TaskPickerOptions = PickerBase & (
  { mode: "start"; controller: Pick<TimerController, "start" | "isBusy"> } |
- { mode: "stage"; controller: Pick<StagingController, "stage" | "isBusy"> }
+ { mode: "stage"; controller: Pick<StagingController, "stage" | "isBusy">; beforePath?: string | null }
 );
 
 export class TaskPickerModal extends SuggestModal<TaskInfo> {
@@ -145,7 +145,7 @@ export class TaskPickerModal extends SuggestModal<TaskInfo> {
   const opening = this.opening;
   this.inlineError?.setText("");
   try {
-   const outcome = await this.options.controller.stage({ taskPath: task.path, title: task.title });
+   const outcome = await this.options.controller.stage({ taskPath: task.path, title: task.title, beforePath: this.options.beforePath });
    if (!this.opened || opening !== this.opening) return;
    if (outcome.kind === "staged" || outcome.kind === "already-staged") {
     this.tasks = this.tasks.filter(candidate => normalizeTimerPath(candidate.path) !== normalizeTimerPath(task.path));

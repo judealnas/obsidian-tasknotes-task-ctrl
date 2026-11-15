@@ -18,19 +18,19 @@
 	min-height: var(--size-4-12);
 	padding: var(--size-4-1);
 }
-.tntp-done-today__row { margin-block: var(--size-4-2); }
-.tntp-done-today__row .tntp-title { padding-inline-end: 0; }
-
 .tntp-pane {
 	padding: var(--size-4-4);
 	max-width: 480px;
+	width: 100%;
+	min-width: 0;
+	box-sizing: border-box;
+	container: tntp-pane / inline-size;
 }
 
 /* Each panel owns its content state; hidden always wins over layout display. */
 .tntp-panel[hidden],
 .tntp-panel--running .tntp-message,
-.tntp-panel--timers:not(.tntp-panel--running) .tntp-cards,
-.tntp-panel--staged:not(.tntp-panel--has-staged) .tntp-cards {
+.tntp-panel--timers:not(.tntp-panel--running) .tntp-cards {
 	display: none;
 }
 
@@ -49,6 +49,7 @@
 
 .tntp-tabs .tntp-tabs__tab {
 	flex: 1;
+	min-width: 0;
 	background: transparent;
 	box-shadow: none;
 	border: 0;
@@ -56,6 +57,20 @@
 	border-bottom: var(--border-width) solid transparent;
 	color: var(--text-muted);
 }
+
+.tntp-tabs__count { margin-inline-start: 0.35em; }
+
+.tntp-insert {
+	width: 100%;
+	min-height: var(--input-height);
+	border-radius: var(--radius-m);
+	font-size: var(--font-ui-large);
+	color: var(--text-muted);
+}
+
+.tntp-panel--missing .tntp-insert,
+.tntp-panel--incompatible .tntp-insert,
+.tntp-panel--loading .tntp-insert { display: none; }
 
 .tntp-tabs .tntp-tabs__tab--active {
 	color: var(--text-normal);
@@ -79,7 +94,7 @@
 .tntp-card--idle .tntp-stat,
 .tntp-card--idle .tntp-stop,
 .tntp-staged-metadata:empty { display: none; }
-.tntp-staged-metadata { margin-block: var(--size-4-1); }
+.tntp-staged-metadata { margin-block: var(--size-4-1); overflow-wrap: anywhere; }
 .tntp-card:not(.tntp-card--staged) .tntp-unstage,
 .tntp-card--staged.tntp-card--paused .tntp-stop { display: none; }
 .tntp-card--staged .tntp-handle { inset-inline-end: calc(var(--size-4-6) + var(--size-4-3)); }
@@ -129,6 +144,8 @@
 }
 
 .tntp-card {
+	min-width: 0;
+	box-sizing: border-box;
 	background-color: var(--background-primary);
 	border: var(--border-width) solid var(--background-modifier-border);
 	border-radius: var(--radius-m);
@@ -232,7 +249,12 @@
 /* TaskNotes keeps inline chips on one line; let a long title wrap inside the card instead. */
 .tntp-pane .tntp-title .task-card--layout-inline {
 	white-space: normal;
+	min-width: 0;
+	max-width: 100%;
 }
+
+.tntp-title__md,
+.tntp-title__md .task-card__title { min-width: 0; max-width: 100%; overflow-wrap: anywhere; }
 
 /* Every chip in the pane is being tracked, so TaskNotes' tracking outline adds nothing here. */
 .tntp-pane .tntp-title .task-card--actively-tracked::before {
@@ -263,6 +285,7 @@
 
 .tntp-stat--total {
 	display: flex;
+	flex-wrap: wrap;
 	align-items: baseline;
 	gap: var(--size-4-2);
 	margin-top: var(--size-4-4);
@@ -279,25 +302,39 @@
 .tntp-actions {
 	margin-top: var(--size-4-4);
 	display: flex;
+	flex-wrap: wrap;
 	gap: var(--size-4-2);
 }
 
 .tntp-pause-resume,
 .tntp-stop,
 .tntp-complete {
-	flex: 1;
+	flex: 1 1 7rem;
+	min-width: 0;
+	max-width: 100%;
+	height: auto;
+	white-space: normal;
+	overflow-wrap: anywhere;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	gap: var(--size-4-1);
 	min-height: var(--input-height);
 }
 
-/* Paused cards keep their place and only change style (D-06): muted, with a "Paused" label. */
-.tntp-card--paused .tntp-title,
+.tntp-actions .svg-icon { flex-shrink: 0; }
+
+@container tntp-pane (max-width: 240px) {
+	.tntp-card .tntp-title {
+		padding-inline-end: 0;
+		padding-block-start: var(--size-4-6);
+	}
+}
+
+/* Paused cards keep their height; muted timer numbers indicate the state. */
 .tntp-card--paused .tntp-clock,
 .tntp-card--paused .tntp-total {
 	color: var(--text-muted);
-}
-
-.tntp-card:not(.tntp-card--paused) .tntp-card__paused {
-	display: none;
 }
 
 /* Message states (idle, loading, missing, incompatible) */

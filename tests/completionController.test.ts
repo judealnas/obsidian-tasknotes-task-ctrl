@@ -164,12 +164,12 @@ test("an occurrence with an unreadable active parent owner prevents completion",
  expect(await c.completion.complete({ sourcePath: occurrence.path, title: "Occurrence" })).toBe("unavailable");
  expect(c.tn.completeCalls).toHaveLength(0); expect(c.tn.stopCalls).toHaveLength(0);
 });
-test("a completion begun before rollover retains its captured day when confirmed after rollover", async () => {
- const before = new Date(2026, 10, 15, 3, 59, 59).getTime(); let now = before;
+test("a completion begun before midnight retains its calendar date when confirmed after midnight", async () => {
+ const before = new Date(2026, 10, 14, 23, 59, 59).getTime(); let now = before;
  const c = await setup(false, () => now);
  c.tn.setTasks([{ path, title: "Daily", status: "open", archived: false, recurrence: "FREQ=DAILY" }]);
  const persist = c.saveRecord.getMockImplementation()!;
- c.saveRecord.mockImplementation(async record => { await persist(record); now = new Date(2026, 10, 15, 4, 0, 1).getTime(); });
+ c.saveRecord.mockImplementation(async record => { await persist(record); now = new Date(2026, 10, 15, 0, 0, 1).getTime(); });
  expect(await c.completion.complete({ sourcePath: path, title: "Daily" })).toBe("completed");
  expect(c.tn.toggleCalls[0]?.date).toBe("2026-11-14");
  expect(c.records()[0]).toMatchObject({ requestDay: "2026-11-14", requestedAt: before, completedAt: before });

@@ -159,7 +159,6 @@ export class TaskCard extends Component {
 		const session = card.createDiv({ cls: ["tntp-stat", "tntp-stat--session"] });
 		session.createSpan({ cls: "tntp-label", text: "Session" });
 		const clock = session.createSpan({ cls: "tntp-clock", attr: { role: "timer", "aria-live": "off" } });
-		session.createSpan({ cls: ["tntp-label", "tntp-card__paused"], text: "Paused" });
 		const totalRow = card.createDiv({ cls: ["tntp-stat", "tntp-stat--total"] });
 		totalRow.createSpan({ cls: "tntp-label", text: "Total" });
 		const total = totalRow.createSpan({ cls: "tntp-total" });

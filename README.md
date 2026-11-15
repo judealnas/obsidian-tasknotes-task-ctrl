@@ -19,17 +19,16 @@ Version 0.3.0 adds **Staged** beside **Timers**, with independent saved order, t
 
 In TaskNotes settings → Task Properties → Custom User Fields, register **key `staged`**, type **Date**, with **no default value**. The key is fixed. Incorrect or unreadable setup disables Stage and explains how to recover; timer controls remain usable.
 
-- **Stage** opens a searchable batch picker. Picking a task appends it and keeps the picker open. Completed, archived and already-staged tasks are hidden.
-- Staging writes `staged: YYYY-MM-DD` through TaskNotes. Past staged dates carry forward; future dates stay hidden until that day. Cards show their staged age.
+- **Stage** opens a searchable batch picker. Picking a task appends it and keeps the picker open. Full-width **+** buttons before, between and after cards open the same picker at that position; multiple choices keep their selection order. Completed, archived and already-staged tasks are hidden.
+- Staging writes `staged: YYYY-MM-DD` through TaskNotes. Staged tasks stay until completed or unstaged; future dates stay hidden until that local calendar date. Cards show the number of calendar days since staging.
 - Start, pause, resume, stop or complete from each staged card. **✕** unstages immediately, stopping regular timing or clearing a saved pause while protecting Pomodoro timing. It writes `staged: null`.
-- **Complete** stops eligible regular timing before completion. Recurring tasks follow TaskNotes' resolved occurrence, which can differ from the requested staging day on an off-schedule request. Repeated pane completion is protected against replay. Failures use Notices; successful completion is quiet.
-- **Done today** contains clickable titles of staged tasks confirmed completed through the pane or observed completed elsewhere. Newest completions appear first; reopening removes a row. Observing completion never changes TaskNotes data.
-- **Rollover hour** in settings defaults to **4 AM**. Done today clears at that hour, and unfinished tasks keep their order and gain a day of age without frontmatter writes. Changing the hour updates cached lists immediately. Age uses calendar dates, including daylight-saving changes and several days away.
-- Drag a reorder handle or use its Up/Down keys. On mobile, left-side **▲/▼** controls move a card within its own tab; screen readers receive its new position.
+- **Complete** stops eligible regular timing before completion. Recurring tasks follow TaskNotes' resolved occurrence, which can differ from the requested calendar date on an off-schedule request. Repeated pane completion is protected against replay. Failures use Notices; successful completion is quiet.
+- There is no Done today section or rollover-hour setting. Midnight only updates the calendar age and reveals eligible future-dated tasks; it never clears the list or writes task frontmatter.
+- Drag a reorder handle or use its Up/Down keys. Dragging near the pane edges scrolls the list. On mobile, left-side **▲/▼** controls move a card within its own tab; screen readers receive its new position.
 
-External history has a limit: TaskNotes' date-only completion evidence cannot establish an exact unobserved completion time or reliably assign an early-morning completion to a staging day. After a cold start, historical rows use the recorded completion/occurrence date as a best-effort day and observation time for ordering. Live external transitions use their first observation time; `dateModified` is never presented as a completion timestamp.
+Completion safety records remain stored to avoid replaying uncertain or completed recurring writes. Refreshing the list does not collect external completion history.
 
-Staging and recurring completion require TaskNotes **4.13.0+** and the relevant public API capabilities. Missing materialization capabilities disable the affected action with an explanation. Regular timers retain the **4.10.0+** floor. Native Phase 7 recurrence checks so far cover **4.18.2** only. Actual overnight, physical sleep/wake, mobile-device and release-upgrade acceptance remain open while this candidate is under review.
+Staging and recurring completion require TaskNotes **4.13.0+** and the relevant public API capabilities. Missing materialization capabilities disable the affected action with an explanation. Regular timers retain the **4.10.0+** floor. Native Phase 7 recurrence checks so far cover **4.18.2** only. Physical mobile-device and published BRAT-upgrade acceptance remain open. The current source removes the beta.1 Done today and custom rollover features; their former acceptance checks are superseded.
 
 ### Timer controls
 

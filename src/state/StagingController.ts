@@ -1,6 +1,6 @@
 import { fieldStatus, STAGED_FIELD_KEY } from "../model/stagedField";
 import { isStageReserved } from "../model/staging";
-import { stagingDay } from "../model/stagingDay";
+import { calendarDate } from "../model/calendarDate";
 import { MUTATION_SOURCE, type TaskNotesGateway } from "../tasknotes/TaskNotesBridge";
 import type { TimerPaneSettings } from "../settings";
 import type { StagingStore } from "./StagingStore";
@@ -24,7 +24,7 @@ export interface StagingControllerDeps {
 	log: (message: string) => void;
 	now?: () => number;
 	/** Explicit action-only persistence seam, connected by the ordering plan. */
-	commitOrder?: (path: string, action: "stage" | "unstage") => Promise<void>;
+	commitOrder?: (path: string, action: "stage" | "unstage", beforePath?: string | null) => Promise<void>;
 	pauses?: PauseStore;
 	notify?: (message: string) => void;
 }
@@ -41,7 +41,7 @@ export class StagingController {
 	isBusy(): boolean { return this.pending; }
 	subscribeBusy(listener: () => void): () => void { this.listeners.add(listener); return () => { this.listeners.delete(listener); }; }
 	private busy(value: boolean): void { this.pending = value; for (const listener of [...this.listeners]) { try { listener(); } catch { this.deps.log("A staging action listener failed."); } } }
-	async stage(target: { taskPath: string; title: string }): Promise<StageOutcome> {
+	async stage(target: { taskPath: string; title: string; beforePath?: string | null }): Promise<StageOutcome> {
 		if (this.pending || this.deps.timerBusy()) return { kind: "busy", message: "Another task action is in progress. Try again." };
 		this.busy(true);
 		const { gateway, staging } = this.deps;
@@ -61,12 +61,12 @@ export class StagingController {
 				const latestTask = await gateway.getTask(target.taskPath);
 				if (revision !== staging.revision || !gateway.stagingAvailability().available || !latestTask || latestTask.archived || statuses.some(status => status.isCompleted && status.value === latestTask.status)) return { kind: "blocked", message: "This task changed while checking. Retry." };
 				if (isStageReserved(latestTask)) return { kind: "already-staged" };
-				const date = stagingDay((this.deps.now ?? Date.now)(), this.deps.getSettings().rolloverHour);
+				const date = calendarDate((this.deps.now ?? Date.now)());
 				staging.invalidate();
 				await gateway.updateTask(task.path, { [STAGED_FIELD_KEY]: date }, { source: MUTATION_SOURCE, reason: "user stage", correlationId: this.deps.newCorrelationId() });
 				staging.invalidate();
 				const outcome: StageOutcome = { kind: "staged" };
-				try { await this.deps.commitOrder?.(task.path, "stage"); }
+				try { await this.deps.commitOrder?.(task.path, "stage", target.beforePath); }
 				catch { outcome.warning = "Task staged, but its order couldn't be saved."; }
 				return outcome;
 			});

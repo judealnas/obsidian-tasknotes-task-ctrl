@@ -10,7 +10,6 @@ import { TimerPaneView, VIEW_TYPE_TIMER_PANE } from "./ui/TimerPaneView";
 import { DEFAULT_SETTINGS, loadSettings, type TimerPaneSettings } from "./settings";
 import { TimerPaneSettingTab } from "./ui/TimerPaneSettingTab";
 import { PAUSE_RECORDS_VERSION, loadPauseRecords } from "./model/pauseLedger";
-import { DEFAULT_ROLLOVER_HOUR, isRolloverHour } from "./model/stagingDay";
 import { StagingStore } from "./state/StagingStore";
 import { StagingController } from "./state/StagingController";
 import { StagedOrderStore, loadStagedOrder } from "./state/StagedOrderStore";
@@ -63,9 +62,6 @@ export default class TaskNotesTimerPanePlugin extends Plugin {
 				...this.extras,
     ...this.completions?.serialize(),
 				completionStatus: written.completionStatus,
-				// Omitted when default, so a user who never changes it keeps an unchanged data.json.
-				...(isRolloverHour(written.rolloverHour) && written.rolloverHour !== DEFAULT_ROLLOVER_HOUR
-					? { rolloverHour: written.rolloverHour } : {}),
 				pauseRecordsVersion: PAUSE_RECORDS_VERSION,
 				pauseRecords: this.pauses?.serialize() ?? [],
 				// Omitted when empty, so a user who never reorders keeps an unchanged data.json.
@@ -115,7 +111,7 @@ export default class TaskNotesTimerPanePlugin extends Plugin {
 		});
 		// The one serial queue every pane write goes through.
 		const queue = new WriteQueue();
-		const staging = new StagingStore({ gateway: bridge, log, schedule, completions, resolveLink: (reference, sourcePath) => this.app.metadataCache.getFirstLinkpathDest(reference.replace(/^\[\[|\]\]$/g, "").split("|")[0]!.split("#")[0]!, sourcePath)?.path ?? null, getRolloverHour: () => this.paneSettings.rolloverHour, ready: () => this.settingsReady, order: stagedOrder,
+		const staging = new StagingStore({ gateway: bridge, log, schedule, completions, resolveLink: (reference, sourcePath) => this.app.metadataCache.getFirstLinkpathDest(reference.replace(/^\[\[|\]\]$/g, "").split("|")[0]!.split("#")[0]!, sourcePath)?.path ?? null, ready: () => this.settingsReady, order: stagedOrder,
 			fileCheck: () => (layoutReady ? (path: string) => this.app.vault.getFileByPath(path) !== null : null) });
 		// The only place the plugin creates Notices; state and model code receive this function.
 		const notify = (message: string) => {
@@ -126,7 +122,7 @@ export default class TaskNotesTimerPanePlugin extends Plugin {
 			getSettings: () => this.paneSettings, settingsReady: () => this.settingsReady });
 		const stagingController = new StagingController({ gateway: bridge, store, staging, queue, newCorrelationId, log, pauses, notify,
 			getSettings: () => this.paneSettings, settingsReady: () => this.settingsReady, timerBusy: () => controller.isBusy(),
-			commitOrder: async (path, action) => { if (action === "stage") stagedOrder.append(path); else stagedOrder.removePath(path, false); await stagedOrder.commit(); } });
+			commitOrder: async (path, action, beforePath) => { if (action === "stage") stagedOrder.insertBefore(path, beforePath); else stagedOrder.removePath(path, false); await stagedOrder.commit(); } });
   const completion = new CompletionController({ gateway: bridge, queue, timer: controller, notify, log, newCorrelationId,
    settingsReady: () => this.settingsReady, getSettings: () => this.paneSettings,
    getRecords: () => completions.records(), storageAvailable: () => completions.available(),

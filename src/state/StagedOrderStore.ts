@@ -41,6 +41,12 @@ export class StagedOrderStore {
 		this.set([...next, ...remaining]);
 	}
 	append(path: string): void { if (this.replace([...this.order, path]) && !this.loaded) this.changedBeforeLoad = true; }
+	insertBefore(path: string, beforePath?: string | null): void {
+		const next = this.order.filter(item => item !== path);
+		const index = beforePath ? next.indexOf(beforePath) : -1;
+		next.splice(index < 0 ? next.length : index, 0, path);
+		if (this.replace(next) && !this.loaded) this.changedBeforeLoad = true;
+	}
 	removePath(path: string, persist = true): void {
 		const target = normalizeTimerPath(path); if (!target) return;
 		if (this.replace(this.order.filter(item => !under(item, target))) && persist) this.save();

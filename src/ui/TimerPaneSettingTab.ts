@@ -1,6 +1,5 @@
 import { Notice, PluginSettingTab, Setting, type App, type Plugin, type DropdownComponent } from "obsidian";
 import { resolveCompletionStatus, type TimerPaneSettings } from "../settings";
-import { ROLLOVER_HOURS, isRolloverHour, rolloverHourLabel } from "../model/stagingDay";
 import type { TaskNotesGateway } from "../tasknotes/TaskNotesBridge";
 import type { TaskStatus } from "../tasknotes/runtime-api.types";
 
@@ -44,21 +43,6 @@ export class TimerPaneSettingTab extends PluginSettingTab {
 					const choice = value === "default" ? null : completed[Number(value)]?.value;
 					if (choice !== undefined && generation === this.generation) {
 						void this.savePatch(dropdown, generation, { completionStatus: choice }, "Couldn't save the completion status. Try again.");
-					}
-				});
-			});
-		// Rendered whatever the TaskNotes status catalog did (D-04).
-		new Setting(this.containerEl)
-			.setName("Rollover hour")
-			.setDesc("The staging day starts at this hour. Earlier times count toward the previous day: with the default, 1:30 at night still counts as yesterday.")
-			.addDropdown(dropdown => {
-				for (const hour of ROLLOVER_HOURS) dropdown.addOption(String(hour), rolloverHourLabel(hour));
-				dropdown.setValue(String(this.deps.getSettings().rolloverHour));
-				dropdown.onChange(value => {
-					// Only an option value saves: the round trip rejects "", " 6" and "06", which Number() accepts.
-					const rolloverHour = Number(value);
-					if (isRolloverHour(rolloverHour) && String(rolloverHour) === value && generation === this.generation) {
-						void this.savePatch(dropdown, generation, { rolloverHour }, "Couldn't save the rollover hour. Try again.");
 					}
 				});
 			});

@@ -19,7 +19,7 @@ export function commandFixture() {
 	gateway.updateTask = async (path, patch, context) => { await update(path, patch, context); task = { ...task, ...patch }; };
 	const staging = new StagingStore({ gateway, log: vi.fn(), schedule: () => () => undefined, now: () => new Date(2026, 10, 14, 12).getTime() });
 	const queue = new WriteQueue(); const refreshNow = vi.fn(() => Promise.resolve());
-	const deps = { gateway, staging, store: { refreshNow }, queue, settingsReady: () => Promise.resolve(), getSettings: () => ({ completionStatus: null, rolloverHour: 4 }), timerBusy: () => false, log: vi.fn(), newCorrelationId: () => "test", now: () => new Date(2026, 10, 14, 12).getTime() };
+	const deps = { gateway, staging, store: { refreshNow }, queue, settingsReady: () => Promise.resolve(), getSettings: () => ({ completionStatus: null }), timerBusy: () => false, log: vi.fn(), newCorrelationId: () => "test", now: () => new Date(2026, 10, 14, 12).getTime() };
 	const controller = new StagingController(deps);
 	return { gateway, staging, queue, controller, deps, target, refreshNow, task: () => task, change: (patch: object) => { task = { ...task, ...patch }; } };
 }

@@ -1,6 +1,6 @@
 import { fieldStatus } from "../model/stagedField";
 import { parseStagedValue, readStaged } from "../model/staging";
-import { stagingDay } from "../model/stagingDay";
+import { calendarDate } from "../model/calendarDate";
 import { normalizeTimerPath, sameEntry, type EntryId } from "../model/pomodoroOwnership";
 import { isNoActiveSessionError } from "../model/errors";
 import { resolveCompletionStatus, type TimerPaneSettings } from "../settings";
@@ -55,7 +55,7 @@ export class CompletionController {
    if (!resolveCompletionStatus(await g.statuses(), this.deps.getSettings().completionStatus)) return { available: false, reason: "No completed status is available from TaskNotes." };
    const task = await g.getTask(target.sourcePath);
    if (!task || task.archived) return { available: false, reason: "This task is no longer available." };
-   const day = stagingDay((this.deps.now ?? Date.now)(), this.deps.getSettings().rolloverHour);
+   const day = calendarDate((this.deps.now ?? Date.now)());
    const record = this.record(normalizeTimerPath(target.sourcePath), day);
    if (record?.phase === "pending" || record?.phase === "uncertain") return { available: false, reason: "The previous completion could not be confirmed. Check this task in TaskNotes." };
    if (record?.phase === "confirmed") return { available: false, reason: "This task was already completed from the pane today." };
@@ -83,7 +83,7 @@ export class CompletionController {
      await this.deps.settingsReady();
      const sourcePath = normalizeTimerPath(target.sourcePath);
      if (!sourcePath || sourcePath !== target.sourcePath || !(await this.availability(target)).available) return "unavailable";
-     const requestDay = stagingDay(requestedAt, this.deps.getSettings().rolloverHour);
+     const requestDay = calendarDate(requestedAt);
      const previous = this.record(sourcePath, requestDay);
      if (previous) {
       if (previous.phase !== "cleanup-pending") return "unavailable";

@@ -48,13 +48,28 @@ import { WriteQueue } from "../src/state/WriteQueue";
 const task = { title: "Task", path: "Task.md", status: "open", archived: false, due: "2026-10-15" };
 const flush = async () => { await Promise.resolve(); await Promise.resolve(); await Promise.resolve(); };
 
+test("a batch picker passes its insertion anchor for every chosen task", async () => {
+	const gateway = createFakeGateway(); gateway.setState({ kind: "ready" });
+	const second = { ...task, path: "Second.md", title: "Second" };
+	gateway.listTasks = () => Promise.resolve([task, second]);
+	const stage = vi.fn(() => Promise.resolve({ kind: "staged" as const }));
+	const modal = new TaskPickerModal({} as App, { mode: "stage", gateway, controller: { stage, isBusy: () => false }, beforePath: "Anchor.md", onClose: vi.fn() });
+	modal.onOpen(); await flush();
+	for (const chosen of [task, second]) {
+		modal.selectSuggestion(chosen, {} as KeyboardEvent);
+		for (let i = 0; i < 4; i++) await flush();
+	}
+	expect(stage.mock.calls).toEqual([[{ taskPath: task.path, title: task.title, beforePath: "Anchor.md" }], [{ taskPath: second.path, title: second.title, beforePath: "Anchor.md" }]]);
+	modal.onClose();
+});
+
 test("Stage selection keeps the native public modal path open and preserves its newest query", async () => {
  const gateway = createFakeGateway(); let current = { ...task, staged: null as string | null };
  gateway.listTasks = () => Promise.resolve([current]); gateway.getTask = () => Promise.resolve(current);
  gateway.setUserFields([{ id: "s", key: "staged", type: "date", displayName: "Staged" }]);
  const original = gateway.updateTask.bind(gateway); gateway.updateTask = async (path, patch, context) => { await original(path, patch, context); current = { ...current, staged: patch.staged as string }; };
  const staging = new StagingStore({ gateway, log: vi.fn(), schedule: () => () => undefined, now: () => new Date(2026, 10, 14, 12).getTime() });
- const controller = new StagingController({ gateway, staging, store: { refreshNow: () => Promise.resolve() }, queue: new WriteQueue(), timerBusy: () => false, getSettings: () => ({ rolloverHour: 4, completionStatus: null }), settingsReady: () => Promise.resolve(), now: () => new Date(2026, 10, 14, 12).getTime(), newCorrelationId: () => "test", log: vi.fn() });
+ const controller = new StagingController({ gateway, staging, store: { refreshNow: () => Promise.resolve() }, queue: new WriteQueue(), timerBusy: () => false, getSettings: () => ({ completionStatus: null }), settingsReady: () => Promise.resolve(), now: () => new Date(2026, 10, 14, 12).getTime(), newCorrelationId: () => "test", log: vi.fn() });
  const closed = vi.fn(); const start = vi.fn();
  const modal = new TaskPickerModal({} as App, { mode: "stage", gateway, controller, onClose: closed });
  modal.onOpen(); await flush(); modal.inputEl.value = "Task";

@@ -3,7 +3,7 @@
 **Defined:** 2026-11-12
 **Core Value:** With the pane open, I can always see what task is being timed and how long I've spent on it, and stop, pause, or switch tasks in one to two clicks, without leaving the pane.
 
-Design sources: `.planning/research/STAGING-DECISIONS.md` (settled decisions; v0.3 resolutions at top), `.planning/research/SUMMARY.md` (research synthesis). "Today" / "staging day" always means the day as defined by the rollover hour, not the calendar date.
+Design sources: `.planning/research/STAGING-DECISIONS.md` (settled decisions; v0.3 resolutions at top), `.planning/research/SUMMARY.md` (research synthesis). Scope revised by user beta feedback on 2026-11-15: Today means the local calendar date. Done today and configurable rollover are removed; earlier phase artifacts remain historical.
 
 ## v0.3 Requirements
 
@@ -16,7 +16,7 @@ Design sources: `.planning/research/STAGING-DECISIONS.md` (settled decisions; v0
 
 ### Setup
 
-- [x] **SETUP-01**: User can set the rollover hour (default 4 AM, 0–23) in the existing settings tab; saving any one setting never resets another. The staged field key is fixed as `staged` (not configurable; Phase 4 discussion)
+- [x] **SETUP-01** (revised 2026-11-15): The staged field key remains fixed as `staged`. Completion settings save safely. The rollover-hour setting is removed and legacy values are retired on the next normal save.
 - [x] **SETUP-02**: If the `staged` key isn't registered as a TaskNotes **date** user field (checked via `catalog.userFields()`), the Staged tab shows a setup notice explaining how to register it (type date, no default value) and Stage is disabled; no write is attempted
 - [x] **SETUP-03**: If TaskNotes lacks the staging APIs (older than 4.13.0 or missing capability), the Staged tab explains why and the Timers tab keeps working as before
 
@@ -42,17 +42,17 @@ Design sources: `.planning/research/STAGING-DECISIONS.md` (settled decisions; v0
 - [x] **ORDER-03**: Staged order follows task renames, and deleted tasks drop out
 - [ ] **ORDER-04**: On mobile, ▲▼ buttons let the user reorder cards on both tabs
 
-### Completion & Done Today
+### Completion
 
 - [ ] **DONE-01**: ✓ on a non-recurring staged task completes it (configured completed status), stops its timer, and clears `staged`
-- [ ] **CTRL-13**: On either tab, ✓ on a recurring task completes only today's instance (staging day passed explicitly), never closes the series, and a repeated ✓ never un-completes it
-- [x] **DONE-02**: A "Done today" section on the Staged tab lists staged tasks completed today — from the pane (plugin's own record) or elsewhere (no write by the pane) — until rollover
+- [ ] **CTRL-13**: On either tab, ✓ on a recurring task completes only today's instance (local calendar date passed explicitly), never closes the series, and a repeated ✓ never un-completes it
+- **DONE-02 — Removed by user, 2026-11-15:** No Done today section or external completion-history collection. Completion safety records remain.
 
-### Rollover
+### Persistent staging and calendar age
 
-- [x] **ROLL-01**: The staging day starts at the rollover hour; at 1:30 AM it is still the previous day (DST-safe calendar math)
-- [ ] **ROLL-02**: Unfinished staged tasks roll forward to the next day with no writes, and their days-staged count increases
-- [ ] **ROLL-03**: Rollover takes effect promptly even if Obsidian was left open overnight or the machine slept
+- **ROLL-01 — Superseded, 2026-11-15:** Use local calendar dates with no custom boundary.
+- [x] **ROLL-02** (revised): Unfinished tasks stay staged in order until completed or unstaged. Calendar age updates without frontmatter writes.
+- **ROLL-03 — Removed by user, 2026-11-15:** No daily rollover feature; normal timer/wake refresh remains.
 
 ### Release
 
@@ -62,7 +62,7 @@ Design sources: `.planning/research/STAGING-DECISIONS.md` (settled decisions; v0
 
 Deferred; tracked but not in this roadmap.
 
-- **DONE-F1**: Undo ✓ from the Done today section
+- **DONE-F1 — Removed:** Done today is no longer part of the product.
 - **STAGE-F1**: "Stage" item in the Timers-card context menu
 - **SCARD-F1**: Total tracked time shown (muted) on idle staged cards
 - **HIST-F1**: Recent tasks, today's log, estimate progress
@@ -111,10 +111,10 @@ Which phases cover which requirements. Updated during roadmap creation.
 | ORDER-04 | Phase 7 | Pending |
 | DONE-01 | Phase 7 | Pending |
 | CTRL-13 | Phase 7 | Pending |
-| DONE-02 | Phase 7 | Complete |
-| ROLL-01 | Phase 4 | Complete |
-| ROLL-02 | Phase 7 | Pending |
-| ROLL-03 | Phase 7 | Pending |
+| DONE-02 | Phase 7 | Removed by user 2026-11-15 |
+| ROLL-01 | Phase 4 | Superseded: calendar dates |
+| ROLL-02 | Phase 7 | Revised: persistent staging / calendar age |
+| ROLL-03 | Phase 7 | Removed by user 2026-11-15 |
 | PANE-04 | Phase 7 | Pending |
 
 **Coverage:**

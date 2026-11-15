@@ -19,9 +19,11 @@ With the pane open, I can always see what task is being timed and how long I've 
 - Stage tasks from the ranked picker; unstage with ✕; staged state is a `staged: YYYY-MM-DD` TaskNotes user field (configurable key) written via `api.tasks.update`, with a setup notice if the field isn't registered
 - Staged cards: idle shows start / ✓ complete / ✕ unstage; running also shows elapsed, pause, stop; title opens the note, right-click opens TaskNotes' task menu
 - Independent, persisted manual order per tab (drag + ArrowUp/Down; up/down buttons on mobile); tasks staged elsewhere join at the bottom
-- Daily rollover at a configurable hour (default 4 AM): unfinished tasks roll forward without writes and show days staged
-- "Done today" section: completing clears `staged`; recurring tasks complete only today's instance
+- Persistent staging until completion or Unstage, with days-staged measured by local calendar dates; no configurable rollover hour
+- Completing clears `staged`; recurring tasks safely complete the resolved occurrence for the requested calendar date. No Done today history UI.
 - Rename display name to "TaskNotes Task Control"; release 0.3.0
+
+Beta feedback on 2026-11-15 supersedes earlier Done today/custom rollover decisions; see quick task 261115-gpo. Positional + insertion, drag scrolling and narrow-pane fixes are also in scope.
 
 Design source: `.planning/research/STAGING-DECISIONS.md` (grilling log; Q7/Q23/Q25 superseded by this milestone's choices).
 
