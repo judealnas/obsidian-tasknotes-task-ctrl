@@ -167,14 +167,14 @@ Plans:
   4. On mobile, ▲▼ buttons let the user reorder cards on both the Staged and Timers tabs.
   5. The plugin shows as "TaskNotes Task Control". The plugin id `tasknotes-timer-pane`, view type, command ids and saved data are unchanged, and upgrading from 0.2.0 through BRAT to the 0.3.0 release keeps the existing pause records and order.
 
-**Plans**: 1/6 plans executed across 6 execution waves
+**Plans**: 2/6 plans executed across 6 execution waves
 
 Plans:
 **Wave 1**
 - [x] 07-01-PLAN.md — Ordinary staged completion tracer and durable recovery (wave 1)
 
 **Wave 2** *(blocked on Wave 1 completion)*
-- [ ] 07-02-PLAN.md — Native recurrence contract, materialized completion and retries (wave 2)
+- [x] 07-02-PLAN.md — Native recurrence contract, materialized completion and retries (wave 2)
 
 **Wave 3** *(blocked on Wave 2 completion)*
 - [ ] 07-03-PLAN.md — Done today and quiet cached rollover (wave 3)
@@ -215,7 +215,7 @@ Phases execute in numeric order: 4 → 5 → 6 → 7 (Phases 4 and 5 are indepen
 | 4. Staging Foundations | v0.3 | 5/5 | Complete    | 2026-11-13 |
 | 5. Two-Tab Shell | v0.3 | 3/3 | Complete    | 2026-11-13 |
 | 6. Staged Tab Core | v0.3 | 5/5 | Complete    | 2026-11-14 |
-| 7. Complete, Roll Over & Release 0.3.0 | v0.3 | 1/6 | In Progress | - |
+| 7. Complete, Roll Over & Release 0.3.0 | v0.3 | 2/6 | In Progress | - |
 
 ## Backlog
 
