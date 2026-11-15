@@ -30,7 +30,8 @@
 /* Each panel owns its content state; hidden always wins over layout display. */
 .tntp-panel[hidden],
 .tntp-panel--running .tntp-message,
-.tntp-panel--timers:not(.tntp-panel--running) .tntp-cards {
+.tntp-panel--has-cards .tntp-message,
+.tntp-panel--timers:not(.tntp-panel--has-cards) .tntp-cards {
 	display: none;
 }
 
@@ -95,10 +96,10 @@
 .tntp-card--idle .tntp-stop,
 .tntp-staged-metadata:empty { display: none; }
 .tntp-staged-metadata { margin-block: var(--size-4-1); overflow-wrap: anywhere; }
-.tntp-card:not(.tntp-card--staged) .tntp-unstage,
+.tntp-card:not(.tntp-card--staged):not(.tntp-card--pending) .tntp-unstage,
 .tntp-card--staged.tntp-card--paused .tntp-stop { display: none; }
-.tntp-card--staged .tntp-handle { inset-inline-end: calc(var(--size-4-6) + var(--size-4-3)); }
-.tntp-card--staged .tntp-title { padding-inline-end: calc(var(--size-4-6) * 2); }
+.tntp-card--staged .tntp-handle, .tntp-card--pending .tntp-handle { inset-inline-end: calc(var(--size-4-6) + var(--size-4-3)); }
+.tntp-card--staged .tntp-title, .tntp-card--pending .tntp-title { padding-inline-end: calc(var(--size-4-6) * 2); }
 .tntp-unstage {
 	position: absolute;
 	inset-block-start: var(--size-4-2);

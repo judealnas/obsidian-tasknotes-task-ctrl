@@ -2,11 +2,11 @@ import { Component, MarkdownRenderer, Notice, SuggestModal, type App } from "obs
 import { filterAndSortTasks } from "../model/taskPicker";
 import { taskWikilink } from "../model/taskLink";
 import { normalizeTimerPath, type Ownership } from "../model/pomodoroOwnership";
-import type { TimerController } from "../state/TimerController";
 import type { TaskNotesGateway } from "../tasknotes/TaskNotesBridge";
 import type { TaskInfo } from "../tasknotes/runtime-api.types";
 import { isStageReserved } from "../model/staging";
 import type { StagingController } from "../state/StagingController";
+import type { TimerController } from "../state/TimerController";
 
 /** Each opening reads once; keystrokes rank the local snapshot through public SuggestModal. */
 interface PickerBase {
@@ -14,7 +14,9 @@ interface PickerBase {
  onClose: () => void;
 }
 export type TaskPickerOptions = PickerBase & (
+ /** Legacy constructor shape; callers must use add mode for selection. */
  { mode: "start"; controller: Pick<TimerController, "start" | "isBusy"> } |
+ { mode: "add"; controller: { add(task: TaskInfo): Promise<void>; isBusy(): boolean; availability(): { available: boolean; reason: string } } } |
  { mode: "stage"; controller: Pick<StagingController, "stage" | "isBusy">; beforePath?: string | null }
 );
 
@@ -40,7 +42,7 @@ export class TaskPickerModal extends SuggestModal<TaskInfo> {
   this.gateway = options.gateway;
   this.options = options;
   this.didClose = options.onClose;
-  this.setPlaceholder(options.mode === "stage" ? "Choose tasks to stage" : "Choose a task to start");
+  this.setPlaceholder(options.mode === "stage" ? "Choose tasks to stage" : "Choose a task to add");
   this.emptyStateText = "Loading tasks…";
  }
 
@@ -133,12 +135,12 @@ export class TaskPickerModal extends SuggestModal<TaskInfo> {
 
  onChooseSuggestion(task: TaskInfo): void {
   // SuggestModal may close before invoking this callback, so closed is not a veto.
-  if (this.options.mode !== "start" || this.chosen || this.options.controller.isBusy() || !this.gateway.startAvailability().available) return;
+  if (this.options.mode !== "add" || this.chosen || this.options.controller.isBusy() || !this.available()) return;
   this.chosen = true;
-  void this.options.controller.start({ taskPath: task.path, title: task.title });
+  void this.options.controller.add(task);
  }
 
- private available(): boolean { return (this.options.mode === "stage" ? this.gateway.stagingAvailability() : this.gateway.startAvailability()).available; }
+ private available(): boolean { return this.options.mode === "start" ? false : (this.options.mode === "stage" ? this.gateway.stagingAvailability() : this.options.controller.availability()).available; }
  private async stageSelection(task: TaskInfo): Promise<void> {
   if (this.options.mode !== "stage") return;
   this.pending = true;

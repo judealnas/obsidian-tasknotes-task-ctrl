@@ -32,10 +32,14 @@ import type { TaskNotesGateway } from "../tasknotes/TaskNotesBridge";
 import { TaskPickerModal } from "./TaskPickerModal";
 import type { CompletionController } from "../state/CompletionController";
 import type { CompletionStore } from "../state/CompletionStore";
+import { idleCardKey, type IdleCardStore } from "../state/IdleCardStore";
+
+const timerCardKey = (timer: TaskCardModel): string => timer.state === "idle" ? idleCardKey(timer.taskPath) : timer.sessionKey;
 
 export const VIEW_TYPE_TIMER_PANE = "tasknotes-timer-pane";
 
 export interface TimerPaneServices {
+ idleCards?: IdleCardStore;
  completions?: CompletionStore;
  completion?: CompletionController;
 	gateway: TaskNotesGateway;
@@ -83,7 +87,7 @@ export class TimerPaneView extends ItemView {
 	private readonly services: TimerPaneServices;
 	private els: PaneElements | null = null;
 	/** Cards by timer key, in display order. */
-	private cards: CardList<OpenTimer, TaskCard> | null = null;
+	private cards: CardList<TaskCardModel, TaskCard> | null = null;
 	private stagedCards: CardList<TaskCardModel, TaskCard> | null = null;
 	private tab: PaneTab = "timers";
 	private readonly paneId = `tntp-pane-${++nextPaneId}`;
@@ -164,8 +168,8 @@ export class TimerPaneView extends ItemView {
 		this.registerDomEvent(stagedButton, "click", () => this.selectTab("staged"));
 		this.registerDomEvent(timersButton, "click", () => this.selectTab("timers"));
 		const header = timersPanel.createDiv({ cls: "tntp-header" });
-		// D-02: Start task, Pause all, Resume all, Stop all; text labels in a wrapping row.
-		const start = header.createEl("button", { text: "Start task", cls: "tntp-start" });
+		// Add task, Pause all, Resume all, Stop all; text labels in a wrapping row.
+		const start = header.createEl("button", { text: "Add task", cls: "tntp-start" });
 		const pauseAll = header.createEl("button", { text: "Pause all", cls: "tntp-pause-all" });
 		const resumeAll = header.createEl("button", { text: "Resume all", cls: "tntp-resume-all" });
 		const stopAll = header.createEl("button", { text: "Stop all", cls: "tntp-stop-all" });
@@ -183,11 +187,11 @@ export class TimerPaneView extends ItemView {
 		const pomodoroNote = timersPanel.createDiv({ cls: ["tntp-label", "tntp-pomodoro-note"], text: "Can't check Pomodoro. Showing all timers." });
 		const cards = timersPanel.createDiv({ cls: "tntp-cards" });
 		this.cards = new CardList(cards, {
-			key: timer => timer.sessionKey,
-			create: (parent, timer) => new TaskCard(parent, timer, { app: this.app, gateway, controller: this.services.controller, completion: this.services.completion, isBusy: () => this.isBusy() }),
+			key: timerCardKey,
+			create: (parent, timer) => new TaskCard(parent, timer, { app: this.app, gateway, controller: this.services.controller, completion: this.services.completion, isBusy: () => this.isBusy(), removeIdle: path => this.services.idleCards!.remove(path), startIdle: (path, title) => this.services.idleCards!.start(path, title) }),
 			update: (card, timer) => card.update(timer, this.completionReady),
 			dispose: card => card.dispose(),
-			commitOrder: order => this.services.cardOrder.set(order),
+			commitOrder: order => this.services.cardOrder.reorder(order),
 			onMove: announceMove,
 			scrollContainer: this.contentEl,
 		});
@@ -218,6 +222,7 @@ export class TimerPaneView extends ItemView {
 		this.updateTabs();
 
 		this.register(store.subscribe(() => { this.render(); void this.refreshCompletion(); }));
+		if (this.services.idleCards) this.register(this.services.idleCards.subscribe(() => this.render()));
 		if (this.services.staging) this.register(this.services.staging.subscribe(() => this.render()));
 		if (this.services.completions) this.register(this.services.completions.subscribe(() => this.render()));
 		if (this.services.stagingController) this.register(this.services.stagingController.subscribeBusy(() => this.render()));
@@ -235,13 +240,16 @@ export class TimerPaneView extends ItemView {
 			this.tick();
 			store.requestRefresh();
 			this.services.staging?.requestRefresh();
+			void this.services.idleCards?.refresh();
 		});
 		this.registerDomEvent(this.containerEl.win, "focus", () => {
 			this.tick();
 			store.requestRefresh();
 			this.services.staging?.requestRefresh();
+			void this.services.idleCards?.refresh();
 		});
 		gateway.probe();
+		void this.services.idleCards?.refresh();
 		this.render();
 		void this.refreshCompletion();
 		return Promise.resolve();
@@ -318,16 +326,16 @@ export class TimerPaneView extends ItemView {
 	}
 
 	private openPicker(): void {
-  const { gateway, controller } = this.services;
-  if (this.picker || this.isBusy() || !gateway.startAvailability().available) return;
-  const modal = new TaskPickerModal(this.app, { mode: "start", gateway, controller, onClose: () => {
+  const { gateway, idleCards } = this.services;
+  if (this.picker || this.isBusy() || !idleCards?.availability().available) return;
+  const modal = new TaskPickerModal(this.app, { mode: "add", gateway, controller: idleCards, onClose: () => {
    if (this.picker === modal) this.picker = null;
   } });
   this.picker = modal;
   modal.open();
  }
 
-	private isBusy(): boolean { return this.services.controller.isBusy() || !!this.services.stagingController?.isBusy(); }
+	private isBusy(): boolean { return this.services.controller.isBusy() || !!this.services.stagingController?.isBusy() || !!this.services.idleCards?.isBusy(); }
 
 	private openStagePicker(beforePath?: string | null): void {
 		const { gateway, staging, stagingController } = this.services;
@@ -337,11 +345,14 @@ export class TimerPaneView extends ItemView {
 	}
 
 	/** Every open timer in display order (the saved order, new timers on top); none unless running. */
-	private currentTimers(): { state: PaneState; timers: OpenTimer[] } {
+	private currentTimers(): { state: PaneState; timers: TaskCardModel[] } {
 		const snapshot = this.services.store.getSnapshot();
 		const state = derivePaneState(this.services.gateway.getState(), snapshot);
-		if (state !== "running" || !snapshot?.primary) return { state, timers: [] };
-		return { state, timers: orderTimers([snapshot.primary, ...snapshot.others], this.services.cardOrder.get()) };
+		if (state !== "running" && state !== "idle") return { state, timers: [] };
+		const active: OpenTimer[] = snapshot?.primary ? [snapshot.primary, ...snapshot.others] : [];
+		const represented = new Set(active.map(timer => normalizeTimerPath(timer.taskPath)));
+		const idle = this.services.idleCards?.models().filter(timer => !represented.has(normalizeTimerPath(timer.taskPath))) ?? [];
+		return { state, timers: orderTimers<TaskCardModel>([...idle, ...active], this.services.cardOrder.get(), timerCardKey) };
 	}
 
 	private render(): void {
@@ -349,11 +360,11 @@ export class TimerPaneView extends ItemView {
 		if (!els) return;
 		const { state, timers } = this.currentTimers();
 		const connected = state === "running" || state === "idle";
-		const gate = this.services.gateway.startAvailability();
+		const gate = this.services.idleCards?.availability() ?? { available: false, reason: "Loading saved tasks" };
 		els.start.disabled = !connected || !gate.available || this.isBusy();
 		setTooltip(els.start, gate.reason);
 		const header = this.services.store.getHeaderState();
-		const busy = this.services.controller.isBusy() || !!this.services.stagingController?.isBusy();
+		const busy = this.isBusy();
 		const busyTip = "A timer action is in progress";
 		els.pauseAll.disabled = !connected || busy || !header.readable || header.eligibleCount === 0;
 		setTooltip(els.pauseAll, busy ? busyTip : !header.readable ? "Cannot verify Pomodoro ownership" : header.eligibleCount === 0 ? "No running timers to pause" : "Pause all running timers");
@@ -367,12 +378,13 @@ export class TimerPaneView extends ItemView {
 		const staging = this.services.staging?.getSnapshot();
 		const stagedPaths = new Set(connected ? staging?.items.map(item => item.taskPath) : []);
 		this.cards?.reconcile(timers.map(timer => ({ ...timer, stagedMarker: stagedPaths.has(normalizeTimerPath(timer.taskPath)) })));
+		els.tabs.timers.panel.toggleClass("tntp-panel--has-cards", connected && timers.length > 0);
 		const runningCount = connected ? header.eligibleCount : 0;
 		setTextIfChanged(els.tabs.staged.count, ` ${stagedPaths.size}`);
 		setTextIfChanged(els.tabs.timers.count, ` ${runningCount}`);
 		els.tabs.timers.count.toggleClass("tntp-tabs__count--running", runningCount > 0);
 		const stagedModels: TaskCardModel[] = connected ? orderStaged(staging?.items ?? [], this.services.stagedOrder?.get() ?? []).map(item => {
-			const matches = timers.filter(timer => normalizeTimerPath(timer.taskPath) === item.taskPath);
+			const matches = timers.filter(timer => timer.state !== "idle" && normalizeTimerPath(timer.taskPath) === item.taskPath);
 			const timed = matches.find(timer => timer.state === "running") ?? matches[0];
 			return { ...(timed ?? { state: "idle" as const, taskPath: item.taskPath, title: displayTitle(item.task.title, item.taskPath), displayKey: taskDisplayKey(item.task) }), stagedCard: true, stagedMetadata: item.metadata };
 		}) : [];
@@ -424,7 +436,7 @@ export class TimerPaneView extends ItemView {
 		switch (state) {
 			case "idle":
 				heading = "No task is being timed";
-				body = "Choose Start task above to start a timer.";
+				body = "Choose Add task above, then Start on its card when you are ready to time it.";
 				break;
 			case "loading":
 				body = "Connecting to TaskNotes…";

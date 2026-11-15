@@ -3,13 +3,13 @@ import { TaskTitle } from "./TaskTitle";
 import { formatHms, timerSessionMs, totalMs, type OpenTimer } from "../model/timeMath";
 import type { TimerPaneServices } from "./TimerPaneView";
 
-export interface IdleStagedCard {
+export interface IdleTaskCard {
 	state: "idle";
 	taskPath: string;
 	title: string;
 	displayKey: string;
 }
-export type TaskCardModel = (OpenTimer | IdleStagedCard) & { stagedMetadata?: string; stagedCard?: boolean; stagedMarker?: boolean };
+export type TaskCardModel = (OpenTimer | IdleTaskCard) & { stagedMetadata?: string; stagedCard?: boolean; stagedMarker?: boolean; pendingCard?: boolean };
 function cardKey(model: TaskCardModel): string { return model.state === "idle" ? model.taskPath : model.sessionKey; }
 
 export interface TaskCardOptions {
@@ -19,6 +19,8 @@ export interface TaskCardOptions {
  completion?: TimerPaneServices["completion"];
  isBusy?: () => boolean;
  unstage?: (target: { taskPath: string; title: string }) => Promise<unknown>;
+ removeIdle?: (path: string) => Promise<void>;
+ startIdle?: (path: string, title: string) => Promise<void>;
 }
 const STOP_LABEL = "Stop timer";
 const STOPPING_LABEL = "Stopping…";
@@ -92,9 +94,11 @@ export class TaskCard extends Component {
   setTextIfChanged(card.metadata, timer.stagedMetadata ?? (timer.stagedMarker ? "Staged" : ""));
   card.card.toggleClass("tntp-card--idle", timer.state === "idle");
   card.card.toggleClass("tntp-card--staged", !!timer.stagedCard);
+  card.card.toggleClass("tntp-card--pending", !!timer.pendingCard);
   this.updatePauseResume(card);
   const busy = this.isBusy();
-  card.unstage.disabled = busy || !this.options.unstage;
+  card.unstage.disabled = busy || (timer.pendingCard ? !this.options.removeIdle : !this.options.unstage);
+  setTooltip(card.unstage, timer.pendingCard ? "Remove task from Timers" : "Unstage task");
   card.complete.disabled = busy || !completionReady || !!timer.stagedCard || timer.state === "idle";
   setTooltip(card.complete, timer.stagedCard ? "Staged task completion will be available in a later update" : busy ? "A timer action is in progress" : completionReady ? "Complete this task and stop its timer" : "No completed status is available from TaskNotes");
   if (this.options.completion) {
@@ -175,7 +179,10 @@ export class TaskCard extends Component {
 			if (!current || pauseResume.disabled || this.isBusy()) return;
 			const model = current.timer;
 			const { taskPath, title } = model;
-			if (model.state === "idle") void this.options.controller.start({ taskPath, title });
+			if (model.state === "idle") {
+				if (model.pendingCard) void this.options.startIdle?.(taskPath, title);
+				else void this.options.controller.start({ taskPath, title });
+			}
 			else if (model.state === "paused") void this.options.controller.resume({ taskPath, title });
 			else void this.options.controller.pause({ taskPath, startTime: model.startTime, title });
 		});
@@ -194,7 +201,9 @@ export class TaskCard extends Component {
 		const unstage = card.createEl("button", { cls: "tntp-unstage", text: "✕" });
 		setTooltip(unstage, "Unstage task");
 		unstage.addEventListener("click", () => {
-			if (this.disposed || unstage.disabled || this.isBusy() || !this.elements.timer.stagedCard) return;
+			if (this.disposed || unstage.disabled || this.isBusy()) return;
+			if (this.elements.timer.pendingCard) { void this.options.removeIdle?.(this.elements.timer.taskPath); return; }
+			if (!this.elements.timer.stagedCard) return;
 			const { taskPath, title } = this.elements.timer;
 			void this.options.unstage?.({ taskPath, title });
 		});
@@ -261,8 +270,9 @@ export class TaskCard extends Component {
 			card.stop.toggleClass("mod-cta", !paused);
 		}
 		const busy = this.isBusy();
-		card.pauseResume.disabled = busy;
-		setTooltip(card.pauseResume, busy ? "A timer action is in progress" : idle ? "Start this task" : paused ? "Resume this timer" : "Pause this timer");
+		const gate = idle && card.timer.pendingCard ? this.options.gateway.startAvailability() : null;
+		card.pauseResume.disabled = busy || !!gate && !gate.available;
+		setTooltip(card.pauseResume, busy ? "A timer action is in progress" : gate && !gate.available ? gate.reason : idle ? "Start this task" : paused ? "Resume this timer" : "Pause this timer");
 	}
 
 

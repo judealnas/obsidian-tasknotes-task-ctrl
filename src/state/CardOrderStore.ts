@@ -2,6 +2,8 @@
  * Plugin-scoped card order, so it outlives the pane and is shared by every open pane.
  * main.ts creates exactly one. Runtime Obsidian-free so Vitest can load it.
  */
+import { normalizeTimerPath } from "../model/pomodoroOwnership";
+
 export interface CardOrderStoreDeps {
 	log: (message: string) => void;
 	/** Writes the order (main.ts merges it into data.json). Default: nothing to write. */
@@ -30,6 +32,24 @@ export class CardOrderStore {
 		return [...this.order];
 	}
 
+	/** Membership transitions share IdleCardStore's awaited save. */
+	prepend(key: string, visible: readonly string[] = []): void {
+		const known = new Set(this.order);
+		this.order = [...new Set([key, ...visible.filter(item => !known.has(item)), ...this.order.filter(item => item !== key)])]; this.notify();
+	}
+	replaceIdentity(from: string, to?: string): void {
+		if (!this.order.includes(from)) return;
+		this.order = [...new Set(this.order.flatMap(key => key === from ? to ? [to] : [] : key === to ? [] : [key]))]; this.notify();
+	}
+	changeIdlePath(from: string, to?: string): void {
+		this.order = [...new Set(this.order.flatMap(key => {
+			if (!key.startsWith("idle-task:")) return [key];
+			const path = normalizeTimerPath(key.slice("idle-task:".length));
+			if (path !== from && !path.startsWith(from + "/")) return [key];
+			return to === undefined ? [] : ["idle-task:" + to + path.slice(from.length)];
+		}))]; this.notify();
+	}
+
 	/** The stored order, once. An order set in memory before this call wins. */
 	load(order: readonly string[]): void {
 		if (this.loaded) return;
@@ -45,6 +65,12 @@ export class CardOrderStore {
 		this.notify();
 		if (this.loaded) this.save();
 		else this.changedBeforeLoad = true;
+	}
+	/** Reorder visible identities while keeping temporarily hidden pending slots. */
+	reorder(visible: readonly string[]): void {
+		const remaining = [...visible]; const shown = new Set(remaining);
+		const next = this.order.flatMap(key => shown.has(key) ? [remaining.shift()!] : key.startsWith("idle-task:") ? [key] : []);
+		this.set([...next, ...remaining]);
 	}
 
 	/** A plain copy for data.json. */
