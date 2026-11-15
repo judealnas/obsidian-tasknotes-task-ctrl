@@ -349,7 +349,7 @@ test("a real staged card joins running and paused timer sessions without replaci
 test("Start opens start-only options once and releases its guard after close and bridge loss", async () => {
 	const s = setup(); await s.view.onOpen(); await flush();
 	const start = s.root.querySelector(".tntp-start")!;
-	event(s.root.querySelector(".tntp-stage")!, "click"); expect(pickerHost.instances).toHaveLength(0);
+	event(s.root.querySelector(".tntp-insert")!, "click"); expect(pickerHost.instances).toHaveLength(0);
 	s.busy(true); event(start, "click"); expect(pickerHost.instances).toHaveLength(0); s.busy(false);
 	event(start, "click"); event(start, "click"); expect(pickerHost.instances).toHaveLength(1);
 	expect(pickerHost.instances[0]!.options.mode).toBe("start");
@@ -472,15 +472,15 @@ test("switches stable panels with independent actions and empty states", async (
 	event(tabs[0]!, "click");
 	expect(panels[1]!.getAttribute("hidden")).toBe("");
 	expect(panels[0]!.getAttribute("hidden")).toBeNull();
-	expect(panels[0]!.querySelector(".tntp-stage")!.disabled).toBe(true);
-	expect(panels[0]!.querySelector(".tntp-message__heading")!.textContent).toBe("Nothing staged for today");
-	expect(panels[0]!.querySelector(".tntp-message__body")!.textContent).toBe("Choose Stage above to pick today's tasks.");
+	expect(panels[0]!.querySelector(".tntp-insert")!.disabled).toBe(true);
+	expect(panels[0]!.querySelector(".tntp-message__heading")!.textContent).toBe("");
+	expect(panels[0]!.querySelector(".tntp-message__body")!.textContent).toBe("");
 	event(tabs[1]!, "click");
 	expect(s.root.querySelector(".tntp-card")).toBe(card);
 	event(tabs[0]!, "click");
 	for (const value of [[], null, [timer()]]) {
 		s.set(value); await flush();
-		expect(panels[0]!.querySelector(".tntp-message__heading")!.textContent).toBe(value === null ? "" : "Nothing staged for today");
+		expect(panels[0]!.querySelector(".tntp-message__heading")!.textContent).toBe("");
 	}
 	const current = s.root.querySelector(".tntp-card");
 	event(tabs[1]!, "click"); event(tabs[0]!, "click"); event(tabs[1]!, "click");

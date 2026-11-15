@@ -58,7 +58,6 @@ interface TabElements {
 	heading: HTMLElement;
 	body: HTMLElement;
 	meta: HTMLElement;
-	stage?: HTMLButtonElement;
 	retry?: HTMLButtonElement;
 }
 
@@ -144,10 +143,6 @@ export class TimerPaneView extends ItemView {
 		const timersCount = timersButton.createSpan({ cls: "tntp-tabs__count", text: " 0" });
 		const stagedPanel = root.createDiv({ cls: ["tntp-panel", "tntp-panel--staged"] });
 		const timersPanel = root.createDiv({ cls: ["tntp-panel", "tntp-panel--timers"] });
-		const stage = stagedPanel.createDiv({ cls: "tntp-header" }).createEl("button", { text: "Stage", cls: "tntp-stage" });
-		stage.disabled = true;
-		setTooltip(stage, "Staging isn't available yet");
-		this.registerDomEvent(stage, "click", () => this.openStagePicker());
 		const stagedList = stagedPanel.createDiv({ cls: "tntp-cards" });
 		this.stagedCards = new CardList(stagedList, {
 			key: timer => timer.taskPath,
@@ -205,7 +200,7 @@ export class TimerPaneView extends ItemView {
 		this.registerDomEvent(retry, "click", () => gateway.probe());
 
 		this.els = { root, start, pauseAll, resumeAll, stopAll, pomodoroNote, cards, heading, body, meta, tabs: {
-			staged: { button: stagedButton, count: stagedCount, panel: stagedPanel, heading: stagedHeading, body: stagedBody, meta: stagedMeta, stage, retry: stagedRetry },
+			staged: { button: stagedButton, count: stagedCount, panel: stagedPanel, heading: stagedHeading, body: stagedBody, meta: stagedMeta, retry: stagedRetry },
 			timers: { button: timersButton, count: timersCount, panel: timersPanel, heading, body, meta },
 		} };
 		for (const tab of ["staged", "timers"] as const) {
@@ -376,10 +371,6 @@ export class TimerPaneView extends ItemView {
 		setTextIfChanged(els.tabs.staged.count, ` ${stagedPaths.size}`);
 		setTextIfChanged(els.tabs.timers.count, ` ${runningCount}`);
 		els.tabs.timers.count.toggleClass("tntp-tabs__count--running", runningCount > 0);
-		if (els.tabs.staged.stage) {
-			els.tabs.staged.stage.disabled = !connected || !staging?.canStage || !this.services.stagingController || busy;
-			setTooltip(els.tabs.staged.stage, busy ? "A task action is in progress" : staging?.canStage ? "Stage tasks for today" : "Check the staged field setup below");
-		}
 		const stagedModels: TaskCardModel[] = connected ? orderStaged(staging?.items ?? [], this.services.stagedOrder?.get() ?? []).map(item => {
 			const matches = timers.filter(timer => normalizeTimerPath(timer.taskPath) === item.taskPath);
 			const timed = matches.find(timer => timer.state === "running") ?? matches[0];
@@ -388,12 +379,12 @@ export class TimerPaneView extends ItemView {
 		this.stagedCards?.reconcile(stagedModels);
 		const staged = els.tabs.staged;
 		if (connected) {
-			setTextIfChanged(staged.heading, "Nothing staged for today");
-			setTextIfChanged(staged.body, "Choose Stage above to pick today's tasks.");
+			setTextIfChanged(staged.heading, "");
+			setTextIfChanged(staged.body, "");
 			setTextIfChanged(staged.meta, "");
 			if (staging) {
-				let heading = staging.items.length ? "" : staging.loaded ? "Nothing staged for today" : "Loading staged tasks…";
-				let body = staging.items.length ? "" : "Choose Stage above to pick today's tasks.";
+				let heading = staging.loaded ? "" : "Loading staged tasks…";
+				let body = "";
 				if (!staging.supported) { heading = "Staging needs a TaskNotes update"; body = "Staging requires TaskNotes 4.13.0 or newer and the staging APIs. Update TaskNotes to use this tab."; }
 				else if (staging.field.kind === "missing" || staging.field.kind === "wrong-type") { heading = "Set up the staged field"; body = "In TaskNotes settings → Task Properties → Custom User Fields, register key staged with type Date and no default value."; }
 				else if (staging.field.kind === "ok" && staging.field.hasDefault) { heading = "Remove the staged field default"; body = "In TaskNotes settings → Task Properties → Custom User Fields, remove the default value from the staged Date field. Existing tasks remain usable."; }

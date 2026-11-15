@@ -17,9 +17,9 @@ Version 0.3.0 adds **Staged** beside **Timers**, with independent saved order, t
 
 ### Daily staging
 
-In TaskNotes settings → Task Properties → Custom User Fields, register **key `staged`**, type **Date**, with **no default value**. The key is fixed. Incorrect or unreadable setup disables Stage and explains how to recover; timer controls remain usable.
+In TaskNotes settings → Task Properties → Custom User Fields, register **key `staged`**, type **Date**, with **no default value**. The key is fixed. Incorrect or unreadable setup disables the + controls and explains how to recover; timer controls remain usable.
 
-- **Stage** opens a searchable batch picker. Picking a task appends it and keeps the picker open. Full-width **+** buttons before, between and after cards open the same picker at that position; multiple choices keep their selection order. Completed, archived and already-staged tasks are hidden.
+- Full-width **+** buttons open a searchable batch picker before, between or after staged cards. The empty Staged tab shows a single + button. Multiple choices keep their selection order and the picker stays open. Completed, archived and already-staged tasks are hidden.
 - Staging writes `staged: YYYY-MM-DD` through TaskNotes. Staged tasks stay until completed or unstaged; future dates stay hidden until that local calendar date. Cards show the number of calendar days since staging.
 - Start, pause, resume, stop or complete from each staged card. **✕** unstages immediately, stopping regular timing or clearing a saved pause while protecting Pomodoro timing. It writes `staged: null`.
 - **Complete** stops eligible regular timing before completion. Recurring tasks follow TaskNotes' resolved occurrence, which can differ from the requested calendar date on an off-schedule request. Repeated pane completion is protected against replay. Failures use Notices; successful completion is quiet.
