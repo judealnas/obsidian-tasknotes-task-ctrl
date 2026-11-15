@@ -1,5 +1,5 @@
 ---
-status: awaiting_human_verify
+status: diagnosed
 trigger: User beta.2 note reports delayed/stale native TaskNotes status bar after pane start/stop.
 created: 2026-11-15
 updated: 2026-11-15
@@ -19,9 +19,11 @@ updated: 2026-11-15
 ## Current Focus
 
 hypothesis: Confirmed TaskNotes status-bar query caches completed results for five seconds and the ticker renders retained task snapshots.
-next_action: Source fix is verified and packaged. Confirm the vault and running TaskNotes version exhibiting the bug before any real installation; Personal Vault disk version is 4.13.0 while the tested fix targets 4.18.2. Await real-workflow confirmation before resolving.
+next_action: User explicitly rejected modifying TaskNotes. Do not develop, install, publish or resume the upstream patch. The status-bar issue remains diagnosed; any future remedy must stay within our plugin and supported public APIs.
 
 ## Boundaries
+
+**User scope correction:** The user explicitly said "I do not want to modify TaskNotes." The local upstream patch and test build below are historical experiments, not an accepted remedy or installation candidate. No further TaskNotes source or installed-plugin changes are authorized. Do not delete the checkout/artifacts without a separate request. Installed TaskNotes was never changed outside the disposable dev-vault test; those test changes were restored completely.
 
 Diagnose before choosing a remedy. No Personal Vault timer/task mutations. Preserve supported public API integration; do not patch TaskNotes internals or manually broadcast private events as a workaround. Use durable backups and disk-only restoration for sandbox mutations; compare existing API state with DOM evidence.
 
