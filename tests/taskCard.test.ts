@@ -8,17 +8,34 @@ import { createFakeGateway } from "./fakes/fakeGateway";
 import { Element, dom, event, flush, resetViewHost, viewHost, workspace } from "./fakes/viewHost";
 
 const model: OpenTimer = { taskPath: "Folder/A.md", title: "<script>title</script>", startTime: "entry1", startMs: 1000, state: "running", sessionStartedAt: "first", sessionKey: "a", sortMs: 1000, accumulatedMs: 2000, segmentStartMs: 1000, totalKnown: true, entries: [{ startMs: 1000, endMs: null }], displayKey: "" };
-function setup(unstage?: (target: { taskPath: string; title: string }) => Promise<unknown>) {
+function setup(unstage?: (target: { taskPath: string; title: string }) => Promise<unknown>, completion?: TimerPaneServices["completion"]) {
 	let busy = false;
 	const controller = { isBusy: () => busy, start: vi.fn(() => Promise.resolve()), pause: vi.fn(() => Promise.resolve()), resume: vi.fn(() => Promise.resolve()), stop: vi.fn(() => Promise.resolve()), stopPaused: vi.fn(() => Promise.resolve()), complete: vi.fn(() => Promise.resolve()) };
 	const gateway = createFakeGateway();
 	const root = new Element();
-	const card = new TaskCard(dom(root), model, { app: { workspace } as unknown as App, gateway, controller: controller as unknown as TimerPaneServices["controller"], unstage });
+	const card = new TaskCard(dom(root), model, { app: { workspace } as unknown as App, gateway, controller: controller as unknown as TimerPaneServices["controller"], unstage, completion });
 	card.update(model, true);
 	return { card, root, el: root.children[0]!, controller, gateway, busy(value: boolean) { busy = value; card.update(card.currentModel, true); } };
 }
 beforeEach(resetViewHost);
 afterEach(() => vi.unstubAllGlobals());
+
+test("coordinated completion supports staged idle/running/paused targets and explains unavailable controls", async () => {
+ const availability = vi.fn(() => Promise.resolve({ available: true, reason: "Complete this task" }));
+ const s = setup(undefined, { availability } as unknown as TimerPaneServices["completion"]);
+ for (const state of ["idle", "running", "paused"] as const) {
+  const timer = state === "idle" ? { state, taskPath: "Idle.md", title: "Idle", displayKey: "" } : { ...model, state };
+  s.card.update({ ...timer, stagedCard: true }, true); await flush();
+  const button = s.el.querySelector(".tntp-complete")!;
+  expect(button.disabled).toBe(false); event(button, "click");
+  expect(s.controller.complete).toHaveBeenLastCalledWith({ taskPath: timer.taskPath, title: timer.title, ...(state === "idle" ? {} : { startTime: model.startTime }) });
+ }
+ availability.mockResolvedValue({ available: false, reason: "Previous completion needs checking" });
+ s.card.update(model, true); await flush();
+ expect(s.el.querySelector(".tntp-complete")!.disabled).toBe(true);
+ expect(s.el.querySelector(".tntp-complete")!.getAttribute("aria-label")).toBe("Previous completion needs checking");
+ s.card.dispose();
+});
 
 test("staged completion never dispatches, and separate Unstage reads the newest model", () => {
 	const unstage = vi.fn(() => Promise.resolve()); const s = setup(unstage);

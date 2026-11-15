@@ -30,10 +30,12 @@ import type { TimerController } from "../state/TimerController";
 import type { TimerStore } from "../state/TimerStore";
 import type { TaskNotesGateway } from "../tasknotes/TaskNotesBridge";
 import { TaskPickerModal } from "./TaskPickerModal";
+import type { CompletionController } from "../state/CompletionController";
 
 export const VIEW_TYPE_TIMER_PANE = "tasknotes-timer-pane";
 
 export interface TimerPaneServices {
+ completion?: CompletionController;
 	gateway: TaskNotesGateway;
 	store: TimerStore;
 	cardOrder: CardOrderStore;
@@ -145,7 +147,7 @@ export class TimerPaneView extends ItemView {
 		const stagedList = stagedPanel.createDiv({ cls: "tntp-cards" });
 		this.stagedCards = new CardList(stagedList, {
 			key: timer => timer.taskPath,
-			create: (parent, timer) => new TaskCard(parent, timer, { app: this.app, gateway, controller: this.services.controller, isBusy: () => this.isBusy(), unstage: this.services.stagingController ? target => this.services.stagingController!.unstage(target) : undefined }),
+			create: (parent, timer) => new TaskCard(parent, timer, { app: this.app, gateway, controller: this.services.controller, completion: this.services.completion, isBusy: () => this.isBusy(), unstage: this.services.stagingController ? target => this.services.stagingController!.unstage(target) : undefined }),
 			update: (card, timer) => card.update(timer, false),
 			dispose: card => card.dispose(),
 			commitOrder: order => this.services.stagedOrder?.reorder(order),
@@ -179,7 +181,7 @@ export class TimerPaneView extends ItemView {
 		const cards = timersPanel.createDiv({ cls: "tntp-cards" });
 		this.cards = new CardList(cards, {
 			key: timer => timer.sessionKey,
-			create: (parent, timer) => new TaskCard(parent, timer, { app: this.app, gateway, controller: this.services.controller, isBusy: () => this.isBusy() }),
+			create: (parent, timer) => new TaskCard(parent, timer, { app: this.app, gateway, controller: this.services.controller, completion: this.services.completion, isBusy: () => this.isBusy() }),
 			update: (card, timer) => card.update(timer, this.completionReady),
 			dispose: card => card.dispose(),
 			commitOrder: order => this.services.cardOrder.set(order),

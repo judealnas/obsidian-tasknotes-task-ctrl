@@ -14,9 +14,11 @@ import { DEFAULT_ROLLOVER_HOUR, isRolloverHour } from "./model/stagingDay";
 import { StagingStore } from "./state/StagingStore";
 import { StagingController } from "./state/StagingController";
 import { StagedOrderStore, loadStagedOrder } from "./state/StagedOrderStore";
+import { CompletionController } from "./state/CompletionController";
+import { CompletionStore } from "./state/CompletionStore";
 
 /** The data.json keys this plugin owns; everything else is kept as found. */
-const OWNED_KEYS = new Set(["completionStatus", "rolloverHour", "pauseRecordsVersion", "pauseRecords", "cardOrder", "stagedOrder"]);
+const OWNED_KEYS = new Set(["completionStatus", "rolloverHour", "pauseRecordsVersion", "pauseRecords", "cardOrder", "stagedOrder", "completionRecordsVersion", "completionRecords"]);
 
 function extrasOf(data: unknown): Record<string, unknown> {
 	if (typeof data !== "object" || data === null || Array.isArray(data)) return {};
@@ -33,6 +35,7 @@ declare module "obsidian" {
 }
 
 export default class TaskNotesTimerPanePlugin extends Plugin {
+ private completions: CompletionStore | null = null;
 	private paneSettings: TimerPaneSettings = { ...DEFAULT_SETTINGS };
 	private settingsReady: Promise<void> = Promise.resolve();
 	private pauses: PauseStore | null = null;
@@ -58,6 +61,7 @@ export default class TaskNotesTimerPanePlugin extends Plugin {
 			const stagedOrder = this.stagedOrder?.serialize() ?? [];
 			await this.saveData({
 				...this.extras,
+    ...this.completions?.serialize(),
 				completionStatus: written.completionStatus,
 				// Omitted when default, so a user who never changes it keeps an unchanged data.json.
 				...(isRolloverHour(written.rolloverHour) && written.rolloverHour !== DEFAULT_ROLLOVER_HOUR
@@ -98,6 +102,8 @@ export default class TaskNotesTimerPanePlugin extends Plugin {
 		this.cardOrder = cardOrder;
 		const stagedOrder = new StagedOrderStore({ log, persist: () => this.persistAll() });
 		this.stagedOrder = stagedOrder;
+  const completions = new CompletionStore({ persist: () => this.persistAll() });
+  this.completions = completions;
 		// The vault can only tell a deleted note from one not yet indexed once the layout is ready (Pitfall 2).
 		let layoutReady = false;
 		const store = new TimerStore({
@@ -121,6 +127,14 @@ export default class TaskNotesTimerPanePlugin extends Plugin {
 		const stagingController = new StagingController({ gateway: bridge, store, staging, queue, newCorrelationId, log, pauses, notify,
 			getSettings: () => this.paneSettings, settingsReady: () => this.settingsReady, timerBusy: () => controller.isBusy(),
 			commitOrder: async (path, action) => { if (action === "stage") stagedOrder.append(path); else stagedOrder.removePath(path, false); await stagedOrder.commit(); } });
+  const completion = new CompletionController({ gateway: bridge, queue, timer: controller, notify, log, newCorrelationId,
+   settingsReady: () => this.settingsReady, getSettings: () => this.paneSettings,
+   getRecords: () => completions.records(), storageAvailable: () => completions.available(),
+   saveRecord: record => completions.saveRecord(record),
+   otherBusy: () => stagingController.isBusy(), clearPause: path => pauses.remove(path),
+   refresh: async () => { await Promise.all([store.refreshNow(), staging.refreshNow()]); } });
+  controller.setCompletionHandler(target => completion.complete({ sourcePath: target.taskPath, title: target.title,
+   entry: target.startTime ? { taskPath: target.taskPath, startTime: target.startTime } : undefined }));
 		this.register(() => {
 			store.dispose();
 			staging.dispose();
@@ -128,15 +142,16 @@ export default class TaskNotesTimerPanePlugin extends Plugin {
 		});
 
 		// Registered synchronously so Obsidian can restore a saved pane leaf (PANE-03).
-		this.registerView(VIEW_TYPE_TIMER_PANE, (leaf) => new TimerPaneView(leaf, { gateway: bridge, store, controller, cardOrder, stagedOrder, staging, stagingController }));
+		this.registerView(VIEW_TYPE_TIMER_PANE, (leaf) => new TimerPaneView(leaf, { gateway: bridge, store, controller, completion, cardOrder, stagedOrder, staging, stagingController }));
 		this.settingsReady = this.loadData().then((data: unknown) => {
 			this.paneSettings = loadSettings(data);
 			this.fileSettings = { ...this.paneSettings };
 			this.extras = extrasOf(data);
+   completions.load(data);
 			pauses.load(loadPauseRecords(data));
 			cardOrder.load(loadCardOrder(data));
 			stagedOrder.load(loadStagedOrder(data));
-		}).catch(() => { log("Loading timer pane settings failed; using defaults."); pauses.load([]); cardOrder.load([]); stagedOrder.load([]); });
+		}).catch(() => { completions.load({ completionRecordsVersion: "unreadable" }); log("Loading timer pane settings failed; using defaults."); pauses.load([]); cardOrder.load([]); stagedOrder.load([]); });
 		this.addSettingTab(new TimerPaneSettingTab(this.app, this, {
 			gateway: bridge,
 			getSettings: () => this.paneSettings,

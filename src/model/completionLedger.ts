@@ -1,0 +1,43 @@
+import { normalizeTimerPath } from "./pomodoroOwnership";
+import { parseStagedValue } from "./staging";
+
+export const COMPLETION_RECORDS_VERSION = 1;
+export type CompletionPhase = "pending" | "uncertain" | "confirmed" | "cleanup-pending";
+export interface CompletionAttempt {
+ attemptId: string;
+ sourcePath: string;
+ requestDay: string;
+ requestedAt: number;
+ resolvedDate?: string;
+ completedPath?: string;
+ completedAt?: number;
+ beforeEvidence: { status: string; staged: string | null; title: string; completedStatus: string };
+ phase: CompletionPhase;
+ pendingCleanupPaths: string[];
+}
+export interface CompletionData { completionRecordsVersion?: unknown; completionRecords?: unknown; }
+export interface LoadedCompletions { records: CompletionAttempt[]; initialized: boolean; quarantine?: CompletionData; }
+function object(value: unknown): value is Record<string, unknown> { return value !== null && typeof value === "object" && !Array.isArray(value); }
+function path(value: unknown): value is string {
+ return typeof value === "string" && !!value && normalizeTimerPath(value) === value && !value.split("/").some(p => p === "." || p === "..") && ![...value].some(c => c.charCodeAt(0) < 32);
+}
+function valid(value: unknown): value is CompletionAttempt {
+ if (!object(value)) return false;
+ const b = value.beforeEvidence;
+ if (typeof value.attemptId !== "string" || !value.attemptId.trim() || !path(value.sourcePath) || !parseStagedValue(value.requestDay) || typeof value.requestedAt !== "number" || !Number.isFinite(value.requestedAt)) return false;
+ if (!["pending", "uncertain", "confirmed", "cleanup-pending"].includes(String(value.phase))) return false;
+ if (!object(b) || typeof b.status !== "string" || typeof b.title !== "string" || typeof b.completedStatus !== "string" || !b.completedStatus || (b.staged !== null && !parseStagedValue(b.staged))) return false;
+ if (value.resolvedDate !== undefined && !parseStagedValue(value.resolvedDate)) return false;
+ if (value.completedPath !== undefined && !path(value.completedPath)) return false;
+ if (value.completedAt !== undefined && (typeof value.completedAt !== "number" || !Number.isFinite(value.completedAt))) return false;
+ if ((value.phase === "confirmed" || value.phase === "cleanup-pending") && (!value.completedPath || value.completedAt === undefined)) return false;
+ return Array.isArray(value.pendingCleanupPaths) && value.pendingCleanupPaths.every(p => path(p) && (p === value.sourcePath || p === value.completedPath)) && new Set(value.pendingCleanupPaths).size === value.pendingCleanupPaths.length;
+}
+/** Unreadable safety state is retained byte-for-value for the single persistence owner. */
+export function loadCompletionRecords(data: unknown): LoadedCompletions {
+ if (!object(data) || (!Object.prototype.hasOwnProperty.call(data, "completionRecordsVersion") && !Object.prototype.hasOwnProperty.call(data, "completionRecords"))) return { records: [], initialized: false };
+ const raw = { completionRecordsVersion: data.completionRecordsVersion, completionRecords: structuredClone(data.completionRecords) };
+ const records = data.completionRecords;
+ if (data.completionRecordsVersion !== COMPLETION_RECORDS_VERSION || !Array.isArray(records) || !records.every(valid) || new Set(records.map(r => r.attemptId)).size !== records.length || new Set(records.map(r => `${r.sourcePath}\0${r.requestDay}`)).size !== records.length) return { records: [], initialized: true, quarantine: raw };
+ return { records: structuredClone(records), initialized: true };
+}

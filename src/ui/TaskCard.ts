@@ -16,6 +16,7 @@ export interface TaskCardOptions {
  app: App;
  gateway: TimerPaneServices["gateway"];
  controller: TimerPaneServices["controller"];
+ completion?: TimerPaneServices["completion"];
  isBusy?: () => boolean;
  unstage?: (target: { taskPath: string; title: string }) => Promise<unknown>;
 }
@@ -78,6 +79,7 @@ export class TaskCard extends Component {
  private elements: CardElements;
  private disposed = false;
  private completionReady = false;
+ private availabilityGeneration = 0;
  private stopping = new Set<string>();
  private titleOwners = new Set<Component>();
  private get app(): App { return this.options.app; }
@@ -105,6 +107,15 @@ export class TaskCard extends Component {
   card.unstage.disabled = busy || !this.options.unstage;
   card.complete.disabled = busy || !completionReady || !!timer.stagedCard || timer.state === "idle";
   setTooltip(card.complete, timer.stagedCard ? "Staged task completion will be available in a later update" : busy ? "A timer action is in progress" : completionReady ? "Complete this task and stop its timer" : "No completed status is available from TaskNotes");
+  if (this.options.completion) {
+   const generation = ++this.availabilityGeneration;
+   card.complete.disabled = true;
+   void this.options.completion.availability({ sourcePath: timer.taskPath, title: timer.title }).then(result => {
+    if (this.disposed || generation !== this.availabilityGeneration) return;
+    card.complete.disabled = this.isBusy() || !result.available;
+    setTooltip(card.complete, this.isBusy() ? "A task action is in progress" : result.reason);
+   });
+  }
   if (!this.stopping.has(cardKey(timer))) {
    card.stop.disabled = busy;
    setTextIfChanged(card.stopLabel, STOP_LABEL);
@@ -182,9 +193,10 @@ export class TaskCard extends Component {
 		const complete = actions.createEl("button", { cls: "tntp-complete", text: "Complete" });
 		complete.addEventListener("click", () => {
 			const current = (this.disposed ? undefined : this.elements);
-			if (!current || complete.disabled || this.isBusy() || current.timer.state === "idle" || current.timer.stagedCard) return;
-			const { taskPath, startTime, title } = current.timer;
-			void this.options.controller.complete({ taskPath, startTime, title });
+			if (!current || complete.disabled || this.isBusy()) return;
+   const model = current.timer;
+   if (!this.options.completion && (model.state === "idle" || model.stagedCard)) return;
+			void this.options.controller.complete({ taskPath: model.taskPath, title: model.title, ...(model.state === "idle" ? {} : { startTime: model.startTime }) });
 		});
 		const unstage = card.createEl("button", { cls: "tntp-unstage", text: "✕" });
 		setTooltip(unstage, "Unstage task");

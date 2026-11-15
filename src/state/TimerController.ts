@@ -67,6 +67,14 @@ export interface TimerControllerDeps {
 }
 
 export class TimerController {
+ private completionHandler: ((target: StartTarget & { startTime?: string }) => Promise<CompleteOutcome>) | null = null;
+ setCompletionHandler(handler: (target: StartTarget & { startTime?: string }) => Promise<CompleteOutcome>): void { this.completionHandler = handler; }
+ async runCompletion(action: () => Promise<CompleteOutcome>): Promise<CompleteOutcome> {
+  if (this.isBusy()) return "busy";
+  this.completing = true; this.busy(1);
+  try { return await action(); }
+  finally { this.completing = false; this.busy(-1); }
+ }
 	/**
 	 * Stops every eligible regular timer, then clears every paused record (D-10), so the
 	 * pane ends empty. Pauses are kept when the batch halted on unreadable Pomodoro
@@ -437,7 +445,8 @@ export class TimerController {
 		} catch { return false; }
 	}
 
-	async complete(target: StopTarget): Promise<CompleteOutcome> {
+	async complete(target: StartTarget & { startTime?: string }): Promise<CompleteOutcome> {
+  if (this.completionHandler) return this.completionHandler(target);
 		if (this.isBusy()) return "busy";
 		this.completing = true;
 		this.busy(1);
@@ -457,7 +466,7 @@ export class TimerController {
 				// closed lastEntryStart, so the still-open check below makes no stop call.
 				if (this.pauses.get(target.taskPath)?.state === "paused") this.pauses.remove(target.taskPath);
 				const active = await gateway.active();
-				if (active.some(item => !item.entry.endTime && sameEntry({ taskPath: item.taskPath, startTime: item.entry.startTime }, target))) {
+				if (target.startTime && active.some(item => !item.entry.endTime && sameEntry({ taskPath: item.taskPath, startTime: item.entry.startTime }, { taskPath: target.taskPath, startTime: target.startTime! }))) {
 					// External replacement can race this path-only public stop after the final read.
 					try { await gateway.stop(target.taskPath, context); }
 					catch (error) { if (!isNoActiveSessionError(gateway.normalizeError(error).message)) throw error; }

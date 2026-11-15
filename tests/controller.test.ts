@@ -54,6 +54,13 @@ beforeEach(() => {
 });
 
 describe("Complete transaction", () => {
+ test("both tabs can delegate completion to the plugin-scoped completion owner", async () => {
+  const ctx = await setup([report()]); const handler = vi.fn(() => Promise.resolve("completed" as const));
+  ctx.controller.setCompletionHandler(handler);
+  expect(await ctx.controller.complete({ taskPath: REPORT_PATH, title: "Idle" })).toBe("completed");
+  expect(handler).toHaveBeenCalledWith({ taskPath: REPORT_PATH, title: "Idle" });
+  expect(ctx.tn.completeCalls).toHaveLength(0);
+ });
 	test("completion is available as a serialized controller action", async () => {
 		const ctx = await setup([report()]);
 		expect(ctx.controller).toHaveProperty("complete", expect.any(Function));

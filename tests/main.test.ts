@@ -7,6 +7,7 @@ import type { TimerPaneSettingTab } from "../src/ui/TimerPaneSettingTab";
 import type { TimerPaneSettings } from "../src/settings";
 import type { App, PluginManifest } from "obsidian";
 import type { StagedOrderStore } from "../src/state/StagedOrderStore";
+import type { CompletionStore } from "../src/state/CompletionStore";
 
 vi.mock("obsidian", () => import("./fakes/fakeObsidian"));
 // Captures the TimerStore main.ts builds, with its deps, so tests can reach fileCheck and requestRefresh.
@@ -24,6 +25,26 @@ vi.mock("../src/state/TimerStore", async (importOriginal) => {
 beforeEach(() => { resetHost(); captured.stores = []; vi.useFakeTimers(); vi.stubGlobal("window", { setTimeout, clearTimeout, setInterval }); });
 afterEach(() => { vi.useRealTimers(); vi.unstubAllGlobals(); });
 const flush = async () => { for (let i = 0; i < 12; i++) await Promise.resolve(); };
+
+test("completion history survives production saves, reloads and unrelated settings changes", async () => {
+ const record = { attemptId: "one", sourcePath: "Tasks/a.md", requestDay: "2026-11-14", requestedAt: 123, beforeEvidence: { status: "open", staged: null, title: "A", completedStatus: "done" }, phase: "pending" as const, pendingCleanupPaths: [] };
+ host.data = { completionRecordsVersion: 1, completionRecords: [record], extra: "kept", stagedOrder: ["Tasks/a.md"] };
+ const plugin = new TaskNotesTimerPanePlugin({} as App, {} as PluginManifest); plugin.onload(); await flush();
+ const store = (plugin as unknown as { completions: CompletionStore }).completions;
+ expect(store.records()).toEqual([record]);
+ await saveSettingsOf(host.tabs[0])({ completionStatus: "done", rolloverHour: 6 });
+ expect(host.saved[host.saved.length - 1]).toMatchObject({ completionRecordsVersion: 1, completionRecords: [record], extra: "kept", stagedOrder: ["Tasks/a.md"], rolloverHour: 6 });
+ host.data = host.saved[host.saved.length - 1];
+ const next = new TaskNotesTimerPanePlugin({} as App, {} as PluginManifest); next.onload(); await flush();
+ expect((next as unknown as { completions: CompletionStore }).completions.records()).toEqual([record]);
+});
+test("future completion safety data is retained by production settings saves", async () => {
+ host.data = { completionRecordsVersion: 99, completionRecords: { protected: true }, extra: "kept" };
+ const plugin = new TaskNotesTimerPanePlugin({} as App, {} as PluginManifest); plugin.onload(); await flush();
+ await saveSettingsOf(host.tabs[0])({ completionStatus: "done", rolloverHour: 4 });
+ expect(host.saved[host.saved.length - 1]).toMatchObject({ completionRecordsVersion: 99, completionRecords: { protected: true }, extra: "kept" });
+ expect((plugin as unknown as { completions: CompletionStore }).completions.available()).toBe(false);
+});
 
 const PAUSED = {
 	state: "paused",
@@ -59,7 +80,7 @@ test("loading failures keep the plugin usable and log a safe explanation", async
 	expect(host.settings).toHaveLength(2);
 	expect(log).toHaveBeenCalledWith("[tasknotes-timer-pane] Loading timer pane settings failed; using defaults.");
 	await saveSettingsOf(host.tabs[0])({ completionStatus: "done", rolloverHour: 4 });
-	expect(host.saved).toEqual([{ completionStatus: "done", pauseRecordsVersion: 1, pauseRecords: [] }]);
+ expect(host.saved).toEqual([{ completionStatus: "done", pauseRecordsVersion: 1, pauseRecords: [], completionRecordsVersion: "unreadable", completionRecords: undefined }]);
 	log.mockRestore();
 });
 
