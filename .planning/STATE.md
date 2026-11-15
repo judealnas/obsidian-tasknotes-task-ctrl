@@ -35,7 +35,7 @@ Status: Awaiting real overnight, physical sleep/wake and mobile acceptance
 Note: Phase 4 complete: UAT 6/6, VERIFICATION passed, SECURITY 19/19 closed. 04-01 spike cleanup done (`staged:` null line confirmed, `spikedefault` removed).
 Last activity: 2026-11-15 — Phase 07 execution started
 
-Progress (v0.3): 17/19 plans complete (89%). Phase 7 plans 01–04 have summaries. Plan 05 version/display/tests are committed; disabled-auto-stop and full native upgrade now pass. Native overnight, physical sleep and mobile acceptance remain open. Plan 06 publication has not started. Milestone verification remains open; no release was tagged or published.
+Progress (v0.3): 17/19 plans complete (89%). Phase 7 plans 01–04 have summaries. Plan 05 version/display/tests are committed; disabled-auto-stop and full native upgrade now pass. Native overnight, physical sleep and mobile acceptance remain open. Stable Plan 06 publication has not started. Milestone verification remains open. Separately authorized beta `0.3.0-beta.1` was published from milestone-v0.3 on 2026-11-15; stable 0.3.0 is not published.
 
 ## Performance Metrics
 
@@ -164,6 +164,7 @@ None yet.
 
 | # | Description | Date | Commit | Directory |
 |---|-------------|------|--------|-----------|
+| 261115-fup | Publish 0.3.0-beta.1 with explicit outstanding acceptance limits | 2026-11-15 | bdc5f0f | [261115-fup-publish-0-3-0-beta-1-from-milestone-v0-3](./quick/261115-fup-publish-0-3-0-beta-1-from-milestone-v0-3/) |
 | 261014-whq | Render card titles as wikilinks so TaskNotes' task-link chip appears; fall back to api.ui.taskMenu on right-click | 2026-10-14 | 1886e77 | [261014-whq-render-card-titles-as-wikilinks-so-taskn](./quick/261014-whq-render-card-titles-as-wikilinks-so-taskn/) |
 | 2 | Hide TaskNotes' tracking outline on chips in the timer pane | 2026-10-14 | afa6a41 | — |
 | 3 | Drop static Tracking label; enlarge card title chip | 2026-10-15 | 72972cc | — |
@@ -191,6 +192,8 @@ Stopped at: 07-05 disabled-auto-stop matrix and cold upgrade passed; physical ac
 Resume file: .planning/phases/07-complete-roll-over-release-0-3-0/.continue-here.md
 
 ## Operator Next Steps
+
+- [2026-11-15 beta publication]: User explicitly authorized beta publication from milestone-v0.3 with physical acceptance still open. Published `0.3.0-beta.1` at `bdc5f0f53f060c10180dd2446bfb67556deb1ec1`; GitHub Release workflow 43735538641 passed full checks. Downloaded assets verified; GitHub Latest remains 0.2.0. See quick task 261115-fup for hashes and release URL. BRAT installation/update to this beta has not been exercised. This beta authorization does not close Phase 7 acceptance or authorize stable 0.3.0 publication. Older no-publication/candidate-version descriptions below are historical.
 
 - [2026-11-15 recovery disposition]: User authorized dev-vault completion-history reset. Verified backup is `07-completion-reset-before.json`; hash/runtime evidence is `07-completion-reset.json` in the Phase 7 directory. Reset changed only completion records/version. Native startup confirms completion available and zero prior attempts; refresh added 69 new fixture observations. UAT stopped. Recovery/reset gate is resolved; remaining native acceptance and publication gates stay open. Older quarantine descriptions below are historical.
 
