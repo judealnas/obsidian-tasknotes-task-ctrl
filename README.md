@@ -4,7 +4,7 @@
 
 An Obsidian plugin that adds a dockable pane for monitoring and controlling TaskNotes' regular (non-Pomodoro) task time tracking. TaskNotes already has a Pomodoro pane, but for normal task timing the only sign that a task is being timed is a small status-bar indicator in the bottom right of the window. This pane fills that gap: keep it open beside your notes to see what you are timing and how long you've spent on it, and start, pause, resume, stop or complete a task's timer in one or two clicks.
 
-![TaskNotes Timer Pane showing two running task timers and controls to start, pause, stop and complete tasks](docs/assets/panel.png)
+![TaskNotes Task Control showing two running task timers and controls to start, pause, stop and complete tasks](docs/assets/panel.png)
 
 ## Requirements
 
@@ -59,14 +59,14 @@ Differences from TaskNotes' own displays, all expected:
 1. Install BRAT from Settings → Community plugins → Browse, and enable it.
 2. Run the command "BRAT: Add a beta plugin for testing" (or use the button in BRAT's settings).
 3. Enter `judealnas/obsidian-tasknotes-timer-pane` and add the plugin.
-4. Enable "TaskNotes Timer Pane" in Settings → Community plugins.
+4. Enable "TaskNotes Task Control" in Settings → Community plugins.
 
 BRAT installs the latest GitHub release and can check for updates.
 
 ## Manual install
 
 1. Download `main.js`, `manifest.json` and `styles.css` from the latest release at https://github.com/judealnas/obsidian-tasknotes-timer-pane/releases.
-2. Put them in `<vault>/.obsidian/plugins/tasknotes-timer-pane/`, then enable "TaskNotes Timer Pane" in Settings → Community plugins.
+2. Put them in `<vault>/.obsidian/plugins/tasknotes-timer-pane/`, then enable "TaskNotes Task Control" in Settings → Community plugins.
 
 To build from source instead, run `npm install` and `npm run build`, then copy the same three files from the repo root.
 
@@ -78,9 +78,9 @@ Develop only in the repo's `dev-vault/` folder, never in your real vault. The bu
 2. `npm run seed` creates `dev-vault/` with four seed tasks in `TaskNotes/Tasks/`. Re-running it leaves existing notes alone. `npm run seed -- --reset` restores the seed notes to their tracked contents. Neither deletes anything or touches `dev-vault/.obsidian/`.
 3. Open `dev-vault/` as a vault in Obsidian ("Open folder as vault"), and turn off Restricted mode when asked.
 4. One-time manual installs into the dev vault:
-   - TaskNotes, the latest 4.13.x, from Settings → Community plugins → Browse.
+   - TaskNotes (native Phase 7 checks use 4.18.2), from Settings → Community plugins → Browse.
    - Hot Reload 0.3.1 from https://github.com/pjeby/hot-reload/releases. It isn't in the community directory: download its `main.js` and `manifest.json` into `dev-vault/.obsidian/plugins/hot-reload/`.
-5. In Settings → Community plugins, enable TaskNotes, Hot Reload and TaskNotes Timer Pane.
+5. In Settings → Community plugins, enable TaskNotes, Hot Reload and TaskNotes Task Control.
 6. `npm run dev` builds in watch mode into the dev vault. Hot Reload reloads the plugin about 0.75 s after `main.js` or `styles.css` changes. A `manifest.json` change needs a manual plugin toggle off and on.
 7. `npm run deploy` does a one-shot build into the dev vault.
 8. `npm run check` is the definition of done: the build, `tsc -noEmit`, ESLint with eslint-plugin-obsidianmd at zero warnings, and Vitest must all pass.
@@ -92,7 +92,7 @@ Develop only in the repo's `dev-vault/` folder, never in your real vault. The bu
 
 Before you start:
 
-- Set up the main checkout's `dev-vault/` per the steps above, with TaskNotes and TaskNotes Timer Pane enabled once. You don't need to deploy a build first: `uat:start` builds the checkout you run it from and installs that build itself.
+- Set up the main checkout's `dev-vault/` per the steps above, with TaskNotes and TaskNotes Task Control enabled once. You don't need to deploy a build first: `uat:start` builds the checkout you run it from and installs that build itself.
 - Run `npm ci` in the checkout you want to test (the main checkout or a worktree) so it can build.
 - Close `dev-vault` in your own Obsidian. The launcher refuses to start while your Obsidian has that vault open, because two instances on one vault would write conflicting changes.
 
