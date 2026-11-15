@@ -90,6 +90,11 @@ export interface TaskNotesTaskCreatedPayload {
 	task?: TaskInfo;
 }
 
+/** Minimal event catalog entry returned by the public `events.list()` API. */
+export interface TaskNotesRuntimeEventDefinition {
+	name: string;
+}
+
 /** Payload passed to `lifecycle.on` handlers (the settings field is omitted). */
 export interface TaskNotesRuntimeLifecyclePayload {
 	event: TaskNotesRuntimeLifecycleEventName;
@@ -192,6 +197,8 @@ export interface TaskNotesRuntimeApiV1 {
 		/** The payload is left as unknown: the pane only re-derives from `time.active()`. */
 		on(event: TaskNotesRuntimeEventName, handler: (payload: unknown) => void): EventRef;
 		off(ref: EventRef): void;
+		/** Added after the original 4.13.8 vendored contract; callers must fail closed when absent. */
+		list?(): readonly TaskNotesRuntimeEventDefinition[];
 	};
 
 	readonly lifecycle: {

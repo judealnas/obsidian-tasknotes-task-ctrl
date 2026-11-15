@@ -208,6 +208,8 @@ export class TaskNotesBridge implements TaskNotesGateway {
 			if (typeof api.events?.on !== "function" || typeof api.events?.off !== "function") {
 				return { available: false, reason: "TaskNotes does not provide task events" };
 			}
+			const catalog = this.taskCreatedCatalogAvailability(api);
+			if (!catalog.available) return catalog;
 			return { available: true, reason: "Create a new TaskNotes task" };
 		} catch {
 			return { available: false, reason: "TaskNotes is not connected" };
@@ -216,6 +218,8 @@ export class TaskNotesBridge implements TaskNotesGateway {
 
 	onTaskCreated(listener: (task: TaskInfo) => void): () => void {
 		const api = this.featureApi("tasks.events", "events.on", candidate => typeof candidate.events?.on === "function" && typeof candidate.events?.off === "function");
+		const catalog = this.taskCreatedCatalogAvailability(api);
+		if (!catalog.available) throw new Error(catalog.reason);
 		let active = true;
 		const events = api.events as typeof api.events & {
 			on(event: TaskNotesRuntimeCreationEventName, handler: (payload: TaskNotesTaskCreatedPayload) => void): ReturnType<typeof api.events.on>;
@@ -237,6 +241,22 @@ export class TaskNotesBridge implements TaskNotesGateway {
 		};
 		this.transientOffs.add(off);
 		return off;
+	}
+
+	private taskCreatedCatalogAvailability(api: TaskNotesRuntimeApiV1): { available: boolean; reason: string } {
+		if (typeof api.events?.list !== "function") {
+			return { available: false, reason: "TaskNotes does not provide the event catalog needed for task creation" };
+		}
+		try {
+			const events: unknown = api.events.list();
+			if (!Array.isArray(events) || !events.some((event: unknown) => typeof event === "object" && event !== null &&
+				"name" in event && (event as { name?: unknown }).name === "task.created")) {
+				return { available: false, reason: "TaskNotes does not advertise the task.created event" };
+			}
+			return { available: true, reason: "TaskNotes advertises task.created" };
+		} catch {
+			return { available: false, reason: "TaskNotes event catalog could not be read" };
+		}
 	}
 
 	/** Re-evaluates TaskNotes availability. Safe to call at any time and as often as needed. */
