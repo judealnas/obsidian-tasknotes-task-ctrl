@@ -2,6 +2,7 @@
 status: complete
 date: 2026-11-15
 quick_id: 261115-gpo
+commit: 71d8d73
 ---
 
 # Applied v0.3 beta feedback

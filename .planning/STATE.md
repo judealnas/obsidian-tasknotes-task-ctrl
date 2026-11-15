@@ -164,6 +164,7 @@ None yet.
 
 | # | Description | Date | Commit | Directory |
 |---|-------------|------|--------|-----------|
+| 261115-gpo | Remove Done today/custom rollover; apply beta pane feedback | 2026-11-15 | 71d8d73 | [261115-gpo-apply-beta-feedback-remove-done-today-an](./quick/261115-gpo-apply-beta-feedback-remove-done-today-an/) |
 | 261115-fup | Publish 0.3.0-beta.1 with explicit outstanding acceptance limits | 2026-11-15 | bdc5f0f | [261115-fup-publish-0-3-0-beta-1-from-milestone-v0-3](./quick/261115-fup-publish-0-3-0-beta-1-from-milestone-v0-3/) |
 | 261014-whq | Render card titles as wikilinks so TaskNotes' task-link chip appears; fall back to api.ui.taskMenu on right-click | 2026-10-14 | 1886e77 | [261014-whq-render-card-titles-as-wikilinks-so-taskn](./quick/261014-whq-render-card-titles-as-wikilinks-so-taskn/) |
 | 2 | Hide TaskNotes' tracking outline on chips in the timer pane | 2026-10-14 | afa6a41 | — |
