@@ -164,6 +164,7 @@ None yet.
 
 | # | Description | Date | Commit | Directory |
 |---|-------------|------|--------|-----------|
+| 261115-ilj | Remove Staged header/empty text and embed native preview in beta note | 2026-11-15 | a91c0a8 | [261115-ilj-remove-staged-header-stage-button-and-em](./quick/261115-ilj-remove-staged-header-stage-button-and-em/) |
 | 261115-hco | Publish 0.3.0-beta.2 with beta feedback changes | 2026-11-15 | 68add19 | [261115-hco-publish-0-3-0-beta-2-with-beta-feedback-](./quick/261115-hco-publish-0-3-0-beta-2-with-beta-feedback-/) |
 | 261115-gpo | Remove Done today/custom rollover; apply beta pane feedback | 2026-11-15 | 71d8d73 | [261115-gpo-apply-beta-feedback-remove-done-today-an](./quick/261115-gpo-apply-beta-feedback-remove-done-today-an/) |
 | 261115-fup | Publish 0.3.0-beta.1 with explicit outstanding acceptance limits | 2026-11-15 | bdc5f0f | [261115-fup-publish-0-3-0-beta-1-from-milestone-v0-3](./quick/261115-fup-publish-0-3-0-beta-1-from-milestone-v0-3/) |

@@ -2,6 +2,7 @@
 status: complete
 date: 2026-11-15
 quick_id: 261115-ilj
+commit: a91c0a8
 ---
 
 # Simplified empty Staged tab and embedded screenshot
