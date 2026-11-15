@@ -1,0 +1,332 @@
+{
+  "run": "statusbar-debug-1794768946203",
+  "at": "2026-11-15T18:55:46.203Z",
+  "tasknotes": "4.18.2",
+  "events": [
+    {
+      "name": "task.updated",
+      "at": 1794768946285
+    },
+    {
+      "name": "task.updated",
+      "at": 1794768946569
+    },
+    {
+      "name": "task.updated",
+      "at": 1794768946573
+    },
+    {
+      "name": "task.updated",
+      "at": 1794768952305
+    },
+    {
+      "name": "time.started",
+      "at": 1794768952305
+    },
+    {
+      "name": "task.updated",
+      "at": 1794768952621
+    },
+    {
+      "name": "task.updated",
+      "at": 1794768952623
+    },
+    {
+      "name": "task.updated",
+      "at": 1794768952971
+    },
+    {
+      "name": "time.stopped",
+      "at": 1794768952971
+    },
+    {
+      "name": "task.updated",
+      "at": 1794768953289
+    },
+    {
+      "name": "task.updated",
+      "at": 1794768953291
+    },
+    {
+      "name": "task.updated",
+      "at": 1794768955240
+    },
+    {
+      "name": "time.started",
+      "at": 1794768955240
+    },
+    {
+      "name": "task.updated",
+      "at": 1794768955559
+    },
+    {
+      "name": "task.updated",
+      "at": 1794768955561
+    },
+    {
+      "name": "task.updated",
+      "at": 1794768955905
+    },
+    {
+      "name": "time.stopped",
+      "at": 1794768955905
+    },
+    {
+      "name": "task.updated",
+      "at": 1794768956222
+    },
+    {
+      "name": "task.updated",
+      "at": 1794768956224
+    },
+    {
+      "name": "task.updated",
+      "at": 1794768968916
+    },
+    {
+      "name": "time.started",
+      "at": 1794768968916
+    },
+    {
+      "name": "task.updated",
+      "at": 1794768969506
+    },
+    {
+      "name": "task.updated",
+      "at": 1794768969507
+    },
+    {
+      "name": "task.updated",
+      "at": 1794768969600
+    },
+    {
+      "name": "time.stopped",
+      "at": 1794768969600
+    },
+    {
+      "name": "task.updated",
+      "at": 1794768970099
+    },
+    {
+      "name": "task.updated",
+      "at": 1794768970100
+    },
+    {
+      "name": "task.updated",
+      "at": 1794768975790
+    }
+  ],
+  "samples": [
+    {
+      "label": "baseline-after-cache-expiry",
+      "at": 1794768952295,
+      "active": [],
+      "fixtureElapsedMs": null,
+      "statusVisible": false,
+      "statusText": null,
+      "paneSnapshot": {
+        "primary": null,
+        "others": []
+      },
+      "notices": []
+    },
+    {
+      "label": "direct-public-api-start",
+      "at": 1794768952962,
+      "active": [
+        {
+          "path": "TaskNotes/Tasks/statusbar-debug-1794768946203.md",
+          "startTime": "2026-11-15T18:55:52.297Z"
+        }
+      ],
+      "fixtureElapsedMs": 665,
+      "statusVisible": true,
+      "statusText": "Tracking: statusbar-debug-1794768946203 (0:00)",
+      "paneSnapshot": {
+        "primary": {
+          "taskPath": "TaskNotes/Tasks/statusbar-debug-1794768946203.md",
+          "title": "statusbar-debug-1794768946203",
+          "startTime": "2026-11-15T18:55:52.297Z",
+          "startMs": 1794768952297,
+          "state": "running",
+          "sessionStartedAt": "2026-11-15T18:55:52.297Z",
+          "sessionKey": "TaskNotes/Tasks/statusbar-debug-1794768946203.md\u00002026-11-15T18:55:52.297Z",
+          "sortMs": 1794768952297,
+          "accumulatedMs": 0,
+          "segmentStartMs": 1794768952297,
+          "totalKnown": true,
+          "entries": [
+            {
+              "startMs": 1794768952297,
+              "endMs": null
+            }
+          ],
+          "displayKey": "{\"path\":\"TaskNotes/Tasks/statusbar-debug-1794768946203.md\",\"title\":\"statusbar-debug-1794768946203\",\"status\":\"open\",\"priority\":\"normal\",\"scheduled\":\"2026-11-15\",\"dateCreated\":\"2026-11-15T13:55:46.205-05:00\",\"dateModified\":\"2026-11-15T13:55:52.297-05:00\",\"tags\":[\"task\"],\"archived\":false,\"id\":\"TaskNotes/Tasks/statusbar-debug-1794768946203.md\",\"contexts\":[],\"projects\":[],\"totalTrackedTime\":0,\"isBlocked\":false,\"isBlocking\":false}"
+        },
+        "others": []
+      },
+      "notices": []
+    },
+    {
+      "label": "direct-public-api-stop-within-five-seconds",
+      "at": 1794768953627,
+      "active": [],
+      "fixtureElapsedMs": null,
+      "statusVisible": true,
+      "statusText": "Tracking: statusbar-debug-1794768946203 (0:01)",
+      "paneSnapshot": {
+        "primary": null,
+        "others": []
+      },
+      "notices": []
+    },
+    {
+      "label": "direct-public-api-restart-old-status-time",
+      "at": 1794768955897,
+      "active": [
+        {
+          "path": "TaskNotes/Tasks/statusbar-debug-1794768946203.md",
+          "startTime": "2026-11-15T18:55:55.233Z"
+        }
+      ],
+      "fixtureElapsedMs": 664,
+      "statusVisible": true,
+      "statusText": "Tracking: statusbar-debug-1794768946203 (0:03)",
+      "paneSnapshot": {
+        "primary": {
+          "taskPath": "TaskNotes/Tasks/statusbar-debug-1794768946203.md",
+          "title": "statusbar-debug-1794768946203",
+          "startTime": "2026-11-15T18:55:55.233Z",
+          "startMs": 1794768955233,
+          "state": "running",
+          "sessionStartedAt": "2026-11-15T18:55:55.233Z",
+          "sessionKey": "TaskNotes/Tasks/statusbar-debug-1794768946203.md\u00002026-11-15T18:55:55.233Z",
+          "sortMs": 1794768955233,
+          "accumulatedMs": 0,
+          "segmentStartMs": 1794768955233,
+          "totalKnown": true,
+          "entries": [
+            {
+              "startMs": 1794768952297,
+              "endMs": 1794768952964
+            },
+            {
+              "startMs": 1794768955233,
+              "endMs": null
+            }
+          ],
+          "displayKey": "{\"path\":\"TaskNotes/Tasks/statusbar-debug-1794768946203.md\",\"title\":\"statusbar-debug-1794768946203\",\"status\":\"open\",\"priority\":\"normal\",\"scheduled\":\"2026-11-15\",\"dateCreated\":\"2026-11-15T13:55:46.205-05:00\",\"dateModified\":\"2026-11-15T13:55:55.233-05:00\",\"tags\":[\"task\"],\"archived\":false,\"id\":\"TaskNotes/Tasks/statusbar-debug-1794768946203.md\",\"contexts\":[],\"projects\":[],\"totalTrackedTime\":0,\"isBlocked\":false,\"isBlocking\":false}"
+        },
+        "others": []
+      },
+      "notices": []
+    },
+    {
+      "label": "direct-public-api-stopped-no-new-event-after-expiry",
+      "at": 1794768962422,
+      "active": [],
+      "fixtureElapsedMs": null,
+      "statusVisible": true,
+      "statusText": "Tracking: statusbar-debug-1794768946203 (0:09)",
+      "paneSnapshot": {
+        "primary": null,
+        "others": []
+      },
+      "notices": []
+    },
+    {
+      "label": "click-stale-native-stop",
+      "at": 1794768962888,
+      "active": [],
+      "fixtureElapsedMs": null,
+      "statusVisible": false,
+      "statusText": "Tracking: statusbar-debug-1794768946203 (0:09)",
+      "paneSnapshot": {
+        "primary": null,
+        "others": []
+      },
+      "notices": [
+        "No active time tracking session found"
+      ]
+    },
+    {
+      "label": "pane-controller-start",
+      "at": 1794768969583,
+      "active": [
+        {
+          "path": "TaskNotes/Tasks/statusbar-debug-1794768946203.md",
+          "startTime": "2026-11-15T18:56:08.907Z"
+        }
+      ],
+      "fixtureElapsedMs": 676,
+      "statusVisible": true,
+      "statusText": "Tracking: statusbar-debug-1794768946203 (0:00)",
+      "paneSnapshot": {
+        "primary": {
+          "taskPath": "TaskNotes/Tasks/statusbar-debug-1794768946203.md",
+          "title": "statusbar-debug-1794768946203",
+          "startTime": "2026-11-15T18:56:08.907Z",
+          "startMs": 1794768968907,
+          "state": "running",
+          "sessionStartedAt": "2026-11-15T18:56:08.907Z",
+          "sessionKey": "TaskNotes/Tasks/statusbar-debug-1794768946203.md\u00002026-11-15T18:56:08.907Z",
+          "sortMs": 1794768968907,
+          "accumulatedMs": 0,
+          "segmentStartMs": 1794768968907,
+          "totalKnown": true,
+          "entries": [
+            {
+              "startMs": 1794768952297,
+              "endMs": 1794768952964
+            },
+            {
+              "startMs": 1794768955233,
+              "endMs": 1794768955898
+            },
+            {
+              "startMs": 1794768968907,
+              "endMs": null
+            }
+          ],
+          "displayKey": "{\"path\":\"TaskNotes/Tasks/statusbar-debug-1794768946203.md\",\"title\":\"statusbar-debug-1794768946203\",\"status\":\"open\",\"priority\":\"normal\",\"scheduled\":\"2026-11-15\",\"dateCreated\":\"2026-11-15T13:55:46.205-05:00\",\"dateModified\":\"2026-11-15T13:56:08.907-05:00\",\"tags\":[\"task\"],\"archived\":false,\"id\":\"TaskNotes/Tasks/statusbar-debug-1794768946203.md\"}"
+        },
+        "others": []
+      },
+      "notices": []
+    },
+    {
+      "label": "pane-controller-stop-within-five-seconds",
+      "at": 1794768970268,
+      "active": [],
+      "fixtureElapsedMs": null,
+      "statusVisible": true,
+      "statusText": "Tracking: statusbar-debug-1794768946203 (0:01)",
+      "paneSnapshot": {
+        "primary": null,
+        "others": []
+      },
+      "notices": []
+    },
+    {
+      "label": "pane-controller-stopped-after-expiry",
+      "at": 1794768975778,
+      "active": [],
+      "fixtureElapsedMs": null,
+      "statusVisible": true,
+      "statusText": "Tracking: statusbar-debug-1794768946203 (0:06)",
+      "paneSnapshot": {
+        "primary": null,
+        "others": []
+      },
+      "notices": []
+    }
+  ],
+  "statusSetting": true,
+  "fixture": "TaskNotes/Tasks/statusbar-debug-1794768946203.md",
+  "paneStart": "started",
+  "paneStop": "stopped",
+  "cleanup": {
+    "archivedFixture": "TaskNotes/Tasks/statusbar-debug-1794768946203.md",
+    "remainingFixtureTimers": 0
+  }
+}
