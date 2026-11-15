@@ -144,10 +144,10 @@ export function createFakeGateway(initial: BridgeState = { kind: "ready" }): Fak
 		toggleCalls,
 		toggleCompleteInstance(taskPath, date, context) {
 			toggleCalls.push({ taskPath, date, context });
-			return Promise.resolve();
+			return Promise.resolve(structuredClone(taskFixtures.get(taskPath) ?? { path: taskPath, title: taskPath, status: "open", archived: false }));
 		},
 		completionAvailable: () => state.kind === "ready",
-		completeTask: () => Promise.resolve(),
+		completeTask: (taskPath, status) => Promise.resolve(structuredClone(taskFixtures.get(taskPath) ?? { path: taskPath, title: taskPath, status, archived: false })),
 		start(taskPath, _options, context) {
 			startCalls.push({ taskPath, context });
 			return Promise.resolve();

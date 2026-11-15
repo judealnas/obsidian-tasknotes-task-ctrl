@@ -763,16 +763,42 @@ describe("recurring completion contract", () => {
 		const { tn, bridge } = readyBridge();
 		expect(bridge.recurringAvailability().available).toBe(true);
 		expect(bridge.recurringAvailability()).toEqual({ available: true, reason: "Recurring completion is available" });
-		await expect(bridge.toggleCompleteInstance(PATH, "2026-11-11", CTX)).resolves.toBeUndefined();
+		await expect(bridge.toggleCompleteInstance(PATH, "2026-11-11", CTX)).resolves.toMatchObject({ path: PATH });
 		expect(tn.toggleCalls).toEqual([{ path: PATH, date: "2026-11-11", context: CTX }]);
 		const task = (await tn.api.tasks!.get!(PATH)) as unknown as { complete_instances?: string[] };
 		expect(task.complete_instances).toEqual(["2026-11-11"]);
 	});
-	test.each(["2026-11-11T00:00:00Z", "11/11/2026", "", "2026-1-1"])("the date %j is refused before TaskNotes is called", async date => {
+	test.each(["2026-11-11T00:00:00Z", "11/11/2026", "", "2026-1-1", "2026-02-30", "2025-02-29", "2026-13-01"])("the date %j is refused before TaskNotes is called", async date => {
 		const { tn, bridge } = readyBridge();
 		await expect(bridge.toggleCompleteInstance(PATH, date, CTX)).rejects.toThrow("Recurring completion needs a YYYY-MM-DD day");
 		expect(tn.toggleCalls).toHaveLength(0);
 	});
+
+ test("completion wrappers preserve materialized identity and method receivers", async () => {
+  const { tn, bridge } = readyBridge({ capabilities: [...DEFAULT_CAPABILITIES, "recurring.materialize"] });
+  const occurrence = { ...TASK, path: "TaskNotes/Tasks/Weekly-instance.md", occurrence_date: "2026-11-11", recurrence_parent: "[[TaskNotes/Tasks/Weekly]]" };
+  tn.api.recurring!.materializeOccurrence = function(path, date) {
+   expect(this).toBe(tn.api.recurring); expect(path).toBe(PATH); expect(date).toBe("2026-11-11"); return Promise.resolve(occurrence);
+  };
+  tn.api.recurring!.toggleCompleteInstance = function() { expect(this).toBe(tn.api.recurring); return Promise.resolve(occurrence); };
+  tn.api.tasks!.complete = function() { expect(this).toBe(tn.api.tasks); return Promise.resolve({ ...occurrence, status: "done" }); };
+  expect(await bridge.materializeOccurrence(PATH, "2026-11-11", CTX)).toEqual(occurrence);
+  expect(await bridge.toggleCompleteInstance(PATH, "2026-11-11", CTX)).toEqual(occurrence);
+  expect(await bridge.completeTask(occurrence.path, "done", CTX)).toMatchObject({ path: occurrence.path, status: "done" });
+ });
+ test("a retired API return cannot be mistaken for fresh completion evidence", async () => {
+  const { tn, bridge } = readyBridge();
+  tn.api.recurring!.toggleCompleteInstance = () => { tn.emitLifecycle("unloading"); return Promise.resolve(TASK); };
+  await expect(bridge.toggleCompleteInstance(PATH, "2026-11-11", CTX)).rejects.toThrow("not connected");
+ });
+ test("materialization refuses missing capabilities and malformed returned identities", async () => {
+  const missing = readyBridge();
+  await expect(missing.bridge.materializeOccurrence(PATH, "2026-11-11", CTX)).rejects.toThrow("recurring.materialize");
+  const { tn, bridge } = readyBridge({ capabilities: [...DEFAULT_CAPABILITIES, "recurring.materialize"] });
+  tn.api.recurring!.materializeOccurrence = () => Promise.resolve({ ...TASK, path: "" });
+  await expect(bridge.materializeOccurrence(PATH, "2026-11-11", CTX)).rejects.toThrow("valid completion identity");
+  await expect(bridge.materializeOccurrence(PATH, "2026-02-30", CTX)).rejects.toThrow("YYYY-MM-DD");
+ });
 	test("TaskNotes 4.12.3 stays ready, but recurring completion is unavailable", () => {
 		const { bridge } = readyBridge({ version: "4.12.3" });
 		expect(bridge.getState()).toEqual({ kind: "ready" });

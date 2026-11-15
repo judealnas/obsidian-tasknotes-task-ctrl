@@ -5,6 +5,8 @@
  * gateway. Runtime Obsidian-free (type-only imports) so Vitest can load it.
  */
 import { errorMessage } from "../model/errors";
+import { parseStagedValue } from "../model/staging";
+import { normalizeTimerPath } from "../model/pomodoroOwnership";
 import { getPomodoroOwnedEntryId, type Ownership } from "../model/pomodoroOwnership";
 import type {
 	ActiveTimeEntry,
@@ -61,7 +63,7 @@ export interface TaskNotesGateway {
 	/** TaskNotes' user fields via catalog.read, feature-gated and not required for ready; consumers pass a rejection to fieldStatus as null. */
 	userFields(): Promise<TaskNotesUserField[]>;
 	completionAvailable(): boolean;
-	completeTask(path: string, status: string, context: TaskNotesMutationContext): Promise<void>;
+	completeTask(path: string, status: string, context: TaskNotesMutationContext): Promise<TaskInfo>;
 	/**
 	 * Whether this TaskNotes can stage tasks (4.13.0+, tasks.read/list, tasks.write/update,
 	 * catalog.read/userFields). Feature-gated, not required for ready. Never throws.
@@ -82,9 +84,10 @@ export interface TaskNotesGateway {
 	 * TaskNotes' recurring.toggleCompleteInstance for an explicit bare YYYY-MM-DD day,
 	 * forwarding the context. It is a toggle (calling it twice can un-complete), so the
 	 * caller checks complete_instances first; Phase 7 decides the semantics from the
-	 * 04-01 Q4 finding. Resolves void: re-read the task instead of trusting the echo.
+	 * 04-01 Q4 finding. Preserves returned identity; callers still confirm through fresh reads.
 	 */
-	toggleCompleteInstance(path: string, date: string, context: TaskNotesMutationContext): Promise<void>;
+	toggleCompleteInstance(path: string, date: string, context: TaskNotesMutationContext): Promise<TaskInfo>;
+ materializeOccurrence?(path: string, date: string, context: TaskNotesMutationContext): Promise<TaskInfo>;
 	start(path: string, options: Record<string, never>, context: TaskNotesMutationContext): Promise<void>;
 	/** Stops the task's open entry through TaskNotes' own api.time.stop; resolves the task as TaskNotes saved it. */
 	stop(taskPath: string, context: TaskNotesMutationContext): Promise<TaskInfo>;
@@ -301,9 +304,10 @@ export class TaskNotesBridge implements TaskNotesGateway {
 		} catch { return false; }
 	}
 
-	async completeTask(path: string, status: string, context: TaskNotesMutationContext): Promise<void> {
+	async completeTask(path: string, status: string, context: TaskNotesMutationContext): Promise<TaskInfo> {
 		const api = this.featureApi("tasks.write", "tasks.complete", api => typeof api.tasks?.complete === "function");
-		await api.tasks!.complete!(path, { status }, context);
+  const result = await api.tasks!.complete!(path, { status }, context);
+  return this.completionResult(api, result);
 	}
 
 	/** Same shape as startAvailability, plus the 4.13.0 floor read from TaskNotes' manifest. */
@@ -345,13 +349,24 @@ export class TaskNotesBridge implements TaskNotesGateway {
 		} catch { return { available: false, reason: "TaskNotes is not connected" }; }
 	}
 
-	async toggleCompleteInstance(path: string, date: string, context: TaskNotesMutationContext): Promise<void> {
+	async toggleCompleteInstance(path: string, date: string, context: TaskNotesMutationContext): Promise<TaskInfo> {
 		// An omitted date targets the scheduled date and a datetime can shift a day (research F11, F13).
-		if (typeof date !== "string" || !/^\d{4}-\d{2}-\d{2}$/.test(date)) throw new Error("Recurring completion needs a YYYY-MM-DD day");
+		if (!parseStagedValue(date)) throw new Error("Recurring completion needs a YYYY-MM-DD day");
 		const api = this.featureApi("recurring.write", "recurring.toggleCompleteInstance", api => typeof api.recurring?.toggleCompleteInstance === "function");
-		// Called as a method so TaskNotes keeps its receiver; the echoed TaskInfo is dropped (Pitfall 1).
-		await api.recurring!.toggleCompleteInstance(path, date, context);
+		const result = await api.recurring!.toggleCompleteInstance(path, date, context);
+  return this.completionResult(api, result);
 	}
+ async materializeOccurrence(path: string, date: string, context: TaskNotesMutationContext): Promise<TaskInfo> {
+  if (!parseStagedValue(date)) throw new Error("Materialization needs a YYYY-MM-DD day");
+  const api = this.featureApi("recurring.materialize", "recurring.materializeOccurrence", api => typeof api.recurring?.materializeOccurrence === "function");
+  if (this.olderThanStagingFloor()) throw new Error("TaskNotes 4.13.0 or newer is needed for materialization");
+  return this.completionResult(api, await api.recurring!.materializeOccurrence!(path, date, context));
+ }
+ private completionResult(api: TaskNotesRuntimeApiV1, result: TaskInfo): TaskInfo {
+  if (this.connectedApi() !== api) throw new Error("TaskNotes changed during completion");
+  if (!result || typeof result.path !== "string" || !result.path || normalizeTimerPath(result.path) !== result.path || typeof result.status !== "string") throw new Error("TaskNotes did not return a valid completion identity");
+  return result;
+ }
 
 	/** True only for a parseable manifest version below 4.13.0; an unknown version is not "older". */
 	private olderThanStagingFloor(): boolean {

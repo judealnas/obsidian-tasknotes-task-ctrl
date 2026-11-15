@@ -29,6 +29,16 @@ export interface TaskInfo {
 	tags?: string[];
 	timeEstimate?: number;
 	timeEntries?: TimeEntry[];
+ /** Public TaskNotes recurrence/occurrence fields; see tasknotes.dev/settings/property-types-reference/. */
+ recurrence?: string;
+ recurrence_anchor?: "scheduled" | "completion";
+ complete_instances?: string[];
+ skipped_instances?: string[];
+ completedDate?: string;
+ scheduled?: string;
+ recurrence_parent?: string;
+ occurrence_date?: string;
+ occurrence_materialization?: "manual" | "on_completion" | "rolling";
 }
 
 /** One open time entry, as returned by `time.active()`. */
@@ -165,6 +175,8 @@ export interface TaskNotesRuntimeApiV1 {
 	 */
 	readonly recurring?: {
 		toggleCompleteInstance(path: string, date?: string, context?: TaskNotesMutationContext): Promise<TaskInfo>;
+  /** Public recurring.materialize capability; returns the actual occurrence identity. */
+  materializeOccurrence?(path: string, date: string, context?: TaskNotesMutationContext): Promise<TaskInfo>;
 	};
 
 	readonly pomodoro?: { status(): Promise<PomodoroState>; };

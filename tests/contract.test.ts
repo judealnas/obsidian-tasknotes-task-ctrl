@@ -182,4 +182,9 @@ describe("Phase 4 staging contract (TaskNotes 4.13.8)", () => {
   expectTypeOf<Toggle>().parameters.toEqualTypeOf<[path: string, date?: string, context?: TaskNotesMutationContext]>();
   expectTypeOf<Toggle>().returns.toEqualTypeOf<Promise<TaskInfo>>();
  });
+ test("public materialization is optional and returns the actual occurrence task", () => {
+  type Materialize = NonNullable<NonNullable<Api["recurring"]>["materializeOccurrence"]>;
+  expectTypeOf<Materialize>().parameters.toEqualTypeOf<[path: string, date: string, context?: TaskNotesMutationContext]>();
+  expectTypeOf<Materialize>().returns.toEqualTypeOf<Promise<TaskInfo>>();
+ });
 });
