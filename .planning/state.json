@@ -36,13 +36,13 @@
     {
       "number": "7",
       "name": "Complete, Roll Over & Release 0.3.0",
-      "status": "pending"
+      "status": "in_progress"
     }
   ],
   "next": {
     "command": "/gsd:progress --next",
     "label": "Advance to the next step",
-    "reason": "Phase 7 of 4 · 68% · executing"
+    "reason": "Phase 07 of 4 · 74% · executing"
   },
-  "updated_at": "2026-11-15T02:51:48.519Z"
+  "updated_at": "2026-11-15T03:35:12.837Z"
 }
