@@ -457,7 +457,9 @@ export class TimerPaneView extends ItemView {
 				if (staging.warning) { heading = "Couldn't refresh staging"; body = staging.warning; }
 				setTextIfChanged(staged.heading, heading); setTextIfChanged(staged.body, body);
 				staged.panel.toggleClass("tntp-panel--has-staged", staging.items.length > 0);
-				staged.panel.toggleClass("tntp-panel--staging-retry", !!staging.warning || staging.field.kind === "unknown");
+				// `refreshNow()` temporarily marks the field unknown while checking TaskNotes.
+				// Show Retry only when the completed read reports a real warning, not during that gap.
+				staged.panel.toggleClass("tntp-panel--staging-retry", !!staging.warning);
 				staged.retry?.setText("Retry");
 			}
 		} else this.renderMessage(staged, state);
