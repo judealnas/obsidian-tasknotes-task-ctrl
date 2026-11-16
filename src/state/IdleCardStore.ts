@@ -57,7 +57,10 @@ export class IdleCardStore {
 		this.changed();
 		for (const change of this.pathChanges.splice(0)) this.changePath(change.from, change.to);
 	}
-	serialize(): Record<string, unknown> { return this.blocked ? this.preserved : { idleTaskPathsVersion: 1, idleTaskPaths: [...this.paths] }; }
+	serialize(): Record<string, unknown> {
+		if (this.blocked) return this.preserved;
+		return this.paths.length ? { idleTaskPathsVersion: 1, idleTaskPaths: [...this.paths] } : {};
+	}
 	models(): TaskCardModel[] {
 		return this.paths.map(path => {
 			const task = this.tasks.get(path);
