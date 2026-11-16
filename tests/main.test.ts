@@ -127,8 +127,8 @@ test("loading failures keep the plugin usable and log a safe explanation", async
 	plugin.onload(); (host.tabs[0] as TimerPaneSettingTab).display(); await flush();
 	expect(host.settings).toHaveLength(1);
 	expect(log).toHaveBeenCalledWith("[tasknotes-timer-pane] Loading timer pane settings failed; using defaults.");
-	await saveSettingsOf(host.tabs[0])({ completionStatus: "done" });
- expect(host.saved).toEqual([{ completionStatus: "done", pauseRecordsVersion: 1, pauseRecords: [], completionRecordsVersion: "unreadable", completionRecords: undefined }]);
+	await expect(saveSettingsOf(host.tabs[0])({ completionStatus: "done" })).rejects.toThrow("Saved plugin data is unreadable");
+ expect(host.saved).toEqual([]);
 	log.mockRestore();
 });
 

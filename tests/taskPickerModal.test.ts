@@ -110,7 +110,7 @@ describe("task picker lifecycle", () => {
   gateway.listTasks = () => Promise.resolve([task]);
   const add = vi.fn(() => Promise.resolve());
   const closed = vi.fn();
-  const modal = new TaskPickerModal({} as App, { mode: "add", gateway, controller: { add, isBusy: () => false, availability: () => ({ available: true, reason: "" }) }, onClose: closed });
+  const modal = new TaskPickerModal({} as App, { mode: "add", gateway, controller: { add, isBusy: () => false, availability: () => ({ available: gateway.getState().kind === "ready", reason: "TaskNotes is unavailable" }) }, onClose: closed });
   return { modal, gateway, add, closed };
  }
  test("unloads row renderers and discards slow results on query change and close", async () => {
