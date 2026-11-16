@@ -330,7 +330,7 @@ test("a malformed card order loads empty; a load rejection keeps the plugin usab
 	expect(orderOf(failing).get()).toEqual([]);
 	orderOf(failing).set(["z"]);
 	await flush();
-	expect(host.saved[host.saved.length - 1]).toMatchObject({ cardOrder: ["z"] });
+	expect(host.saved).toEqual([]);
 	log.mockRestore();
 });
 

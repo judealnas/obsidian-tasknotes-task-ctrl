@@ -28,6 +28,7 @@ import { StagingController } from "../src/state/StagingController";
 import { StagedOrderStore } from "../src/state/StagedOrderStore";
 import { CompletionStore } from "../src/state/CompletionStore";
 import { CompletionController } from "../src/state/CompletionController";
+import { IdleCardStore } from "../src/state/IdleCardStore";
 import type { ActiveTimeEntry, TaskInfo } from "../src/tasknotes/runtime-api.types";
 import { createFakeGateway } from "./fakes/fakeGateway";
 import { Element, event, flush, resetViewHost, viewHost, transfer, hostDocument, hostWindow, HostEvent, workspace, Platform } from "./fakes/viewHost";
@@ -44,13 +45,16 @@ export function setup(initial: OpenTimer[] = [timer()], cardOrder = new CardOrde
 	const controller = { stop: vi.fn(() => Promise.resolve()), pause: vi.fn(() => Promise.resolve()), resume: vi.fn(() => Promise.resolve()), stopPaused: vi.fn(() => Promise.resolve()), complete: vi.fn(() => Promise.resolve()), start: vi.fn(), pauseAll: vi.fn(), resumeAll: vi.fn(), stopAll: vi.fn(), completionAvailable: vi.fn(() => Promise.resolve(true)), isBusy: () => busy, subscribeBusy: (fn: () => void) => { busyListeners.add(fn); return () => busyListeners.delete(fn); } };
 	const store = { getSnapshot: () => snapshot, getHeaderState: () => ({ readable: true, eligibleCount: 1, pausedCount: 1 }), subscribe: (fn: () => void) => { listeners.add(fn); return () => listeners.delete(fn); }, requestRefresh: vi.fn() };
 	const stagedOrder = new StagedOrderStore({ log: vi.fn() }); stagedOrder.load([]);
+	const pauses = new PauseStore({ log: vi.fn() }); pauses.load([]);
+	const idleCards = new IdleCardStore({ gateway, pauses, order: cardOrder, controller, persist: () => Promise.resolve(), notify: vi.fn(), log: vi.fn(), fileCheck: () => null, visibleKeys: () => [] });
+	idleCards.load({});
 	const completions = new CompletionStore({ persist: () => Promise.resolve() }); completions.load({});
 	const staging = new StagingStore({ gateway, completions, order: stagedOrder, schedule: (fn, ms) => { const timers = { setTimeout, clearTimeout }; const id = timers.setTimeout(fn, ms); return () => timers.clearTimeout(id); }, log: vi.fn() });
 	const stagingController = new StagingController({ gateway, staging, store: { refreshNow: () => Promise.resolve() }, queue: new WriteQueue(), timerBusy: controller.isBusy, settingsReady: () => Promise.resolve(), getSettings: () => ({ completionStatus: null }), newCorrelationId: () => "test", log: vi.fn() });
-	const view = new TimerPaneView({} as WorkspaceLeaf, { gateway, controller, completions, store, cardOrder, stagedOrder, staging: withStaging ? staging : undefined, stagingController: withStaging ? stagingController : undefined } as unknown as TimerPaneServices);
-	view.register(() => staging.dispose());
+	const view = new TimerPaneView({} as WorkspaceLeaf, { gateway, controller, completions, store, cardOrder, stagedOrder, idleCards, staging: withStaging ? staging : undefined, stagingController: withStaging ? stagingController : undefined } as unknown as TimerPaneServices);
+	view.register(() => staging.dispose()); view.register(() => idleCards.dispose());
 	const root = view.contentEl as unknown as Element;
-	return { view, root, gateway, controller, completions, cardOrder, stagedOrder, store, staging, stagingController,
+	return { view, root, gateway, controller, completions, cardOrder, stagedOrder, store, staging, stagingController, idleCards,
 		set(timers: OpenTimer[] | null) { snapshot = timers === null ? null : { primary: timers[0] ?? null, others: timers.slice(1) }; listeners.forEach(fn => fn()); },
 		busy(value: boolean) { busy = value; busyListeners.forEach(fn => fn()); },
 	};
@@ -346,13 +350,13 @@ test("a real staged card joins running and paused timer sessions without replaci
 	await view.onClose(); view.unload(); staging.dispose(); store.dispose();
 });
 
-test("Start opens start-only options once and releases its guard after close and bridge loss", async () => {
+test("Add task opens the picker once and releases its guard after close and bridge loss", async () => {
 	const s = setup(); await s.view.onOpen(); await flush();
 	const start = s.root.querySelector(".tntp-start")!;
 	event(s.root.querySelector(".tntp-insert")!, "click"); expect(pickerHost.instances).toHaveLength(0);
 	s.busy(true); event(start, "click"); expect(pickerHost.instances).toHaveLength(0); s.busy(false);
 	event(start, "click"); event(start, "click"); expect(pickerHost.instances).toHaveLength(1);
-	expect(pickerHost.instances[0]!.options.mode).toBe("start");
+	expect(pickerHost.instances[0]!.options.mode).toBe("add");
 	pickerHost.instances[0]!.close(); event(start, "click"); expect(pickerHost.instances).toHaveLength(2);
 	s.gateway.setState({ kind: "missing" }); event(start, "click"); expect(pickerHost.instances).toHaveLength(2);
 	s.gateway.setState({ kind: "ready" }); event(start, "click"); expect(pickerHost.instances).toHaveLength(3);
@@ -486,7 +490,7 @@ test("switches stable panels with independent actions and empty states", async (
 	event(tabs[1]!, "click"); event(tabs[0]!, "click"); event(tabs[1]!, "click");
 	expect(s.root.querySelector(".tntp-card")).toBe(current);
 	expect(card).not.toBeNull();
-	expect(panels[1]!.querySelector(".tntp-header")!.children.map(el => el.textContent).join(",")).toBe("Start task,Pause all,Resume all,Stop all");
+	expect(panels[1]!.querySelector(".tntp-header")!.children.map(el => el.textContent).join(",")).toBe("Add task,Pause all,Resume all,Stop all");
 	await s.view.onClose();
 });
 

@@ -38,7 +38,6 @@ declare module "obsidian" {
 export default class TaskNotesTimerPanePlugin extends Plugin {
 	private idleCards: IdleCardStore | null = null;
 	private dataReadable = false;
-	private legacyRollover: Record<string, unknown> = {};
  private completions: CompletionStore | null = null;
 	private paneSettings: TimerPaneSettings = { ...DEFAULT_SETTINGS };
 	private settingsReady: Promise<void> = Promise.resolve();
@@ -70,7 +69,6 @@ export default class TaskNotesTimerPanePlugin extends Plugin {
 				...this.idleCards?.serialize(),
     ...this.completions?.serialize(),
 				completionStatus: written.completionStatus,
-				...this.legacyRollover,
 				pauseRecordsVersion: PAUSE_RECORDS_VERSION,
 				pauseRecords: this.pauses?.serialize() ?? [],
 				// Omitted when empty, so a user who never reorders keeps an unchanged data.json.
@@ -160,7 +158,6 @@ export default class TaskNotesTimerPanePlugin extends Plugin {
 		this.registerView(VIEW_TYPE_TIMER_PANE, (leaf) => new TimerPaneView(leaf, { gateway: bridge, store, controller, completion, completions, cardOrder, stagedOrder, staging, stagingController, idleCards, taskCreation }));
 		this.settingsReady = this.loadData().then((data: unknown) => {
 			this.dataReadable = true;
-			if (typeof data === "object" && data !== null && "rolloverHour" in data) this.legacyRollover = { rolloverHour: data.rolloverHour };
 			this.paneSettings = loadSettings(data);
 			this.fileSettings = { ...this.paneSettings };
 			this.extras = extrasOf(data);

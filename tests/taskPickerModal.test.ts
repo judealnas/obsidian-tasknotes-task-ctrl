@@ -108,10 +108,10 @@ describe("task picker lifecycle", () => {
  function setup() {
   const gateway = createFakeGateway();
   gateway.listTasks = () => Promise.resolve([task]);
-  const start = vi.fn(() => Promise.resolve("started" as const));
+  const add = vi.fn(() => Promise.resolve());
   const closed = vi.fn();
-  const modal = new TaskPickerModal({} as App, { mode: "start", gateway, controller: { start, isBusy: () => false }, onClose: closed });
-  return { modal, gateway, start, closed };
+  const modal = new TaskPickerModal({} as App, { mode: "add", gateway, controller: { add, isBusy: () => false, availability: () => ({ available: true, reason: "" }) }, onClose: closed });
+  return { modal, gateway, add, closed };
  }
  test("unloads row renderers and discards slow results on query change and close", async () => {
   const { modal } = setup(); modal.onOpen(); await flush();
@@ -132,15 +132,15 @@ describe("task picker lifecycle", () => {
   expect(load).toHaveBeenCalledTimes(1);
  });
  test("mouse and keyboard share once-only selection even when host closes first", async () => {
-  const { modal, start } = setup(); modal.onOpen(); await flush();
+  const { modal, add } = setup(); modal.onOpen(); await flush();
   modal.selectSuggestion(task, {} as KeyboardEvent); modal.onChooseSuggestion(task);
-  expect(start).toHaveBeenCalledTimes(1);
-  expect(start).toHaveBeenCalledWith({ taskPath: "Task.md", title: "Task" });
+  expect(add).toHaveBeenCalledTimes(1);
+  expect(add).toHaveBeenCalledWith(task);
  });
  test("bridge loss closes the picker and blocks stale selection", async () => {
-  const { modal, gateway, start, closed } = setup(); modal.onOpen(); await flush();
+  const { modal, gateway, add, closed } = setup(); modal.onOpen(); await flush();
   gateway.setState({ kind: "missing" }); modal.selectSuggestion(task, {} as MouseEvent);
-  expect(closed).toHaveBeenCalledTimes(1); expect(start).not.toHaveBeenCalled();
+  expect(closed).toHaveBeenCalledTimes(1); expect(add).not.toHaveBeenCalled();
  });
 });
 
@@ -148,7 +148,7 @@ test.each([false, true])("picker read failure closes and releases guards when No
  const gateway = createFakeGateway(); gateway.listTasks = () => Promise.reject(new Error("Read failed"));
  const closed = vi.fn(); host.notices = 0; host.throwNotice = throws;
  const errorLog = vi.spyOn(console, "error").mockImplementation(() => undefined);
- const modal = new TaskPickerModal({} as App, { mode: "start", gateway, controller: { start: () => Promise.resolve("started"), isBusy: () => false }, onClose: closed });
+ const modal = new TaskPickerModal({} as App, { mode: "add", gateway, controller: { add: () => Promise.resolve(), isBusy: () => false, availability: () => ({ available: true, reason: "" }) }, onClose: closed });
  modal.onOpen(); await flush();
  expect(closed).toHaveBeenCalledTimes(1); expect(host.notices).toBe(1);
  expect(modal.getSuggestions("")).toEqual([]);
@@ -165,9 +165,9 @@ describe("Pomodoro row tag (D-17)", () => {
   const read = vi.fn(ownership);
   gateway.pomodoroOwnership = read;
   const closed = vi.fn();
-  const start = vi.fn(() => Promise.resolve("started" as const));
-  const modal = new TaskPickerModal({} as App, { mode: "start", gateway, controller: { start, isBusy: () => false }, onClose: closed });
-  return { modal, gateway, read, closed, start };
+  const add = vi.fn(() => Promise.resolve());
+  const modal = new TaskPickerModal({} as App, { mode: "add", gateway, controller: { add, isBusy: () => false, availability: () => ({ available: true, reason: "" }) }, onClose: closed });
+  return { modal, gateway, read, closed, add };
  }
  function tags(modal: TaskPickerModal, row: typeof task | typeof other): Element[] {
   const el = new Element();
@@ -220,10 +220,10 @@ describe("Pomodoro row tag (D-17)", () => {
   modal.onOpen(); await flush();
   expect(tags(modal, task)).toHaveLength(0);
  });
- test("choosing the tagged row still calls controller.start, which decides", async () => {
-  const { modal, start } = open(() => Promise.resolve({ readable: true, owner: { taskPath: "Task.md", startTime: "2026-10-14T09:00:00.000Z" } }));
+ test("choosing the tagged row still calls controller.add", async () => {
+  const { modal, add } = open(() => Promise.resolve({ readable: true, owner: { taskPath: "Task.md", startTime: "2026-10-14T09:00:00.000Z" } }));
   modal.onOpen(); await flush();
   modal.onChooseSuggestion(task);
-  expect(start).toHaveBeenCalledWith({ taskPath: "Task.md", title: "Task" });
+  expect(add).toHaveBeenCalledWith(task);
  });
 });
