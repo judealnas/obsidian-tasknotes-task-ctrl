@@ -20,11 +20,11 @@ An Obsidian plugin that adds a dockable pane for monitoring and controlling Task
 3. Open the command palette and run **BRAT: Add a beta plugin for testing**.
 4. Enter `judealnas/obsidian-tasknotes-timer-pane` and add the plugin.
 5. In **Settings → BRAT**, choose which release to track:
-   - **Latest** follows the newest version and can include prereleases. It currently selects `0.3.0-beta.2`.
-   - **Frozen version** stays on one release tag. Use `0.2.0` to stay on stable or `0.3.0-beta.2` to test the current beta.
+   - **Latest** follows the newest version and can include prereleases. It currently selects `0.3.0-beta.3`.
+   - **Frozen version** stays on one release tag. Use `0.2.0` to stay on stable or `0.3.0-beta.3` to test the current beta.
 6. Open **Settings → Community plugins** and enable **TaskNotes Task Control**.
 
-See the [BRAT guide](https://github.com/TfTHacker/obsidian42-brat/blob/main/BRAT-DEVELOPER-GUIDE.md) for details about latest and frozen versions. The [0.3.0-beta.2 release notes](docs/releases/0.3.0-beta.2.md) list the beta's outstanding acceptance checks.
+See the [BRAT guide](https://github.com/TfTHacker/obsidian42-brat/blob/main/BRAT-DEVELOPER-GUIDE.md) for details about latest and frozen versions. The [0.3.0-beta.3 release notes](docs/releases/0.3.0-beta.3.md) list the beta's outstanding acceptance checks.
 
 ### Manual install
 
@@ -122,4 +122,4 @@ The instance listens for DevTools connections on port 9333. That port is localho
 1. `npm version patch` (or `minor` / `major`) bumps `package.json`, `manifest.json` and `versions.json`, commits, and tags the version without a `v` prefix.
 2. `git push --follow-tags` pushes the commit and tag. The release workflow runs `npm run check`, confirms the tag matches `manifest.json`, and publishes a GitHub release with `main.js`, `manifest.json` and `styles.css`.
 
-For a beta, use the same prerelease version in `package.json`, `package-lock.json`, `manifest.json`, and the matching tag without a `v` prefix (for example, `0.3.0-beta.2`). Tags containing a hyphen are published as GitHub prereleases and do not replace GitHub's Latest release. Release notes come from `docs/releases/<tag>.md` when present. BRAT's latest tracking may still select prereleases. Beta publication does not close outstanding stable-release acceptance checks.
+For a beta, use the same prerelease version in `package.json`, `package-lock.json`, `manifest.json`, and the matching tag without a `v` prefix (for example, `0.3.0-beta.3`). Tags containing a hyphen are published as GitHub prereleases and do not replace GitHub's Latest release. Release notes come from `docs/releases/<tag>.md` when present. BRAT's latest tracking may still select prereleases. Beta publication does not close outstanding stable-release acceptance checks.
