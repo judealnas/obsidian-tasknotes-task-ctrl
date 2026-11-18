@@ -4,6 +4,7 @@ export const host = {
 	settings: [] as Setting[], tabs: [] as PluginSettingTab[], failSave: false,
 	/** vault.on handlers by event name, in registration order. */
 	vaultHandlers: {} as Record<string, Array<(...args: unknown[]) => unknown>>,
+	workspaceHandlers: {} as Record<string, Array<(...args: unknown[]) => unknown>>,
 	/** Callbacks passed to workspace.onLayoutReady; a test fires them. */
 	layoutReady: [] as Array<() => void>,
 	/** Paths vault.getFileByPath finds. */
@@ -13,7 +14,7 @@ export const host = {
 export function resetHost(): void {
 	host.order = []; host.data = undefined; host.saved = []; host.notices = [];
 	host.settings = []; host.tabs = []; host.failSave = false;
-	host.vaultHandlers = {}; host.layoutReady = []; host.files = new Set();
+	host.vaultHandlers = {}; host.workspaceHandlers = {}; host.layoutReady = []; host.files = new Set();
 	host.viewTypes = []; host.commands = []; host.ribbonLabels = [];
 }
 /** Fires every vault handler registered for `name`. */
@@ -55,9 +56,19 @@ export const MarkdownRenderer = {};
 export function setIcon(): void {}
 export function setTooltip(): void {}
 export class Notice { constructor(message: string) { host.notices.push(message); } }
+export class TFile {
+	constructor(public path: string) {}
+	get basename(): string { return this.path.split("/").pop()!.replace(/\.[^.]+$/, ""); }
+}
 export class Plugin {
 	app = {
-		workspace: { onLayoutReady: (callback: () => void) => { host.layoutReady.push(callback); } },
+		workspace: {
+			onLayoutReady: (callback: () => void) => { host.layoutReady.push(callback); },
+			on: (name: string, handler: (...args: unknown[]) => unknown) => {
+				(host.workspaceHandlers[name] ??= []).push(handler);
+				return {};
+			},
+		},
 		vault: {
 			on: (name: string, handler: (...args: unknown[]) => unknown) => {
 				(host.vaultHandlers[name] ??= []).push(handler);

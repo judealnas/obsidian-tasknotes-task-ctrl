@@ -1,6 +1,7 @@
 import { afterEach, beforeEach, expect, test, vi } from "vitest";
 import TaskNotesTimerPanePlugin from "../src/main";
-import { emitVault, fireLayoutReady, host, resetHost } from "./fakes/fakeObsidian";
+import { emitVault, fireLayoutReady, host, resetHost, TFile } from "./fakes/fakeObsidian";
+import { StagingController } from "../src/state/StagingController";
 import type { TimerStore, TimerStoreDeps } from "../src/state/TimerStore";
 import type { PauseStore } from "../src/state/PauseStore";
 import type { TimerPaneSettingTab } from "../src/ui/TimerPaneSettingTab";
@@ -33,6 +34,39 @@ vi.mock("../src/state/TimerStore", async (importOriginal) => {
 beforeEach(() => { resetHost(); captured.stores = []; vi.useFakeTimers(); vi.stubGlobal("window", { setTimeout, clearTimeout, setInterval }); });
 afterEach(() => { vi.useRealTimers(); vi.unstubAllGlobals(); });
 const flush = async () => { for (let i = 0; i < 12; i++) await Promise.resolve(); };
+
+test("TaskNotes Note actions stages the selected file only after clicking", async () => {
+ const plugin = new TaskNotesTimerPanePlugin({} as App, {} as PluginManifest); plugin.onload(); await flush();
+ const staging = capturedStaging.stores[capturedStaging.stores.length - 1]!;
+ const gateway = (staging as unknown as { deps: StagingStoreDeps }).deps.gateway;
+ const available = vi.spyOn(gateway, "stagingAvailability").mockReturnValue({ available: true, reason: "" });
+ const stage = vi.spyOn(StagingController.prototype, "stage").mockResolvedValue({ kind: "already-staged" });
+ try {
+  let click: (() => Promise<void>) | undefined;
+  const item = { setTitle: vi.fn(() => item), setIcon: vi.fn(() => item), setDisabled: vi.fn(() => item), onClick: (callback: () => Promise<void>) => { click = callback; return item; } };
+  const menu = { addItem: (callback: (value: typeof item) => void) => callback(item) };
+  const handler = host.workspaceHandlers["file-menu"]![0]!;
+  handler(menu, new TFile("Tasks/Chosen.md"), "tasknotes-context-menu");
+  expect(item.setTitle).toHaveBeenCalledWith("Stage task");
+  expect(item.setDisabled).toHaveBeenLastCalledWith(false);
+  expect(stage).not.toHaveBeenCalled();
+  await click!();
+  expect(stage).toHaveBeenCalledExactlyOnceWith({ taskPath: "Tasks/Chosen.md", title: "Chosen" });
+  expect(host.notices).toContain("This task is already staged.");
+  available.mockReturnValue({ available: false, reason: "Disconnected" });
+  handler(menu, new TFile("Tasks/Chosen.md"), "tasknotes-context-menu");
+  expect(item.setDisabled).toHaveBeenLastCalledWith(true);
+ } finally { stage.mockRestore(); available.mockRestore(); }
+});
+
+test("Stage task is absent from unrelated file menus and folder menus", async () => {
+ const plugin = new TaskNotesTimerPanePlugin({} as App, {} as PluginManifest); plugin.onload(); await flush();
+ const menu = { addItem: vi.fn() };
+ const handler = host.workspaceHandlers["file-menu"]![0]!;
+ handler(menu, new TFile("Notes/Other.md"), "file-explorer");
+ handler(menu, { path: "Folder" }, "tasknotes-context-menu");
+ expect(menu.addItem).not.toHaveBeenCalled();
+});
 
 test.each([null, undefined, {}])("legacy empty data %j keeps defaults and stable registration", async data => {
  host.data = data;

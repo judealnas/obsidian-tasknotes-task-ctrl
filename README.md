@@ -74,6 +74,7 @@ In TaskNotes settings → Task Properties → Custom User Fields, register **key
 
 - Full-width **+** buttons open a searchable batch picker before, between or after staged cards. The empty Staged tab shows a single + button. Multiple choices keep their selection order and the picker stays open. Completed, archived and already-staged tasks are hidden.
 - Staging writes `staged: YYYY-MM-DD` through TaskNotes. Staged tasks stay until completed or unstaged; future dates stay hidden until that local calendar date. Cards show the number of calendar days since staging.
+- Right-click a task and choose **Note actions → Stage task** to stage it without opening the picker. This also works from task titles in the timer pane. Already-staged tasks keep their existing date and order.
 - Start, pause, resume, stop or complete from each staged card. **✕** unstages immediately, stopping regular timing or clearing a saved pause while protecting Pomodoro timing. It writes `staged: null`.
 - **Complete** stops eligible regular timing before completion. Recurring tasks follow TaskNotes' resolved occurrence, which can differ from the requested calendar date on an off-schedule request. Repeated pane completion is protected against replay. Failures use Notices; successful completion is quiet.
 - There is no Done today section or rollover-hour setting. Midnight only updates the calendar age and reveals eligible future-dated tasks; it never clears the list or writes task frontmatter.

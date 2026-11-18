@@ -1,4 +1,4 @@
-import { Notice, Plugin } from "obsidian";
+import { Notice, Plugin, TFile } from "obsidian";
 import { PauseStore } from "./state/PauseStore";
 import { CardOrderStore } from "./state/CardOrderStore";
 import { loadCardOrder } from "./model/cardOrder";
@@ -137,6 +137,20 @@ export default class TaskNotesTimerPanePlugin extends Plugin {
 		const stagingController = new StagingController({ gateway: bridge, store, staging, queue, newCorrelationId, log, pauses, notify,
 			getSettings: () => this.paneSettings, settingsReady: () => this.settingsReady, timerBusy: () => controller.isBusy(),
 			commitOrder: async (path, action, beforePath) => { if (action === "stage") stagedOrder.insertBefore(path, beforePath); else stagedOrder.removePath(path, false); await stagedOrder.commit(); } });
+		// TaskNotes exposes its Note actions submenu through Obsidian's file-menu event.
+		this.registerEvent(this.app.workspace.on("file-menu", (menu, file, source) => {
+			if (source !== "tasknotes-context-menu" || !(file instanceof TFile)) return;
+			menu.addItem(item => item
+				.setTitle("Stage task")
+				.setIcon("list-plus")
+				.setDisabled(!bridge.stagingAvailability().available || stagingController.isBusy() || controller.isBusy())
+				.onClick(async () => {
+					const result = await stagingController.stage({ taskPath: file.path, title: file.basename });
+					if (result.warning) notify(result.warning);
+					else if (result.message) notify(result.message);
+					else if (result.kind === "already-staged") notify("This task is already staged.");
+				}));
+		}));
   const completion = new CompletionController({ gateway: bridge, queue, timer: controller, notify, log, newCorrelationId,
    settingsReady: () => this.settingsReady, getSettings: () => this.paneSettings,
    getRecords: () => completions.records(), storageAvailable: () => completions.available(),
