@@ -34,6 +34,36 @@ See the [BRAT guide](https://github.com/TfTHacker/obsidian42-brat/blob/main/BRAT
 
 To build from source, run `npm install` and `npm run build`, then copy the same three files from the repository root.
 
+### Switch a vault between local and release builds
+
+Requires Node.js 22 or later and Git. Install this plugin in the target vault first, then configure its location once:
+
+```powershell
+npm run vault:setup -- "C:\path\to\Your Vault"
+```
+
+This saves the path in Git-ignored `.vault-switch.local.json`. Setup checks the existing plugin ID and changes no vault files. It supports the standard `.obsidian` configuration folder and refuses linked or redirected vault/plugin directories.
+
+Before switching, disable **TaskNotes Task Control** in Obsidian's Community plugins settings. Leave it disabled until the command finishes, then re-enable it. The commands check `.obsidian/community-plugins.json`; they do not control the running Obsidian process. Turn off BRAT automatic updates while using a local build.
+
+```powershell
+npm run vault:local                       # Build this checkout, including uncommitted changes
+npm run vault:release -- 0.3.0-beta.3       # Download this exact GitHub release
+npm run vault:status                      # Identify the installed files
+npm run vault:undo                        # Restore files from the previous switch
+```
+
+- Both sources replace only `main.js`, `manifest.json`, and `styles.css`. They preserve `data.json`, task notes, and other plugin files. The existing `npm run dev` and `npm run deploy` still target only the disposable dev-vault.
+- Local switching runs the same TypeScript check and production bundler as `npm run build`. A failed build or invalid/incomplete download leaves the installed plugin untouched. Release downloads validate the plugin ID, exact manifest version, asset sizes, and GitHub-provided SHA-256 digests when available. `latest` is deliberately unsupported.
+- Before replacement, the current plugin files and any `data.json` are backed up under Git-ignored `.vault-switch/`, separately for each vault. Backups can contain private saved state; keep this directory private. Backups are retained until you remove them yourself.
+- Status compares file hashes and records the local Git commit plus whether the checkout had uncommitted changes. A matching version number alone does not identify a build. Files changed by BRAT or another tool are reported as unknown or changed. Status describes files on disk, not the code currently loaded by Obsidian.
+- Undo restores the previous three plugin files, including a previously absent stylesheet. It leaves current saved data and task notes intact. Repeating undo switches back to the build it just replaced. A restored install that predates the switcher may have unknown build provenance.
+- Replacement is atomic per file, not across all three files. Ordinary write failures trigger automatic restoration. An interrupted switch retains a recovery record: keep the plugin disabled and run `npm run vault:undo`. If a crashed process left `switch.lock`, first confirm no switch is running, then remove only the lock file named in the error and retry undo. Do not run other installers against the same vault during switching.
+
+Keeping saved data does not guarantee that an older release can read a newer build's data. The backup is available for separate manual recovery; these commands never restore `data.json` automatically or reverse changes to TaskNotes task notes.
+
+Run `npm run test:vault-switch` to exercise switching and recovery against temporary test vaults without opening Obsidian.
+
 ## Using the pane
 
 Version 0.3.0 adds **Staged** beside **Timers**, with independent saved order, task/running-timer counts, and a running cue on Timers. The display name changes; the plugin id, installed folder, saved data and view type remain `tasknotes-timer-pane`, and the command id remains `open-timer-pane`. Upgrade in place and keep `data.json`.

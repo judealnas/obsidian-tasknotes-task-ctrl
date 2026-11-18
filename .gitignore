@@ -4,6 +4,8 @@ dev-vault/
 data.json
 *.log
 .DS_Store
+.vault-switch.local.json
+.vault-switch/
 .claude/worktrees/
 dev-vault-task-backup-*/
 .planning/phases/07-complete-roll-over-release-0-3-0/07-resume-backup/

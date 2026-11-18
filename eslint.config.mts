@@ -7,6 +7,7 @@ export default defineConfig(
 	globalIgnores([
 		".claude/worktrees/**",
 		".planning/**",
+		".vault-switch/**",
 		"node_modules",
 		"dev-vault",
 		"dev-vault-seed",
