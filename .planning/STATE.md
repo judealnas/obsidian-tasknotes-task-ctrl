@@ -6,10 +6,10 @@ current_phase: 07
 current_phase_name: Complete, Roll Over & Release 0.3.0
 status: executing
 stopped_at: Beta feedback implemented; Done today and custom rollover removed; mobile and BRAT acceptance open
-last_updated: "2026-11-15T08:25:13.976Z"
+last_updated: "2026-11-18T18:12:58.945Z"
 last_activity: 2026-11-15
 last_activity_desc: Phase 07 execution started
-state_head: bc988d080db5e75a05dd57239f204cb428175cf7
+state_head: 9098c7a9cb9d2c33d0c4aa64a7162d63e99e5922
 progress:
   total_phases: 4
   completed_phases: 3
@@ -176,6 +176,9 @@ None yet.
 | 261027-mcs | Add drag-and-drop reordering of the timer cards in the pane | 2026-10-27 | 8051ea7 | [261027-mcs-add-drag-and-drop-reordering-of-the-time](./quick/261027-mcs-add-drag-and-drop-reordering-of-the-time/) |
 | 261113-i5w | Invisible isolated Obsidian UAT instance (hidden desktop + CDP MCP) | 2026-11-13 | f0ff2be | [261113-i5w-invisible-isolated-obsidian-uat-instance](./quick/261113-i5w-invisible-isolated-obsidian-uat-instance/) |
 | 261113-iua | UAT sandbox runs the code under test and GSD verify steps start it | 2026-11-13 | 0f4a076 | [261113-iua-uat-sandbox-runs-the-code-under-test-and](./quick/261113-iua-uat-sandbox-runs-the-code-under-test-and/) |
+| 13 | Clean up README and document BRAT installation | 2026-11-15 | 7a0dc3a | — |
+| 261115-na9 | Add tasks as persistent idle timer cards | 2026-11-15 | 6045c1f | [261115-na9-add-tasks-as-persistent-idle-timer-cards](./quick/261115-na9-add-tasks-as-persistent-idle-timer-cards/) |
+| 261115-ogd | Create tasks from Staged or Timers with TaskNotes dialog | 2026-11-15 | a5bdb85 | [261115-ogd-create-tasks-from-staged-or-timers-with](./quick/261115-ogd-create-tasks-from-staged-or-timers-with/) |
 
 ## Deferred Items
 
@@ -205,7 +208,6 @@ Resume file: .planning/phases/07-complete-roll-over-release-0-3-0/.continue-here
 - [2026-11-15 beta.2 publication]: User authorized and published 0.3.0-beta.2 from milestone-v0.3 at 68add19e6b378baffc662e9a9e1b5df4fa1161f3, including the completed feedback revision. Local/GitHub build, lint and 636 tests passed; downloaded assets matched the tested bundle/tagged source. Release workflow 43741551679 succeeded. GitHub Latest remains 0.2.0. Physical mobile and actual BRAT update remain open. Prior statements below that no subsequent beta was authorized are historical; stable 0.3.0 remains unpublished and acceptance incomplete. See quick task 261115-hco for release URL and hashes.
 
 - [2026-11-15 beta feedback scope revision]: Done today, external history collection and configurable rollover are removed by explicit user direction. Staging and recurring requests now use local calendar dates; unfinished tasks persist and calendar age refreshes without task writes. Completion safety/replay records remain. See quick task 261115-gpo for UI fixes, tests and native evidence. This supersedes older instructions below to wait for overnight/custom-rollover acceptance. Physical mobile/touch, actual BRAT upgrade and stable publication remain open. No new beta publication was requested.
-
 
 - [2026-11-15 beta publication]: User explicitly authorized beta publication from milestone-v0.3 with physical acceptance still open. Published `0.3.0-beta.1` at `bdc5f0f53f060c10180dd2446bfb67556deb1ec1`; GitHub Release workflow 43735538641 passed full checks. Downloaded assets verified; GitHub Latest remains 0.2.0. See quick task 261115-fup for hashes and release URL. BRAT installation/update to this beta has not been exercised. This beta authorization does not close Phase 7 acceptance or authorize stable 0.3.0 publication. Older no-publication/candidate-version descriptions below are historical.
 
