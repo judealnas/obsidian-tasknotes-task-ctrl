@@ -54,12 +54,15 @@ export class StagingController {
 				const [fields, statuses, task] = await Promise.all([gateway.userFields(), gateway.statuses(), gateway.getTask(target.taskPath)]);
 				const field = fieldStatus(fields);
 				if (field.kind !== "ok" || field.hasDefault) return { kind: "blocked", message: "Register staged as a Date field with no default value, then retry." };
-				if (!task || task.archived || statuses.some(status => status.isCompleted && status.value === task.status)) return { kind: "blocked", message: "This task is no longer available to stage." };
+				if (!task) return { kind: "blocked", message: "This task is no longer available to stage." };
+				if (task.archived || statuses.some(status => status.isCompleted && status.value === task.status)) return { kind: "blocked", message: "Completed/archived tasks cannot be staged" };
 				if (isStageReserved(task)) return { kind: "already-staged" };
 				const latestField = fieldStatus(await gateway.userFields());
 				if (revision !== staging.revision || !gateway.stagingAvailability().available || latestField.kind !== "ok" || latestField.hasDefault) return { kind: "blocked", message: "TaskNotes changed while checking this task. Retry." };
 				const latestTask = await gateway.getTask(target.taskPath);
-				if (revision !== staging.revision || !gateway.stagingAvailability().available || !latestTask || latestTask.archived || statuses.some(status => status.isCompleted && status.value === latestTask.status)) return { kind: "blocked", message: "This task changed while checking. Retry." };
+				if (revision !== staging.revision || !gateway.stagingAvailability().available) return { kind: "blocked", message: "This task changed while checking. Retry." };
+				if (!latestTask) return { kind: "blocked", message: "This task changed while checking. Retry." };
+				if (latestTask.archived || statuses.some(status => status.isCompleted && status.value === latestTask.status)) return { kind: "blocked", message: "Completed/archived tasks cannot be staged" };
 				if (isStageReserved(latestTask)) return { kind: "already-staged" };
 				const date = calendarDate((this.deps.now ?? Date.now)());
 				staging.invalidate();

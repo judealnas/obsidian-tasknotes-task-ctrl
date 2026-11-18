@@ -24,6 +24,35 @@ export function commandFixture() {
 	return { gateway, staging, queue, controller, deps, target, refreshNow, task: () => task, change: (patch: object) => { task = { ...task, ...patch }; } };
 }
 
+test.each(["archived", "completed"] as const)("Stage reports the completed or archived message for an initially %s task", async state => {
+	const s = commandFixture();
+	if (state === "archived") s.change({ archived: true });
+	else { s.change({ status: "closed" }); s.gateway.statuses = () => Promise.resolve([{ value: "closed", isCompleted: true }]); }
+	const result = await s.controller.stage(s.target);
+	expect(result).toEqual({ kind: "blocked", message: "Completed/archived tasks cannot be staged" });
+	expect(s.gateway.updateCalls).toHaveLength(0); s.staging.dispose();
+});
+
+test("Stage keeps the missing-task message", async () => {
+	const s = commandFixture(); s.gateway.getTask = () => Promise.resolve(null);
+	expect(await s.controller.stage(s.target)).toEqual({ kind: "blocked", message: "This task is no longer available to stage." });
+	expect(s.gateway.updateCalls).toHaveLength(0); s.staging.dispose();
+});
+
+test.each(["archived", "completed"] as const)("Stage reports the completed or archived message when the final task read becomes %s", async state => {
+	const s = commandFixture();
+	if (state === "completed") s.gateway.statuses = () => Promise.resolve([{ value: "closed", isCompleted: true }]);
+	let reads = 0;
+	s.gateway.getTask = () => Promise.resolve(++reads === 1
+		? { path: s.target.taskPath, title: s.target.title, status: "open", archived: false }
+		: state === "archived"
+			? { path: s.target.taskPath, title: s.target.title, status: "open", archived: true }
+			: { path: s.target.taskPath, title: s.target.title, status: "closed", archived: false });
+	const result = await s.controller.stage(s.target);
+	expect(result).toEqual({ kind: "blocked", message: "Completed/archived tasks cannot be staged" });
+	expect(s.gateway.updateCalls).toHaveLength(0); s.staging.dispose();
+});
+
 test("a task staged during the final registration check is not overwritten", async () => {
 	const s = commandFixture();
 	const original = s.gateway.userFields.bind(s.gateway); let reads = 0;
