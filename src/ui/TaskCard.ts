@@ -2,14 +2,16 @@ import { Component, Platform, setIcon, setTooltip, type App } from "obsidian";
 import { TaskTitle } from "./TaskTitle";
 import { formatHms, timerSessionMs, totalMs, type OpenTimer } from "../model/timeMath";
 import type { TimerPaneServices } from "./TimerPaneView";
+import type { TaskInfo } from "../tasknotes/runtime-api.types";
 
 export interface IdleTaskCard {
 	state: "idle";
 	taskPath: string;
 	title: string;
 	displayKey: string;
+	task?: TaskInfo;
 }
-export type TaskCardModel = (OpenTimer | IdleTaskCard) & { stagedMetadata?: string; stagedCard?: boolean; stagedMarker?: boolean; pendingCard?: boolean };
+export type TaskCardModel = (OpenTimer | IdleTaskCard) & { stagedMetadata?: string; stagedCard?: boolean; pendingCard?: boolean };
 function cardKey(model: TaskCardModel): string { return model.state === "idle" ? model.taskPath : model.sessionKey; }
 
 export interface TaskCardOptions {
@@ -56,6 +58,14 @@ function setTextIfChanged(el: HTMLElement, text: string): void {
 
 
 
+/** Context is plain text; normalize prefixes and omit empty or repeated values. */
+function formatContexts(value: unknown): string {
+ if (!Array.isArray(value)) return "";
+ const contexts = value.filter((item): item is string => typeof item === "string")
+  .map(item => item.trim().replace(/^@+/, "").trim()).filter(Boolean);
+ return [...new Set(contexts)].map(context => `@${context}`).join(", ");
+}
+
 /** Owns a single timer's DOM, actions and all pending/current title renderers. No interval. */
 export class TaskCard extends Component {
  private elements: CardElements;
@@ -91,7 +101,7 @@ export class TaskCard extends Component {
   this.completionReady = completionReady;
   card.titleOwner.update(timer);
   setTextIfChanged(card.titleLabel, `Open ${timer.title}`);
-  setTextIfChanged(card.metadata, timer.stagedMetadata ?? (timer.stagedMarker ? "Staged" : ""));
+  setTextIfChanged(card.metadata, [timer.stagedMetadata, formatContexts(timer.task?.contexts)].filter(Boolean).join(" · "));
   card.card.toggleClass("tntp-card--idle", timer.state === "idle");
   card.card.toggleClass("tntp-card--staged", !!timer.stagedCard);
   card.card.toggleClass("tntp-card--pending", !!timer.pendingCard);

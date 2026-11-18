@@ -67,6 +67,17 @@ test("product display name changes while saved pane identity stays unchanged", (
  expect(s.view.getViewType()).toBe("tasknotes-timer-pane"); s.view.unload();
 });
 
+test("fixed context metadata appears in both tabs without display controls", async () => {
+ const task: TaskInfo = { path: "A.md", title: "Task A", status: "open", archived: false, contexts: ["work"], tags: ["urgent"] };
+ const s = setup([timer({ task })], undefined, true);
+ s.gateway.listTasks = () => Promise.resolve([{ ...task, staged: "2026-11-12" }]);
+ await s.view.onOpen(); await s.staging.refreshNow(); await flush();
+ expect(s.root.querySelectorAll(".tntp-staged-metadata").map(el => el.textContent)).toEqual(["Nov 12 · 1 day ago · @work", "Nov 12 · 1 day ago · @work"]);
+ expect(s.root.querySelectorAll(".tntp-display-controls__button")).toHaveLength(0);
+ expect(s.root.querySelectorAll(".tntp-card-details")).toHaveLength(0);
+ await s.view.onClose(); s.view.unload();
+});
+
 test("staged insertion buttons open the shared picker at the corresponding card or end", async () => {
 	const s = setup([], undefined, true);
 	s.gateway.setUserFields([{ id: "s", key: "staged", displayName: "Staged", type: "date" }]);
@@ -261,7 +272,7 @@ test("shared counts, running accent, markers and orders never navigate independe
 	expect(tabs[0]!.classes.has("tntp-tabs__tab--active")).toBe(true); expect(tabs[1]!.classes.has("tntp-tabs__tab--active")).toBe(false);
 	expect(tabs[0]!.querySelector(".tntp-tabs__count")!.classes.has("tntp-tabs__count--running")).toBe(false); expect(tabs[1]!.querySelector(".tntp-tabs__count")!.classes.has("tntp-tabs__count--running")).toBe(true);
 	const timedCard = timers.querySelector(".tntp-card")!; const timedTitle = timedCard.querySelector(".tntp-title")!;
-	expect(timedCard.querySelector(".tntp-staged-metadata")!.textContent).toBe("Staged"); expect(staged.querySelector(".tntp-card")).not.toBe(timedCard);
+	expect(timedCard.querySelector(".tntp-staged-metadata")!.textContent).toBe("Nov 12 · 1 day ago"); expect(staged.querySelector(".tntp-card")).not.toBe(timedCard);
 	const handle = staged.querySelector(".tntp-handle")!; handle.focus(); event(handle, "keydown", { key: "ArrowDown" });
 	expect(staged.querySelectorAll(".tntp-title").map(el => el.textContent)).toEqual(["B", "Task A"]);
 	expect(second.querySelector(".tntp-panel--staged")!.querySelectorAll(".tntp-title").map(el => el.textContent)).toEqual(["B", "Task A"]);

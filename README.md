@@ -68,6 +68,8 @@ Run `npm run test:vault-switch` to exercise switching and recovery against tempo
 
 Version 0.3.0 adds **Staged** beside **Timers**, with independent saved order, task/running-timer counts, and a running cue on Timers. The display name changes; the plugin id, installed folder, saved data and view type remain `tasknotes-timer-pane`, and the command id remains `open-timer-pane`. Upgrade in place and keep `data.json`.
 
+Cards use fixed details: staged date, relative age, and context on one line, for example **Nov 18 · today · @home**. Multiple contexts appear as **@home, @work**; missing contexts add no separator. Timer cards without a staged date show just their contexts. Tags and subtasks are not displayed.
+
 ### Daily staging
 
 In TaskNotes settings → Task Properties → Custom User Fields, register **key `staged`**, type **Date**, with **no default value**. The key is fixed. Incorrect or unreadable setup disables the + controls and explains how to recover; timer controls remain usable.

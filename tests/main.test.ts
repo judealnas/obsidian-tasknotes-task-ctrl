@@ -78,6 +78,14 @@ test.each([null, undefined, {}])("legacy empty data %j keeps defaults and stable
  expect(host.saved).toEqual([]);
 });
 
+test("retired card details preferences survive unrelated settings saves unchanged", async () => {
+ host.data = { completionStatus: "done", pauseRecordsVersion: 1, pauseRecords: [], cardDetails: { contexts: false, tags: true, subtasks: true }, extra: { retained: true } };
+ const old = structuredClone(host.data);
+ const plugin = new TaskNotesTimerPanePlugin({} as App, {} as PluginManifest); plugin.onload(); await flush();
+ await saveSettingsOf(host.tabs[0])({ completionStatus: "done" });
+ expect(host.saved[host.saved.length - 1]).toEqual(old);
+});
+
 test("populated 0.2 data round-trips through candidate settings saves without losing user state", async () => {
  host.data = { completionStatus: "done", pauseRecordsVersion: 1, pauseRecords: [PAUSED], cardOrder: ["a", "b"], stagedOrder: ["Tasks/A.md", "Tasks/B.md"], unknownExtension: { retained: true } };
  const old = structuredClone(host.data);

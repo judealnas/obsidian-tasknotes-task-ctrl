@@ -155,3 +155,20 @@ test("failed current title render falls back to text and releases its component"
 	expect(s.el.querySelector(".tntp-title")!.textContent).toBe(model.title); expect(viewHost.renders[0]!.component.unloads).toBe(1);
 	s.card.dispose(); log.mockRestore();
 });
+
+
+test.each([
+ { contexts: ["home"], metadata: "Nov 18 · today", expected: "Nov 18 · today · @home" },
+ { contexts: ["home", "@work", "@@home", "", "@"], metadata: "Nov 18 · today", expected: "Nov 18 · today · @home, @work" },
+ { contexts: [], metadata: "Nov 18 · today", expected: "Nov 18 · today" },
+ { contexts: ["home"], metadata: undefined, expected: "@home" },
+ { contexts: [], metadata: undefined, expected: "" },
+])("fixed metadata formats $expected and updates after context removal", ({ contexts, metadata, expected }) => {
+ const s = setup();
+ const task = { path: model.taskPath, title: model.title, status: "open", archived: false, contexts };
+ s.card.update({ ...model, task, stagedMetadata: metadata }, true);
+ expect(s.el.querySelector(".tntp-staged-metadata")!.textContent).toBe(expected);
+ s.card.update({ ...model, task: { ...task, contexts: [] } }, true);
+ expect(s.el.querySelector(".tntp-staged-metadata")!.textContent).toBe("");
+ s.card.dispose();
+});

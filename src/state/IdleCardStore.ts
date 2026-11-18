@@ -64,7 +64,7 @@ export class IdleCardStore {
 	models(): TaskCardModel[] {
 		return this.paths.map(path => {
 			const task = this.tasks.get(path);
-			return { state: "idle", taskPath: path, title: displayTitle(task?.title, path), displayKey: taskDisplayKey(task), pendingCard: true };
+			return { state: "idle", taskPath: path, title: displayTitle(task?.title, path), displayKey: taskDisplayKey(task), task, pendingCard: true };
 		});
 	}
 	subscribe(listener: () => void): () => void { this.listeners.add(listener); return () => { this.listeners.delete(listener); }; }

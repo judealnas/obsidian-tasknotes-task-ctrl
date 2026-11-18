@@ -431,7 +431,8 @@ export class TimerPaneView extends ItemView {
 		els.root.toggleClass("tntp-pane--pomodoro-unknown", this.services.gateway.getState().kind === "ready" && !header.readable);
 		const staging = this.services.staging?.getSnapshot();
 		const stagedPaths = new Set(connected ? staging?.items.map(item => item.taskPath) : []);
-		this.cards?.reconcile(timers.map(timer => ({ ...timer, stagedMarker: stagedPaths.has(normalizeTimerPath(timer.taskPath)) })));
+		const stagedByPath = new Map(connected ? staging?.items.map(item => [item.taskPath, item]) : []);
+		this.cards?.reconcile(timers.map(timer => ({ ...timer, stagedMetadata: stagedByPath.get(normalizeTimerPath(timer.taskPath))?.metadata })));
 		els.tabs.timers.panel.toggleClass("tntp-panel--has-cards", connected && timers.length > 0);
 		const runningCount = connected ? header.eligibleCount : 0;
 		setTextIfChanged(els.tabs.staged.count, ` ${stagedPaths.size}`);
@@ -440,7 +441,7 @@ export class TimerPaneView extends ItemView {
 		const stagedModels: TaskCardModel[] = connected ? orderStaged(staging?.items ?? [], this.services.stagedOrder?.get() ?? []).map(item => {
 			const matches = timers.filter(timer => timer.state !== "idle" && normalizeTimerPath(timer.taskPath) === item.taskPath);
 			const timed = matches.find(timer => timer.state === "running") ?? matches[0];
-			return { ...(timed ?? { state: "idle" as const, taskPath: item.taskPath, title: displayTitle(item.task.title, item.taskPath), displayKey: taskDisplayKey(item.task) }), stagedCard: true, stagedMetadata: item.metadata };
+			return { ...(timed ?? { state: "idle" as const, taskPath: item.taskPath, title: displayTitle(item.task.title, item.taskPath), displayKey: taskDisplayKey(item.task) }), task: item.task, stagedCard: true, stagedMetadata: item.metadata };
 		}) : [];
 		this.stagedCards?.reconcile(stagedModels);
 		const staged = els.tabs.staged;
