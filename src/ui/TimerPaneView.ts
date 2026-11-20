@@ -159,7 +159,7 @@ export class TimerPaneView extends ItemView {
 			onMove: announceMove,
 			insert: beforeKey => this.openStagePicker(beforeKey),
 			canInsert: () => !!this.services.staging?.getSnapshot().canStage && !this.isBusy(),
-			scrollContainer: this.contentEl,
+			scrollContainer: stagedPanel,
 		});
 		const stagedMessage = stagedPanel.createDiv({ cls: "tntp-message", attr: { "aria-live": "polite" } });
 		const stagedHeading = stagedMessage.createDiv({ cls: "tntp-message__heading" });
@@ -195,7 +195,7 @@ export class TimerPaneView extends ItemView {
 			dispose: card => card.dispose(),
 			commitOrder: order => this.services.cardOrder.reorder(order),
 			onMove: announceMove,
-			scrollContainer: this.contentEl,
+			scrollContainer: timersPanel,
 		});
 
 		const message = timersPanel.createDiv({ cls: "tntp-message", attr: { "aria-live": "polite" } });

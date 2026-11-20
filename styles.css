@@ -18,8 +18,16 @@
 	min-height: var(--size-4-12);
 	padding: var(--size-4-1);
 }
+.workspace-leaf-content[data-type="tasknotes-timer-pane"] > .view-content {
+	padding: 0;
+	overflow: hidden;
+}
 .tntp-pane {
-	padding: var(--size-4-4);
+	display: flex;
+	flex-direction: column;
+	height: 100%;
+	min-height: 0;
+	padding: var(--size-4-2) var(--size-4-4) 0;
 	max-width: 480px;
 	width: 100%;
 	min-width: 0;
@@ -44,8 +52,16 @@
 }
 
 .tntp-tabs {
+	flex-shrink: 0;
 	display: flex;
 	margin-bottom: var(--size-4-3);
+}
+
+.tntp-panel {
+	flex: 1;
+	min-height: 0;
+	overflow-y: auto;
+	padding-bottom: var(--size-4-4);
 }
 
 .tntp-tabs .tntp-tabs__tab {
