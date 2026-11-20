@@ -96,6 +96,8 @@ export function createFakeGateway(initial: BridgeState = { kind: "ready" }): Fak
 	const dataListeners = new Set<() => void>();
 
 	return {
+		inlineCreationAvailability: () => ({ available: false, reason: "Inline creation is not enabled in this fake" }),
+		priorities: () => Promise.resolve([]),
 		get activeCalls() {
 			return activeCalls;
 		},

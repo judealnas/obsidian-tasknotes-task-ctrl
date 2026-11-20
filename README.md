@@ -70,6 +70,8 @@ Version 0.3.0 adds **Staged** beside **Timers**, with independent saved order, t
 
 Cards use fixed details: staged date, relative age, and context on one line, for example **Nov 18 · today · @home**. Multiple contexts appear as **@home, @work**; missing contexts add no separator. Timer cards without a staged date show just their contexts. Tags and subtasks are not displayed.
 
+In either task picker, **Enter** selects a result and **Shift+Enter** creates a new task from the current search query using TaskNotes' natural-language parser. Creation waits for pending parsing; queries containing only properties must be edited to include a task title. The saved task is staged or added as an idle timer card. Creation happens inline; it does not open TaskNotes' separate creation window.
+
 ### Daily staging
 
 In TaskNotes settings → Task Properties → Custom User Fields, register **key `staged`**, type **Date**, with **no default value**. The key is fixed. Incorrect or unreadable setup disables the + controls and explains how to recover; timer controls remain usable.

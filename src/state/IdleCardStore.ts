@@ -7,6 +7,8 @@ import type { CardOrderStore } from "./CardOrderStore";
 import type { PauseStore } from "./PauseStore";
 import type { TimerController } from "./TimerController";
 
+export type IdleAddOutcome = { kind: "added-and-saved" | "already-represented" | "unavailable" | "invalid/full" | "failed/unsaved" | "cancelled"; message?: string };
+
 export const idleCardKey = (path: string): string => "idle-task:" + normalizeTimerPath(path);
 const MAX_PATHS = 1000;
 const under = (path: string, parent: string): boolean => path === parent || path.startsWith(parent + "/");
@@ -85,20 +87,30 @@ export class IdleCardStore {
 		const active = await this.deps.gateway.active();
 		return active.some(item => !item.entry.endTime && normalizeTimerPath(item.taskPath) === path) || !!this.deps.pauses.get(path);
 	}
-	async add(task: TaskInfo): Promise<void> {
-		await this.action(async () => {
+	async add(task: TaskInfo, canWrite: () => boolean = () => true): Promise<IdleAddOutcome> {
+		if (this.pending || this.deps.controller.isBusy() || !this.availability().available) return { kind: "unavailable", message: "Adding tasks is unavailable or busy." };
+		this.pending = true; this.changed();
+		try {
 			const path = normalizeTimerPath(task.path); const revision = this.revision;
-			if (!path || path.length > 4096 || path.split("/").includes("..")) return;
+			if (!path || path.length > 4096 || path.split("/").includes("..")) return { kind: "invalid/full", message: "Invalid task path." };
 			const represented = await this.represented(path);
-			if (!this.availability().available || revision !== this.revision || represented) return;
+			if (!canWrite()) return { kind: "cancelled" };
+			if (!this.availability().available || revision !== this.revision) return { kind: "unavailable", message: "TaskNotes changed. Try adding again." };
+			if (represented) return { kind: "already-represented" };
 			if (!this.paths.includes(path)) {
-				if (this.paths.length >= MAX_PATHS) { this.deps.notify("The added-task list is full. Remove a task first."); return; }
+				if (this.paths.length >= MAX_PATHS) return { kind: "invalid/full", message: "The added-task list is full. Remove a task first." };
 				this.paths.unshift(path); this.tasks.set(path, task);
 				this.deps.order.prepend(idleCardKey(path), this.deps.visibleKeys()); this.changed();
 			}
+			// Re-save existing membership too: the previous persistence attempt may have failed.
 			await this.save();
-		});
+			return { kind: "added-and-saved" };
+		} catch {
+			this.deps.log("Saving added task failed.");
+			return { kind: "failed/unsaved", message: "Couldn't save the added task. Retry add to save it again." };
+		} finally { this.pending = false; this.changed(); }
 	}
+
 	async remove(path: string): Promise<void> {
 		await this.action(async () => {
 			path = normalizeTimerPath(path); const revision = this.revision;

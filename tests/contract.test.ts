@@ -6,6 +6,9 @@ import { describe, expectTypeOf, test } from "vitest";
 import type { EventRef } from "obsidian";
 import type {
 	ActiveTimeEntry,
+ ParsedTaskData,
+ TaskCreationData,
+ TaskPriority,
  CompleteTaskOptions,
  PomodoroState,
  PomodoroSession,
@@ -26,6 +29,15 @@ import type {
 type Api = TaskNotesRuntimeApiV1;
 
 describe("TaskNotes Runtime API v1 contract", () => {
+ test("optional inline creation contract pins top-level status/priority and public APIs", () => {
+  expectTypeOf<ParsedTaskData["status"]>().toEqualTypeOf<string | undefined>();
+  expectTypeOf<ParsedTaskData["priority"]>().toEqualTypeOf<string | undefined>();
+  expectTypeOf<NonNullable<Api["nlp"]>["parse"]>().parameters.toEqualTypeOf<[text: string]>();
+  expectTypeOf<NonNullable<Api["nlp"]>["parse"]>().returns.toEqualTypeOf<ParsedTaskData>();
+  expectTypeOf<NonNullable<NonNullable<Api["tasks"]>["create"]>>().parameters.toEqualTypeOf<[data: TaskCreationData, context?: TaskNotesMutationContext]>();
+  expectTypeOf<NonNullable<NonNullable<Api["catalog"]>["priorities"]>>().returns.toEqualTypeOf<TaskPriority[]>();
+  expectTypeOf<NonNullable<Api["relationships"]>["subtasks"]>().returns.toEqualTypeOf<Promise<TaskInfo[]>>();
+ });
 	test("root: apiVersion is the literal 1, capabilities and hasCapability", () => {
 		expectTypeOf<Api["apiVersion"]>().toEqualTypeOf<1>();
 		expectTypeOf<Api["capabilities"]>().toEqualTypeOf<readonly string[]>();

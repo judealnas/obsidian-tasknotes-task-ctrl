@@ -879,3 +879,21 @@ describe("Timers unaffected by staging (SC3)", () => {
 		expect(bridge.recurringAvailability()).toEqual({ available: false, reason: "TaskNotes does not provide recurring.toggleCompleteInstance" });
 	});
 });
+
+test("inline creation and optional metadata require capability plus function without blocking readiness", async () => {
+ const tn = createFakeTaskNotes({ capabilities: [...DEFAULT_CAPABILITIES, "nlp.parse", "relationships.read"] });
+ Object.assign(tn.api, { nlp: { parse: (text: string) => ({ title: text, status: "open", priority: "high" }) }, relationships: { subtasks: () => Promise.resolve([]) } });
+ tn.api.tasks!.create = vi.fn((data: import("../src/tasknotes/runtime-api.types").TaskCreationData) => Promise.resolve({ ...data, path: "Created.md", status: data.status ?? "open", archived: false }));
+ tn.api.catalog!.priorities = () => [{ value: "high", label: "High", color: "#ff0000" }];
+ const { bridge } = setup(tn.plugin); bridge.probe();
+ expect(bridge.getState().kind).toBe("ready"); expect(bridge.inlineCreationAvailability().available).toBe(true);
+ expect(await bridge.parseTask("Draft")).toEqual({ title: "Draft", status: "open", priority: "high" });
+ expect((await bridge.createTask({ title: "Draft" }, { source: "test" })).path).toBe("Created.md");
+ expect(await bridge.priorities()).toHaveLength(1); expect(await bridge.subtasks("Created.md")).toEqual([]);
+ delete tn.api.tasks!.create; expect(bridge.inlineCreationAvailability().available).toBe(false); expect(bridge.getState().kind).toBe("ready");
+ delete tn.api.catalog!.priorities; await expect(bridge.priorities()).rejects.toThrow("catalog.priorities");
+ const old = setup(createFakeTaskNotes().plugin); old.bridge.probe();
+ expect(old.bridge.inlineCreationAvailability().available).toBe(false); expect(old.bridge.getState().kind).toBe("ready");
+ await expect(old.bridge.subtasks("A.md")).rejects.toThrow("relationships.read");
+ bridge.dispose(); old.bridge.dispose();
+});

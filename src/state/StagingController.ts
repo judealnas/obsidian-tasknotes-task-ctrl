@@ -10,7 +10,7 @@ import { PauseStore } from "./PauseStore";
 import { normalizeTimerPath, sameEntry, type EntryId, type Ownership } from "../model/pomodoroOwnership";
 import { isNoActiveSessionError } from "../model/errors";
 
-export type StageOutcome = { kind: "staged" | "already-staged" | "blocked" | "failed" | "busy"; message?: string; warning?: string };
+export type StageOutcome = { kind: "staged" | "already-staged" | "blocked" | "failed" | "busy" | "cancelled"; message?: string; warning?: string };
 export type UnstageOutcome = { kind: "unstaged" | "blocked" | "failed" | "partial" | "busy"; message?: string; warning?: string };
 export interface StagingControllerDeps {
 	gateway: TaskNotesGateway;
@@ -41,7 +41,7 @@ export class StagingController {
 	isBusy(): boolean { return this.pending; }
 	subscribeBusy(listener: () => void): () => void { this.listeners.add(listener); return () => { this.listeners.delete(listener); }; }
 	private busy(value: boolean): void { this.pending = value; for (const listener of [...this.listeners]) { try { listener(); } catch { this.deps.log("A staging action listener failed."); } } }
-	async stage(target: { taskPath: string; title: string; beforePath?: string | null }): Promise<StageOutcome> {
+	async stage(target: { taskPath: string; title: string; beforePath?: string | null }, canWrite: () => boolean = () => true): Promise<StageOutcome> {
 		if (this.pending || this.deps.timerBusy()) return { kind: "busy", message: "Another task action is in progress. Try again." };
 		this.busy(true);
 		const { gateway, staging } = this.deps;
@@ -49,23 +49,31 @@ export class StagingController {
 		try {
 			result = await this.deps.queue.run(async (): Promise<StageOutcome> => {
 				await this.deps.settingsReady();
+				if (!canWrite()) return { kind: "cancelled" };
 				if (!gateway.stagingAvailability().available) return { kind: "blocked", message: "Staging is unavailable. Check TaskNotes and retry." };
 				const revision = staging.revision;
 				const [fields, statuses, task] = await Promise.all([gateway.userFields(), gateway.statuses(), gateway.getTask(target.taskPath)]);
+				if (!canWrite()) return { kind: "cancelled" };
 				const field = fieldStatus(fields);
 				if (field.kind !== "ok" || field.hasDefault) return { kind: "blocked", message: "Register staged as a Date field with no default value, then retry." };
 				if (!task) return { kind: "blocked", message: "This task is no longer available to stage." };
 				if (task.archived || statuses.some(status => status.isCompleted && status.value === task.status)) return { kind: "blocked", message: "Completed/archived tasks cannot be staged" };
 				if (isStageReserved(task)) return { kind: "already-staged" };
 				const latestField = fieldStatus(await gateway.userFields());
+				if (!canWrite()) return { kind: "cancelled" };
 				if (revision !== staging.revision || !gateway.stagingAvailability().available || latestField.kind !== "ok" || latestField.hasDefault) return { kind: "blocked", message: "TaskNotes changed while checking this task. Retry." };
 				const latestTask = await gateway.getTask(target.taskPath);
+				if (!canWrite()) return { kind: "cancelled" };
 				if (revision !== staging.revision || !gateway.stagingAvailability().available) return { kind: "blocked", message: "This task changed while checking. Retry." };
 				if (!latestTask) return { kind: "blocked", message: "This task changed while checking. Retry." };
 				if (latestTask.archived || statuses.some(status => status.isCompleted && status.value === latestTask.status)) return { kind: "blocked", message: "Completed/archived tasks cannot be staged" };
 				if (isStageReserved(latestTask)) return { kind: "already-staged" };
+				// Final lifetime check is inside the queued mutation, after every deferred read.
+				if (!canWrite()) return { kind: "cancelled" };
 				const date = calendarDate((this.deps.now ?? Date.now)());
 				staging.invalidate();
+				// Invalidation notifies subscribers synchronously; they may close the owning picker.
+				if (!canWrite()) return { kind: "cancelled" };
 				await gateway.updateTask(task.path, { [STAGED_FIELD_KEY]: date }, { source: MUTATION_SOURCE, reason: "user stage", correlationId: this.deps.newCorrelationId() });
 				staging.invalidate();
 				const outcome: StageOutcome = { kind: "staged" };

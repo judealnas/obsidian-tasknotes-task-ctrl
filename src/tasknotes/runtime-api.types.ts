@@ -150,6 +150,39 @@ export interface PomodoroState {
 }
 export interface CompleteTaskOptions { status?: string; }
 
+/** Optional public creation/relationship surface pinned to TaskNotes a2414b67 (4.18.2). */
+export interface ParsedTaskData {
+ title: string;
+ status?: string;
+ priority?: string;
+ dueDate?: string;
+ dueTime?: string;
+ scheduledDate?: string;
+ scheduledTime?: string;
+ contexts?: string[];
+ projects?: string[];
+ tags?: string[];
+ details?: string;
+ recurrence?: string;
+ estimate?: number;
+ userFields?: Record<string, unknown>;
+}
+export interface TaskCreationData {
+ title: string;
+ status?: string;
+ priority?: string;
+ due?: string;
+ scheduled?: string;
+ contexts?: string[];
+ projects?: string[];
+ tags?: string[];
+ details?: string;
+ recurrence?: string;
+ timeEstimate?: number;
+ customFrontmatter?: Record<string, unknown>;
+}
+export interface TaskPriority { value: string; label: string; color: string; }
+
 /**
  * A `tasks.update` patch: TaskInfo fields plus any other key. TaskNotes 4.13.x stores
  * only TaskInfo fields and registered user fields; other keys are echoed, not written.
@@ -168,6 +201,7 @@ export interface TaskNotesRuntimeApiV1 {
 	};
 
 	readonly tasks?: {
+		create?(data: TaskCreationData, context?: TaskNotesMutationContext): Promise<TaskInfo>;
 		list(): Promise<TaskInfo[]>;
 		/** 4.13.8: null when the path is not a cached task (also while TaskNotes' cache warms). */
 		get?(path: string): Promise<TaskInfo | null>;
@@ -176,6 +210,7 @@ export interface TaskNotesRuntimeApiV1 {
 		update?(path: string, updates: TaskNotesTaskPatch, context?: TaskNotesMutationContext): Promise<TaskInfo>;
 	};
 	readonly catalog?: {
+		priorities?(): TaskPriority[];
 		statuses(): TaskStatus[];
 		/** 4.13.0+: TaskNotes' registered user fields (shallow copies). Gate on catalog.read. */
 		userFields?(): TaskNotesUserField[];
@@ -192,6 +227,8 @@ export interface TaskNotesRuntimeApiV1 {
 	};
 
 	readonly pomodoro?: { status(): Promise<PomodoroState>; };
+	readonly nlp?: { parse(text: string): ParsedTaskData };
+	readonly relationships?: { subtasks(path: string): Promise<TaskInfo[]> };
 
 	readonly events: {
 		/** The payload is left as unknown: the pane only re-derives from `time.active()`. */

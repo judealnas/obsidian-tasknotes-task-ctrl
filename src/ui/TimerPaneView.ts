@@ -6,7 +6,6 @@
  */
 import {
 	ItemView,
-	Notice,
 	setTooltip,
 	type WorkspaceLeaf,
 	type ViewStateResult,
@@ -34,8 +33,7 @@ import { TaskPickerModal } from "./TaskPickerModal";
 import type { CompletionController } from "../state/CompletionController";
 import type { CompletionStore } from "../state/CompletionStore";
 import { idleCardKey, type IdleCardStore } from "../state/IdleCardStore";
-import type { TaskCreationCoordinator } from "../state/TaskCreationCoordinator";
-import type { TaskInfo } from "../tasknotes/runtime-api.types";
+import type { PickerCreationController } from "../state/PickerCreationController";
 
 const timerCardKey = (timer: TaskCardModel): string => timer.state === "idle" ? idleCardKey(timer.taskPath) : timer.sessionKey;
 
@@ -52,7 +50,7 @@ export interface TimerPaneServices {
 	staging?: StagingStore;
 	stagingController?: StagingController;
 	stagedOrder?: StagedOrderStore;
-	taskCreation?: TaskCreationCoordinator;
+	taskCreation?: PickerCreationController;
 }
 
 const PANE_STATES: readonly PaneState[] = ["running", "idle", "loading", "missing", "incompatible"];
@@ -342,7 +340,6 @@ export class TimerPaneView extends ItemView {
     const offs = [idleCards.subscribe(listener), this.services.controller.subscribeBusy(listener)];
     return () => { for (const off of offs) off(); };
    },
-   onCreated: (task: TaskInfo) => this.addCreatedTask(task),
   } : undefined;
   const modal = new TaskPickerModal(this.app, { mode: "add", gateway, controller: idleCards, creation, onClose: () => {
    if (this.picker === modal) this.picker = null;
@@ -367,35 +364,9 @@ export class TimerPaneView extends ItemView {
 				const offs = [staging.subscribe(listener), stagingController.subscribeBusy(listener), this.services.controller.subscribeBusy(listener)];
 				return () => { for (const off of offs) off(); };
 			},
-			onCreated: (task: TaskInfo) => this.stageCreatedTask(task, beforePath),
 		} : undefined;
 		const modal = new TaskPickerModal(this.app, { mode: "stage", gateway, controller: stagingController, beforePath, creation, onClose: () => { if (this.picker === modal) this.picker = null; } });
 		this.picker = modal; modal.open();
-	}
-
-	private async addCreatedTask(task: TaskInfo): Promise<void> {
-		const idleCards = this.services.idleCards;
-		if (!idleCards) { this.creationNotice("The task was created, but added tasks are unavailable."); return; }
-		const gate = idleCards.availability();
-		if (!gate.available) { this.creationNotice("The task was created, but it couldn't be added: " + gate.reason); return; }
-		await idleCards.add(task);
-		if (!idleCards.models().some(model => normalizeTimerPath(model.taskPath) === normalizeTimerPath(task.path))) {
-			this.creationNotice("The task was created, but it couldn't be added to Timers.");
-		}
-	}
-
-	private async stageCreatedTask(task: TaskInfo, beforePath?: string | null): Promise<void> {
-		const controller = this.services.stagingController;
-		if (!controller) { this.creationNotice("The task was created, but staging is unavailable."); return; }
-		const outcome = await controller.stage({ taskPath: task.path, title: task.title, beforePath });
-		if (outcome.kind !== "staged" && outcome.kind !== "already-staged") {
-			this.creationNotice(outcome.message ?? "The task was created, but it couldn't be staged.");
-		} else if (outcome.warning) this.creationNotice(outcome.warning);
-	}
-
-	private creationNotice(message: string): void {
-		try { new Notice(message); }
-		catch (error) { console.error("[tasknotes-timer-pane] Showing the task creation result failed", error); }
 	}
 
 	/** Every open timer in display order (the saved order, new timers on top); none unless running. */

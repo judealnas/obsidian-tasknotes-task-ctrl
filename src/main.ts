@@ -16,7 +16,7 @@ import { StagedOrderStore, loadStagedOrder } from "./state/StagedOrderStore";
 import { CompletionController } from "./state/CompletionController";
 import { CompletionStore } from "./state/CompletionStore";
 import { IdleCardStore } from "./state/IdleCardStore";
-import { TaskCreationCoordinator } from "./state/TaskCreationCoordinator";
+import { PickerCreationController } from "./state/PickerCreationController";
 
 /** The data.json keys this plugin owns; everything else is kept as found. */
 const OWNED_KEYS = new Set(["completionStatus", "rolloverHour", "pauseRecordsVersion", "pauseRecords", "cardOrder", "stagedOrder", "completionRecordsVersion", "completionRecords", "idleTaskPathsVersion", "idleTaskPaths"]);
@@ -124,8 +124,8 @@ export default class TaskNotesTimerPanePlugin extends Plugin {
 		const notify = (message: string) => {
 			new Notice(message);
 		};
-		const taskCreation = new TaskCreationCoordinator({ app: this.app, gateway: bridge, notify, log });
 		const newCorrelationId = () => crypto.randomUUID();
+		const taskCreation = new PickerCreationController({ gateway: bridge, queue, notify, newCorrelationId });
 		const controller = new TimerController({ gateway: bridge, store, queue, notify, newCorrelationId, log, pauses,
 			getSettings: () => this.paneSettings, settingsReady: () => this.settingsReady });
 		const idleCards = new IdleCardStore({ gateway: bridge, pauses, order: cardOrder, controller, notify, log,

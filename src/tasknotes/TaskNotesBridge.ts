@@ -11,6 +11,9 @@ import { getPomodoroOwnedEntryId, type Ownership } from "../model/pomodoroOwners
 import type {
 	ActiveTimeEntry,
 	TaskInfo,
+	ParsedTaskData,
+	TaskCreationData,
+	TaskPriority,
 	TaskStatus,
 	TaskNotesMutationContext,
 	TaskNotesTaskPatch,
@@ -51,6 +54,11 @@ export interface TaskNotesPluginLike {
 }
 
 export interface TaskNotesGateway {
+	inlineCreationAvailability?(): { available: boolean; reason: string };
+	parseTask?(text: string): Promise<ParsedTaskData>;
+	createTask?(data: TaskCreationData, context: TaskNotesMutationContext): Promise<TaskInfo>;
+	priorities?(): Promise<TaskPriority[]>;
+	subtasks?(path: string): Promise<TaskInfo[]>;
 	getState(): BridgeState;
 	onState(listener: (state: BridgeState) => void): () => void;
 	onData(listener: () => void): () => void;
@@ -326,6 +334,39 @@ export class TaskNotesBridge implements TaskNotesGateway {
   const tasks = await api.tasks!.list();
   if (readApi() !== api) throw new Error("TaskNotes changed while loading tasks");
   return tasks;
+ }
+
+ inlineCreationAvailability(): { available: boolean; reason: string } {
+  try {
+   this.featureApi("nlp.parse", "nlp.parse", api => typeof api.nlp?.parse === "function");
+   this.featureApi("tasks.write", "tasks.create", api => typeof api.tasks?.create === "function");
+   return { available: true, reason: "Create a task without starting a timer" };
+  } catch (error) { return { available: false, reason: describeError(error) }; }
+ }
+ async parseTask(text: string): Promise<ParsedTaskData> {
+  const api = this.featureApi("nlp.parse", "nlp.parse", api => typeof api.nlp?.parse === "function");
+  const parsed = await Promise.resolve(api.nlp!.parse(text));
+  if (this.connectedApi() !== api) throw new Error("TaskNotes changed while parsing");
+  return parsed;
+ }
+ async createTask(data: TaskCreationData, context: TaskNotesMutationContext): Promise<TaskInfo> {
+  const api = this.featureApi("tasks.write", "tasks.create", api => typeof api.tasks?.create === "function");
+  // Keep returned identity even after disconnect: the caller must not retry creation.
+  const task = await api.tasks!.create!(data, context);
+  if (!task || typeof task.path !== "string" || !normalizeTimerPath(task.path)) throw new Error("TaskNotes returned no created task identity");
+  return task;
+ }
+ async priorities(): Promise<TaskPriority[]> {
+  const api = this.featureApi("catalog.read", "catalog.priorities", api => typeof api.catalog?.priorities === "function");
+  const result = await Promise.resolve(api.catalog!.priorities!());
+  if (this.connectedApi() !== api) throw new Error("TaskNotes changed while reading priorities");
+  return result;
+ }
+ async subtasks(path: string): Promise<TaskInfo[]> {
+  const api = this.featureApi("relationships.read", "relationships.subtasks", api => typeof api.relationships?.subtasks === "function");
+  const result = await api.relationships!.subtasks(path);
+  if (this.connectedApi() !== api) throw new Error("TaskNotes changed while reading subtasks");
+  return result;
  }
 
  async getTask(path: string): Promise<TaskInfo | null> {
