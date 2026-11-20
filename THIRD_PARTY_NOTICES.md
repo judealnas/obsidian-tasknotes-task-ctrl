@@ -7,8 +7,8 @@ Adapted: src/modals/TaskSelectorWithCreateModal.ts (display-only layout and inli
 src/services/buildTaskCreationDataFromParsed.ts, src/utils/dateUtils.ts and
 src/utils/taskIdentificationFrontmatter.ts (payload/date/tag normalization).
 Owned adaptations: src/ui/TaskPickerRow.ts, src/ui/TaskPickerModal.ts and src/model/taskCreation.ts.
-Modifications: public API only, default omission, custom-field validation, explicit preview/title confirmation,
-acknowledged destination routing, cancellation, safe static rows and scoped styling.
+Modifications: public API only, default omission, custom-field validation, query-based creation with title validation,
+acknowledged destination routing, close/reconnect lifecycle guards, safe static rows and scoped styling.
 No upstream CSS is copied. Type-only public API subsets are in src/tasknotes/runtime-api.types.ts.
 
 ## TaskNotes MIT license
