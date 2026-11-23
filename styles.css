@@ -36,6 +36,7 @@
 }
 
 /* Each panel owns its content state; hidden always wins over layout display. */
+.tntp-header[hidden],
 .tntp-panel[hidden],
 .tntp-panel--running .tntp-message,
 .tntp-panel--has-cards .tntp-message,
@@ -52,8 +53,15 @@
 }
 
 .tntp-tabs {
+	display: flex;
+}
+
+.tntp-tab-row {
 	flex-shrink: 0;
 	display: flex;
+	flex-direction: column;
+	align-items: stretch;
+	gap: var(--size-4-1);
 	margin-bottom: var(--size-4-3);
 }
 
@@ -386,7 +394,18 @@
 	margin-top: var(--size-4-6);
 }
 
-.tntp-header { display: flex; gap: var(--size-4-2); margin-bottom: var(--size-4-4); flex-wrap: wrap; }
+.tntp-header {
+	display: grid;
+	grid-template-columns: repeat(3, minmax(0, 1fr));
+	gap: var(--size-4-2);
+}
+
+.tntp-header > button {
+	min-width: 0;
+	height: auto;
+	min-height: var(--input-height);
+	white-space: normal;
+}
 .tntp-picker-pomodoro { color: var(--text-muted); font-size: var(--font-ui-small); white-space: nowrap; }
 .tntp-pomodoro-note { color: var(--text-muted); font-size: var(--font-ui-smaller); margin-bottom: var(--size-4-2); }
 

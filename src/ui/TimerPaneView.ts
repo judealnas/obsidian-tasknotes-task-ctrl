@@ -70,6 +70,7 @@ interface TabElements {
 interface PaneElements {
 	root: HTMLElement;
 	start: HTMLButtonElement;
+	bulkControls: HTMLElement;
 	pauseAll: HTMLButtonElement;
 	resumeAll: HTMLButtonElement;
 	stopAll: HTMLButtonElement;
@@ -142,7 +143,8 @@ export class TimerPaneView extends ItemView {
 		const root = this.contentEl.createDiv({ cls: ["tntp-pane", "tntp-pane--loading"] });
 		const reorderStatus = root.createDiv({ cls: ["tntp-visually-hidden", "tntp-reorder-status"], attr: { role: "status", "aria-live": "polite", "aria-atomic": "true" } });
 		const announceMove = (card: TaskCard, position: number, count: number) => reorderStatus.setText(`${card.currentModel.title}, position ${position} of ${count}`);
-		const strip = root.createDiv({ cls: "tntp-tabs", attr: { role: "tablist", "aria-label": "Task views" } });
+		const row = root.createDiv({ cls: "tntp-tab-row" });
+		const strip = row.createDiv({ cls: "tntp-tabs", attr: { role: "tablist", "aria-label": "Task views" } });
 		const stagedButton = strip.createEl("button", { text: "Staged", cls: "tntp-tabs__tab" });
 		const timersButton = strip.createEl("button", { text: "Timers", cls: "tntp-tabs__tab" });
 		const stagedCount = stagedButton.createSpan({ cls: "tntp-tabs__count", text: " 0" });
@@ -157,8 +159,6 @@ export class TimerPaneView extends ItemView {
 			dispose: card => card.dispose(),
 			commitOrder: order => this.services.stagedOrder?.reorder(order),
 			onMove: announceMove,
-			insert: beforeKey => this.openStagePicker(beforeKey),
-			canInsert: () => !!this.services.staging?.getSnapshot().canStage && !this.isBusy(),
 			scrollContainer: stagedPanel,
 		});
 		const stagedMessage = stagedPanel.createDiv({ cls: "tntp-message", attr: { "aria-live": "polite" } });
@@ -169,13 +169,12 @@ export class TimerPaneView extends ItemView {
 		this.registerDomEvent(stagedRetry, "click", () => { gateway.probe(); void this.services.staging?.refreshNow(); });
 		this.registerDomEvent(stagedButton, "click", () => this.selectTab("staged"));
 		this.registerDomEvent(timersButton, "click", () => this.selectTab("timers"));
-		const header = timersPanel.createDiv({ cls: "tntp-header" });
-		// Add task, Pause all, Resume all, Stop all; text labels in a wrapping row.
-		const start = header.createEl("button", { text: "Add task", cls: "tntp-start" });
+		const start = row.createEl("button", { text: "+", cls: "tntp-start" });
+		const header = row.createDiv({ cls: "tntp-header" });
 		const pauseAll = header.createEl("button", { text: "Pause all", cls: "tntp-pause-all" });
 		const resumeAll = header.createEl("button", { text: "Resume all", cls: "tntp-resume-all" });
 		const stopAll = header.createEl("button", { text: "Stop all", cls: "tntp-stop-all" });
-		this.registerDomEvent(start, "click", () => void this.openPicker());
+		this.registerDomEvent(start, "click", () => this.tab === "staged" ? this.openStagePicker(null) : this.openPicker());
 		this.registerDomEvent(pauseAll, "click", () => {
 			if (!this.services.controller.isBusy() && !pauseAll.disabled) void this.services.controller.pauseAll();
 		});
@@ -205,7 +204,7 @@ export class TimerPaneView extends ItemView {
 		const retry = message.createEl("button", { cls: "tntp-message__retry", text: "Check for TaskNotes" });
 		this.registerDomEvent(retry, "click", () => gateway.probe());
 
-		this.els = { root, start, pauseAll, resumeAll, stopAll, pomodoroNote, cards, heading, body, meta, tabs: {
+		this.els = { root, start, bulkControls: header, pauseAll, resumeAll, stopAll, pomodoroNote, cards, heading, body, meta, tabs: {
 			staged: { button: stagedButton, count: stagedCount, panel: stagedPanel, heading: stagedHeading, body: stagedBody, meta: stagedMeta, retry: stagedRetry },
 			timers: { button: timersButton, count: timersCount, panel: timersPanel, heading, body, meta },
 		} };
@@ -305,6 +304,8 @@ export class TimerPaneView extends ItemView {
 
 	private updateTabs(): void {
 		if (!this.els) return;
+		if (this.tab === "timers") this.els.bulkControls.removeAttribute("hidden");
+		else this.els.bulkControls.setAttribute("hidden", "");
 		for (const tab of ["staged", "timers"] as const) {
 			const { button, panel } = this.els.tabs[tab];
 			button.toggleClass("tntp-tabs__tab--active", tab === this.tab);
@@ -313,7 +314,7 @@ export class TimerPaneView extends ItemView {
 			if (tab === this.tab) panel.removeAttribute("hidden");
 			else panel.setAttribute("hidden", "");
 		}
-		this.updatePanelFocus();
+		this.render();
 	}
 
 	private updatePanelFocus(): void {
@@ -385,7 +386,8 @@ export class TimerPaneView extends ItemView {
 		if (!els) return;
 		const { state, timers } = this.currentTimers();
 		const connected = state === "running" || state === "idle";
-		const gate = this.services.idleCards?.availability() ?? { available: false, reason: "Loading saved tasks" };
+		els.start.setAttribute("aria-label", this.tab === "staged" ? "Stage tasks" : "Add task");
+		const gate = this.tab === "staged" ? { available: !!this.services.staging?.getSnapshot().canStage, reason: "Stage tasks" } : this.services.idleCards?.availability() ?? { available: false, reason: "Loading saved tasks" };
 		els.start.disabled = !connected || !gate.available || this.isBusy();
 		setTooltip(els.start, gate.reason);
 		const header = this.services.store.getHeaderState();
@@ -464,7 +466,7 @@ export class TimerPaneView extends ItemView {
 		switch (state) {
 			case "idle":
 				heading = "No task is being timed";
-				body = "Choose Add task above, then Start on its card when you are ready to time it.";
+				body = "Choose + beside the tabs, then Start on its card when you are ready to time it.";
 				break;
 			case "loading":
 				body = "Connecting to TaskNotes…";

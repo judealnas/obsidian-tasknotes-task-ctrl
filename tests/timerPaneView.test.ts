@@ -78,19 +78,15 @@ test("fixed context metadata appears in both tabs without display controls", asy
  await s.view.onClose(); s.view.unload();
 });
 
-test("staged insertion buttons open the shared picker at the corresponding card or end", async () => {
+test("the tab row plus opens the staging picker", async () => {
 	const s = setup([], undefined, true);
 	s.gateway.setUserFields([{ id: "s", key: "staged", displayName: "Staged", type: "date" }]);
 	s.gateway.listTasks = () => Promise.resolve(["A.md", "B.md"].map(path => ({ path, title: path, status: "open", archived: false, staged: "2026-11-12" })));
 	await s.view.onOpen(); await s.staging.refreshNow(); await flush();
-	const buttons = s.root.querySelector(".tntp-panel--staged")!.querySelectorAll(".tntp-insert");
-	expect(buttons).toHaveLength(3);
-	for (const [index, beforePath] of ["A.md", "B.md", null].entries()) {
-		event(buttons[index]!, "click");
-		const picker = pickerHost.instances[pickerHost.instances.length - 1]!;
-		expect(picker.options).toMatchObject({ mode: "stage", beforePath }); picker.close();
-	}
-	s.busy(true); expect(buttons.every(button => button.disabled)).toBe(true);
+	event(s.root.querySelectorAll(".tntp-tabs__tab")[0]!, "click");
+	event(s.root.querySelector(".tntp-start")!, "click");
+	expect(pickerHost.instances[pickerHost.instances.length - 1]!.options).toMatchObject({ mode: "stage", beforePath: null });
+	s.busy(true); expect(s.root.querySelector(".tntp-start")!.disabled).toBe(true);
 	await s.view.onClose(); s.view.unload();
 });
 
@@ -364,7 +360,6 @@ test("a real staged card joins running and paused timer sessions without replaci
 test("Add task opens the picker once and releases its guard after close and bridge loss", async () => {
 	const s = setup(); await s.view.onOpen(); await flush();
 	const start = s.root.querySelector(".tntp-start")!;
-	event(s.root.querySelector(".tntp-insert")!, "click"); expect(pickerHost.instances).toHaveLength(0);
 	s.busy(true); event(start, "click"); expect(pickerHost.instances).toHaveLength(0); s.busy(false);
 	event(start, "click"); event(start, "click"); expect(pickerHost.instances).toHaveLength(1);
 	expect(pickerHost.instances[0]!.options.mode).toBe("add");
@@ -487,7 +482,7 @@ test("switches stable panels with independent actions and empty states", async (
 	event(tabs[0]!, "click");
 	expect(panels[1]!.getAttribute("hidden")).toBe("");
 	expect(panels[0]!.getAttribute("hidden")).toBeNull();
-	expect(panels[0]!.querySelector(".tntp-insert")!.disabled).toBe(true);
+	expect(s.root.querySelector(".tntp-start")!.disabled).toBe(true);
 	expect(panels[0]!.querySelector(".tntp-message__heading")!.textContent).toBe("");
 	expect(panels[0]!.querySelector(".tntp-message__body")!.textContent).toBe("");
 	event(tabs[1]!, "click");
@@ -501,7 +496,12 @@ test("switches stable panels with independent actions and empty states", async (
 	event(tabs[1]!, "click"); event(tabs[0]!, "click"); event(tabs[1]!, "click");
 	expect(s.root.querySelector(".tntp-card")).toBe(current);
 	expect(card).not.toBeNull();
-	expect(panels[1]!.querySelector(".tntp-header")!.children.map(el => el.textContent).join(",")).toBe("Add task,Pause all,Resume all,Stop all");
+	const controls = s.root.querySelector(".tntp-tab-row")!.querySelector(".tntp-header")!;
+	event(tabs[0]!, "click");
+	expect(controls.getAttribute("hidden")).toBe("");
+	event(tabs[1]!, "click");
+	expect(controls.getAttribute("hidden")).toBeNull();
+	expect(controls.children.map(el => el.textContent).join(",")).toBe("Pause all,Resume all,Stop all");
 	await s.view.onClose();
 });
 
