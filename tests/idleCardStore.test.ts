@@ -1,0 +1,21 @@
+import { expect, test, vi } from "vitest";
+import { IdleCardStore } from "../src/state/IdleCardStore";
+import { PauseStore } from "../src/state/PauseStore";
+import { CardOrderStore } from "../src/state/CardOrderStore";
+import { createFakeGateway } from "./fakes/fakeGateway";
+const task = { path: "Task.md", title: "Task", status: "open", archived: false };
+test("idle add acknowledges saved membership; failed persistence retries same membership", async () => {
+ const gateway = createFakeGateway(); const log = vi.fn();
+ const order = new CardOrderStore({ log }); order.load([]);
+ const pauses = new PauseStore({ log }); pauses.load([]);
+ const persist = vi.fn().mockRejectedValueOnce(new Error("disk full")).mockResolvedValue(undefined);
+ const start = vi.fn(); const store = new IdleCardStore({ gateway, order, pauses, persist, log, notify: vi.fn(), controller: { start, isBusy: () => false }, fileCheck: () => null, visibleKeys: () => [] });
+ expect((await store.add(task)).kind).toBe("unavailable"); store.load({});
+ expect((await store.add(task)).kind).toBe("failed/unsaved");
+ expect(store.serialize()).toEqual({ idleTaskPathsVersion: 1, idleTaskPaths: ["Task.md"] });
+ expect((await store.add({ ...task, path: "./Task.md" })).kind).toBe("added-and-saved");
+ expect(persist).toHaveBeenCalledTimes(2); expect(store.models()).toHaveLength(1); expect(start).not.toHaveBeenCalled();
+ const restored = new IdleCardStore({ gateway, order, pauses, persist, log, notify: vi.fn(), controller: { start, isBusy: () => false }, fileCheck: () => null, visibleKeys: () => [] });
+ restored.load(store.serialize()); expect(restored.models()).toHaveLength(1);
+ expect((await store.add({ ...task, path: "../bad.md" })).kind).toBe("invalid/full");
+});

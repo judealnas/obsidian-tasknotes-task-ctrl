@@ -19,6 +19,8 @@ export interface ParsedEntry {
  * paused session from the pane's ledger. The card key is `sessionKey`.
  */
 export interface OpenTimer {
+	/** The public task snapshot used for read-only card details. */
+	task?: TaskInfo;
 	taskPath: string;
 	title: string;
 	/** The open entry's start; for a paused card, the start of the entry the pause closed. */
@@ -233,6 +235,7 @@ export function deriveSnapshot(active: readonly ActiveTimeEntry[], ledger?: Snap
 			totalKnown: true,
 			entries: parseEntries(item?.task?.timeEntries),
 			displayKey: taskDisplayKey(item?.task),
+			task: item?.task,
 		});
 	}
 	for (const record of records) {
@@ -253,6 +256,7 @@ export function deriveSnapshot(active: readonly ActiveTimeEntry[], ledger?: Snap
 			totalKnown: task !== null,
 			entries: parseEntries(task?.timeEntries),
 			displayKey: taskDisplayKey(task),
+			task: task ?? undefined,
 		});
 	}
 	const sorted = [...timers].sort(compareTimers);

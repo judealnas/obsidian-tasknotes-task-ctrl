@@ -1,0 +1,10 @@
+{
+  "at": "2026-11-15T08:23:04.356Z",
+  "dataSha256BeforeAndAfter": "ab33e763cfe796a1cade92bfa3451f0c384c8e0244254fa45fb6179ea3d372f7",
+  "dataByteExact": true,
+  "assets": {
+    "main.js": "0d49928c2d505bf0972705e7e5edeaccf0596b6eff042cbdab3e8fc6188d7bee",
+    "manifest.json": "e70688449ceee914ff762cb6d8896c92c2cbee1b64c9d3a3186829165211f677",
+    "styles.css": "db55f2d65882845be635814cd9e6006f74cf27ff21487ee7e88402a274ec29fb"
+  }
+}

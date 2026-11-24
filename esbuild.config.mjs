@@ -1,7 +1,7 @@
 import esbuild from "esbuild";
 import process from "process";
 import { builtinModules } from "node:module";
-import { access, copyFile, mkdir, writeFile } from "node:fs/promises";
+import { access, copyFile, mkdir, readFile, writeFile } from "node:fs/promises";
 
 // Build modes, read from the first CLI argument:
 //   production  -> main.js at the repo root (minified, no sourcemap), then exit
@@ -13,7 +13,7 @@ const deploy = mode === "deploy";
 
 // Hard-coded, repo-relative target (D-01). There is deliberately no environment
 // variable or CLI override: the build can never write into a real vault.
-const DEV_DIR = "dev-vault/.obsidian/plugins/tasknotes-timer-pane";
+const DEV_DIR = "dev-vault/.obsidian/plugins/tasknotes-task-ctrl";
 
 const devVaultAssets = {
 	name: "dev-vault-assets",
@@ -27,12 +27,13 @@ const devVaultAssets = {
 			}
 			await copyFile("manifest.json", `${DEV_DIR}/manifest.json`);
 			await copyFile("styles.css", `${DEV_DIR}/styles.css`);
+			await copyFile("THIRD_PARTY_NOTICES.md", `${DEV_DIR}/THIRD_PARTY_NOTICES.md`);
 		});
 	},
 };
 
 const context = await esbuild.context({
-	banner: { js: "/* bundled by esbuild — see the repository for source */" },
+	banner: { js: "/*!\n" + await readFile("THIRD_PARTY_NOTICES.md", "utf8") + "\n*/" },
 	entryPoints: ["src/main.ts"],
 	bundle: true,
 	external: [

@@ -1,9 +1,9 @@
 {
-	"id": "tasknotes-timer-pane",
-	"name": "TaskNotes Timer Pane",
-	"version": "0.2.0",
+	"id": "tasknotes-task-ctrl",
+	"name": "TaskNotes Task Control",
+	"version": "0.4.0",
 	"minAppVersion": "1.12.2",
-	"description": "Sidebar pane to watch, start, pause, stop and complete TaskNotes time tracking.",
+	"description": "Stage tasks and control regular task timers.",
 	"author": "Jude Alnas",
 	"isDesktopOnly": false
 }

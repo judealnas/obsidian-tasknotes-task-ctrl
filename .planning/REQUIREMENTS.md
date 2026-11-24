@@ -1,78 +1,87 @@
-# Requirements: TaskNotes Timer Pane
+# Requirements: TaskNotes Task Control — v0.3 Staging Tasks
 
-**Defined:** 2026-10-13
+**Defined:** 2026-11-12
 **Core Value:** With the pane open, I can always see what task is being timed and how long I've spent on it, and stop, pause, or switch tasks in one to two clicks, without leaving the pane.
 
-## v1 Requirements
+Design sources: `.planning/research/STAGING-DECISIONS.md` (settled decisions; v0.3 resolutions at top), `.planning/research/SUMMARY.md` (research synthesis). Scope revised by user beta feedback on 2026-11-15: Today means the local calendar date. Done today and configurable rollover are removed; earlier phase artifacts remain historical.
 
-Requirements for initial release. Each maps to roadmap phases.
+## v0.3 Requirements
 
-### Pane
+### Tabs
 
-- [x] **PANE-01**: User can open the timer pane from a ribbon icon. It opens in the right sidebar, and if it's already open, it is revealed instead of duplicated.
-- [x] **PANE-02**: User can open the timer pane from the command palette.
-- [x] **PANE-03**: The pane is still there in the same place after an Obsidian restart.
+- [x] **TABS-01**: Pane has two tabs: **Staged** and **Timers**; Timers shows every regular timed task exactly as in v0.2 (cards, Start, Pause all, Resume all, Stop all)
+- [x] **TABS-02**: Pane remembers the last-active tab across restarts
+- [x] **TABS-03**: Tab labels show counts (e.g. "Staged 4 · Timers 1"), and the Timers tab is visibly highlighted while any regular timer runs
+- [x] **TABS-04**: Timers-tab cards for staged tasks show a small staged marker
 
-### Display
+### Setup
 
-- [x] **DISP-01**: User sees the title of the task being timed, and clicking it opens the task note.
-- [x] **DISP-02**: User sees the current session's elapsed time (H:MM:SS), updating every second and calculated from the entry's start time.
-- [x] **DISP-03**: User sees the task's total tracked time, including the running session, to the second.
-- [x] **DISP-04**: When nothing is being timed, user sees an idle state with a "Start a task" button.
-- [x] **DISP-05**: User sees a clear message when TaskNotes is missing, disabled, or older than 4.10.
-- [x] **DISP-06**: When several timers are running, the pane shows the most recently started one.
-- [x] **DISP-07**: The timer owned by an active Pomodoro is not shown in the pane. When Pomodoro state can't be read, all timers are shown with a muted note under the header. *(Rewritten 2026-10-16: Pomodoro timers are hidden, not labelled; see Phase 3 CONTEXT.)*
+- [x] **SETUP-01** (revised 2026-11-15): The staged field key remains fixed as `staged`. Completion settings save safely. The rollover-hour setting is removed and legacy values are retired on the next normal save.
+- [x] **SETUP-02**: If the `staged` key isn't registered as a TaskNotes **date** user field (checked via `catalog.userFields()`), the Staged tab shows a setup notice explaining how to register it (type date, no default value) and Stage is disabled; no write is attempted
+- [x] **SETUP-03**: If TaskNotes lacks the staging APIs (older than 4.13.0 or missing capability), the Staged tab explains why and the Timers tab keeps working as before
 
-### Controls
+### Staging
 
-- [x] **CTRL-01**: User can stop the active timer with one click.
-- [x] **CTRL-02**: User can pause any running timer with one click from its card, or every regular timer from the header ("Pause all"). This closes the entry, and the card shows the task as paused. *(Rewritten 2026-10-16.)*
-- [x] **CTRL-03**: User can resume a paused task with one click from its card, or every paused task from the header ("Resume all"). This opens a new entry on the same task, and the card's session time continues from its paused value. *(Rewritten 2026-10-16.)*
-- [x] **CTRL-04**: Several tasks can be paused at once, and paused state survives an Obsidian restart. Starting another timer does not clear a pause. A pause clears when its task is resumed, stopped from the pane (including Stop all), completed, deleted, or taken over by a Pomodoro, and follows the task when it is renamed or moved. *(Rewritten 2026-10-16.)*
-- [x] **CTRL-05**: User can start timing any task from a fuzzy task picker, opened from the pane header. The task starts alongside any running timers.
-- [x] **CTRL-06**: User can stop every running timer, except one owned by an active Pomodoro, with one click from the pane header ("Stop all"). *(Rewritten 2026-10-15: switching was removed; see Phase 2 CONTEXT.)*
-- [x] **CTRL-07**: User can mark the active task complete from the pane, which also stops its timer.
-- ~~**CTRL-08**: Pause is hidden for timers controlled by a Pomodoro.~~ *(Dropped 2026-10-16: Pomodoro timers are hidden entirely; see DISP-07.)*
-- [x] **CTRL-09**: Controls are disabled while an action is in progress, and a failed action shows a notice explaining what happened.
-- ~~**CTRL-10**: A setting controls whether switching stops all running timers (default) or only the displayed one.~~ *(Dropped 2026-10-15: switching was removed.)*
+- [x] **STAGE-01**: User can stage a task from a picker listing tasks that are not done, not archived, and not already staged; staging writes `staged: <staging day>` via `api.tasks.update`
+- [x] **STAGE-02**: Tasks staged outside the pane (hand edit, other device) appear on the Staged tab, appended at the bottom of the order
+- [x] **STAGE-03**: ✕ unstages a task by writing an empty (`null`) `staged` value; if the task's regular timer is running it is stopped, and if paused its pause is cleared; a Pomodoro-owned timer is left untouched
+- [x] **STAGE-04**: Missing, empty/null, or invalid `staged` values count as not staged; a future date stays hidden until that day
+- [x] **STAGE-05**: Each staged card shows how many days the task has been staged (since its `staged` date)
 
-### Sync
+### Staged Cards
 
-- [x] **SYNC-01**: Timers started or stopped elsewhere in TaskNotes appear in the pane within about a second.
-- [x] **SYNC-02**: Changes from Obsidian Sync or hand-edited frontmatter appear in the pane.
-- [x] **SYNC-03**: The pane reconnects by itself after TaskNotes is disabled, re-enabled, or updated, without restarting Obsidian.
-- [x] **SYNC-04**: Elapsed time is correct after the computer sleeps and wakes.
+- [x] **SCARD-01**: An idle staged card offers start, ✓ complete, and ✕ unstage; clicking the title opens the note and right-click opens TaskNotes' task menu
+- [x] **SCARD-02**: A running staged card shows the live session and total time, with pause, stop, ✓ and ✕
+- [x] **SCARD-03**: A paused staged card shows the frozen session, with resume, ✓ and ✕
+- [x] **SCARD-04**: A staged task being timed by Pomodoro appears idle, and start is refused with the existing "being timed by Pomodoro" notice
 
-## v2 Requirements
+### Ordering
 
-Deferred to future release. Tracked but not in current roadmap.
+- [x] **ORDER-01**: User can reorder the Staged tab by drag and by ArrowUp/Down, and the order persists across restarts
+- [x] **ORDER-02**: Staged and Timers orders are independent — reordering one never changes the other
+- [x] **ORDER-03**: Staged order follows task renames, and deleted tasks drop out
+- [ ] **ORDER-04**: On mobile, ▲▼ buttons let the user reorder cards on both tabs
 
-### History
+### Completion
 
-- **HIST-01**: User sees recent tasks and can resume one with a single click
-- **HIST-02**: User sees today's log of time per task, split correctly at midnight
+- [ ] **DONE-01**: ✓ on a non-recurring staged task completes it (configured completed status), stops its timer, and clears `staged`
+- [ ] **CTRL-13**: On either tab, ✓ on a recurring task completes only today's instance (local calendar date passed explicitly), never closes the series, and a repeated ✓ never un-completes it
+- **DONE-02 — Removed by user, 2026-11-15:** No Done today section or external completion-history collection. Completion safety records remain.
 
-### Display
+### Persistent staging and calendar age
 
-- **DISP-08**: User sees progress of total time against the task's time estimate
-- **DISP-09**: User sees an "also running" list of other active timers, each with its own stop button
+- **ROLL-01 — Superseded, 2026-11-15:** Use local calendar dates with no custom boundary.
+- [x] **ROLL-02** (revised): Unfinished tasks stay staged in order until completed or unstaged. Calendar age updates without frontmatter writes.
+- **ROLL-03 — Removed by user, 2026-11-15:** No daily rollover feature; normal timer/wake refresh remains.
 
-### Controls
+### Release
 
-- **CTRL-11**: Hotkey commands for pause/resume, stop, and switch task
-- **CTRL-12**: User can add an optional description to a session
+- [ ] **PANE-04**: Display name becomes "TaskNotes Task Control"; plugin id (`tasknotes-timer-pane`), view type, command ids and saved data are unchanged; released as 0.3.0 through BRAT
+
+## Future Requirements
+
+Deferred; tracked but not in this roadmap.
+
+- **DONE-F1 — Removed:** Done today is no longer part of the product.
+- **STAGE-F1**: "Stage" item in the Timers-card context menu
+- **SCARD-F1**: Total tracked time shown (muted) on idle staged cards
+- **HIST-F1**: Recent tasks, today's log, estimate progress
+- **PANE-F1**: Hotkeys
+- **VER-F1**: v0.2 leftovers — skipped Phase 1 native desktop checks; observe the unreadable-Pomodoro note
 
 ## Out of Scope
 
 | Feature | Reason |
 |---------|--------|
-| Pomodoro controls | TaskNotes already has a Pomodoro pane; duplicating it confuses timer ownership |
-| Writing timeEntries directly to frontmatter | Not under TaskNotes' lock and the field name can be remapped; only `api.time.start`/`stop` are safe |
-| TaskNotes HTTP API | In-process Runtime API chosen; no server or token needed |
-| Desktop overlay / always-on-top window | Project wants in-Obsidian integration; Obsidian pop-out windows cover this |
-| Reports, charts, export | TaskNotes has Stats views; not part of the core need |
-| zczs520/tasknotes fork | Unknown provenance; not an official TaskNotes release |
-| Community plugin submission | Personal use; BRAT or manual install is enough |
+| Pomodoro display or 🍅 start on staged cards | User chose to keep v0.2 behavior: Pomodoro-owned entries hidden in both tabs |
+| Using TaskNotes' `scheduled` field for staging | Kept free for its intended purpose (Q2) |
+| Auto-registering the `staged` user field | No official API; would require TaskNotes internals (Q15) |
+| Deleting the key via undocumented `customFrontmatter` | User chose documented-only `null` write; empty `staged:` is harmless |
+| Already-staged tasks in the Stage picker / re-staging to reset days | User chose to hide them; unstage + re-stage resets instead |
+| Configurable staged field key | Hard-coded as `staged` for simplicity (Phase 4 discussion) |
+| Cross-device data.json merge (former SYNC-05) | Multi-device operation is out of scope (Phase 4 discussion); single-device saves still never reset other keys |
+| Bulk timer actions on the Staged tab header | Staged header has Stage only; bulk actions stay on Timers |
+| Auto-archive / "overdue" styling for long-staged tasks | Anti-feature per research; quiet carry-over with days count instead |
 
 ## Traceability
 
@@ -80,36 +89,39 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| PANE-01 | Phase 1 | Complete |
-| PANE-02 | Phase 1 | Complete |
-| PANE-03 | Phase 1 | Complete |
-| DISP-01 | Phase 1 | Complete |
-| DISP-02 | Phase 1 | Complete |
-| DISP-03 | Phase 1 | Complete |
-| DISP-04 | Phase 2 | Complete |
-| DISP-05 | Phase 1 | Complete |
-| DISP-06 | Phase 1 | Complete |
-| DISP-07 | Phase 3 | Complete |
-| CTRL-01 | Phase 1 | Complete |
-| CTRL-02 | Phase 3 | Complete |
-| CTRL-03 | Phase 3 | Complete |
-| CTRL-04 | Phase 3 | Complete |
-| CTRL-05 | Phase 2 | Complete |
-| CTRL-06 | Phase 2 | Complete |
-| CTRL-07 | Phase 2 | Complete |
-| CTRL-08 | Phase 3 | Dropped |
-| CTRL-09 | Phase 2 | Complete |
-| CTRL-10 | Phase 2 | Dropped |
-| SYNC-01 | Phase 1 | Complete |
-| SYNC-02 | Phase 1 | Complete |
-| SYNC-03 | Phase 1 | Complete |
-| SYNC-04 | Phase 1 | Complete |
+| TABS-01 | Phase 5 | Complete |
+| TABS-02 | Phase 5 | Complete |
+| TABS-03 | Phase 6 | Complete |
+| TABS-04 | Phase 6 | Complete |
+| SETUP-01 | Phase 4 | Complete |
+| SETUP-02 | Phase 6 | Complete |
+| SETUP-03 | Phase 6 | Complete |
+| STAGE-01 | Phase 6 | Complete |
+| STAGE-02 | Phase 6 | Complete |
+| STAGE-03 | Phase 6 | Complete |
+| STAGE-04 | Phase 6 | Complete |
+| STAGE-05 | Phase 6 | Complete |
+| SCARD-01 | Phase 6 | Complete |
+| SCARD-02 | Phase 6 | Complete |
+| SCARD-03 | Phase 6 | Complete |
+| SCARD-04 | Phase 6 | Complete |
+| ORDER-01 | Phase 6 | Complete |
+| ORDER-02 | Phase 6 | Complete |
+| ORDER-03 | Phase 6 | Complete |
+| ORDER-04 | Phase 7 | Pending |
+| DONE-01 | Phase 7 | Pending |
+| CTRL-13 | Phase 7 | Pending |
+| DONE-02 | Phase 7 | Removed by user 2026-11-15 |
+| ROLL-01 | Phase 4 | Superseded: calendar dates |
+| ROLL-02 | Phase 7 | Revised: persistent staging / calendar age |
+| ROLL-03 | Phase 7 | Removed by user 2026-11-15 |
+| PANE-04 | Phase 7 | Pending |
 
 **Coverage:**
-- v1 requirements: 24 total
-- Mapped to phases: 24
+- v0.3 requirements: 27 total
+- Mapped to phases: 27
 - Unmapped: 0 ✓
 
 ---
-*Requirements defined: 2026-10-13*
-*Last updated: 2026-10-16 after Phase 3 discussion (DISP-07, CTRL-02, CTRL-03, CTRL-04 rewritten; CTRL-08 dropped)*
+*Requirements defined: 2026-11-12*
+*Last updated: 2026-11-12 after Phase 4 discussion (SYNC-05 dropped; staged key fixed)*

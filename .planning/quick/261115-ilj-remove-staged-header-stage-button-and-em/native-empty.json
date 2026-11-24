@@ -1,0 +1,21 @@
+{
+  "timestamp": "2026-11-15T18:25:57.441Z",
+  "checks": {
+    "stageHeaderRemoved": true,
+    "emptyHeading": "",
+    "emptyBody": "",
+    "plusCount": 1,
+    "plusEnabled": true,
+    "stagedCount": "0",
+    "originalStagedTasks": 36
+  },
+  "clip": {
+    "x": 431.5,
+    "y": 40,
+    "width": 480,
+    "height": 360,
+    "scale": 1
+  },
+  "mainjsSha256": "369ac0338a7ed2d21504c1b39b723cb7db6fbfabfa75073761e07f59a21bbaa3",
+  "fixture": "Temporary read-only empty snapshot; no tasks unstaged"
+}

@@ -1,0 +1,26 @@
+{
+  "at": "2026-11-15T08:23:36.432Z",
+  "checks": {
+    "version": true,
+    "name": true,
+    "id": true,
+    "minAppVersion": true,
+    "pause": true,
+    "cardOrder": true,
+    "stagedOrder": true,
+    "completionStatus": true,
+    "rolloverHour": true,
+    "extra": true,
+    "leafIds": true,
+    "viewType": true,
+    "legacyTabDefault": true,
+    "pausedCardVisible": true,
+    "noActiveTimers": true
+  },
+  "accumulatedMs": 1344,
+  "beforeVersion": "0.2.0",
+  "afterVersion": "0.3.0",
+  "nativeUpgradeAccepted": true,
+  "actualBRATUpdate": false,
+  "initialHarnessCorrection": "Initial assertion checked activeTab; production persists tab. Captured candidate states were tab:timers on both leaves."
+}

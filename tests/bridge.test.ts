@@ -1,12 +1,14 @@
 // D-12 bridge-availability tests. Per D-04 the missing and too-old states are faked
 // (apiVersion, capabilities, version); no old TaskNotes is ever installed.
 import { afterEach, beforeEach, describe, expect, test, vi } from "vitest";
+import { fieldStatus } from "../src/model/stagedField";
 import { derivePaneState } from "../src/model/timeMath";
 import { TimerStore } from "../src/state/TimerStore";
 import {
 	EARLY_PROBE_DELAY_MS,
 	LOADING_WARN_MS,
 	PROBE_INTERVAL_MS,
+	REQUIRED_CAPABILITIES,
 	TaskNotesBridge,
 	isVersionOlder,
 	type TaskNotesPluginLike,
@@ -15,7 +17,7 @@ import type {
 	TaskNotesRuntimeLifecycleEventName,
 	TaskNotesRuntimeEventName,
 } from "../src/tasknotes/runtime-api.types";
-import { createFakeTaskNotes, makeActiveEntry, timerSchedule, type FakeTaskNotes } from "./fakes/fakeTaskNotes";
+import { DEFAULT_CAPABILITIES, createFakeTaskNotes, makeActiveEntry, timerSchedule, type FakeTaskNotes } from "./fakes/fakeTaskNotes";
 
 const SUBSCRIBED: ReadonlyArray<TaskNotesRuntimeLifecycleEventName | TaskNotesRuntimeEventName> = [
 	"unloading",
@@ -587,4 +589,311 @@ describe("Start feature gates", () => {
   const pending = bridge.listTasks(); tn.emitLifecycle("unloading"); resolve([]);
   await expect(pending).rejects.toThrow(); expect(bridge.startAvailability().available).toBe(false);
  });
+});
+
+describe("staging field registration (D-03)", () => {
+	const STAGED_DATE = { id: "f1", displayName: "Staged", key: "staged", type: "date" };
+	test("a ready bridge on TaskNotes 4.13.8 reads catalog.userFields and fieldStatus reports ok", async () => {
+		const tn = createFakeTaskNotes({ version: "4.13.8", userFields: [STAGED_DATE] });
+		const { bridge } = setup(tn.plugin);
+		bridge.probe();
+		const fields = await bridge.userFields();
+		expect(fields).toHaveLength(1);
+		expect(fields).toEqual([STAGED_DATE]);
+		expect(fieldStatus(fields)).toEqual({ kind: "ok", hasDefault: false });
+	});
+	test("no staged entry is missing; staged as text is wrong-type", async () => {
+		const tn = createFakeTaskNotes();
+		const { bridge } = setup(tn.plugin);
+		bridge.probe();
+		expect(fieldStatus(await bridge.userFields())).toEqual({ kind: "missing" });
+		tn.setUserFields([{ ...STAGED_DATE, type: "text" }]);
+		expect(fieldStatus(await bridge.userFields())).toEqual({ kind: "wrong-type", type: "text", hasDefault: false });
+	});
+	test("returns a copy, so a caller cannot mutate the fake catalog", async () => {
+		const tn = createFakeTaskNotes({ userFields: [STAGED_DATE] });
+		const { bridge } = setup(tn.plugin);
+		bridge.probe();
+		const first = await bridge.userFields();
+		first[0]!.type = "text";
+		expect(fieldStatus(await bridge.userFields())).toEqual({ kind: "ok", hasDefault: false });
+	});
+	test("without catalog.userFields the bridge stays ready and userFields() rejects", async () => {
+		const tn = createFakeTaskNotes({ omitMethods: ["catalog.userFields"] });
+		const { bridge } = setup(tn.plugin);
+		bridge.probe();
+		expect(bridge.getState()).toEqual({ kind: "ready" });
+		await expect(bridge.userFields()).rejects.toThrow("TaskNotes does not provide catalog.userFields");
+	});
+	test("without catalog.read userFields() rejects", async () => {
+		const tn = createFakeTaskNotes({ capabilities: ["time.read", "time.write", "tasks.events", "lifecycle.events"], userFields: [STAGED_DATE] });
+		const { bridge } = setup(tn.plugin);
+		bridge.probe();
+		expect(bridge.getState()).toEqual({ kind: "ready" });
+		await expect(bridge.userFields()).rejects.toThrow("TaskNotes is missing catalog.read");
+	});
+	test("a failed catalog read rejects, and fieldStatus of the null a consumer passes is unknown", async () => {
+		const tn = createFakeTaskNotes({ userFields: [STAGED_DATE] });
+		const { bridge } = setup(tn.plugin);
+		bridge.probe();
+		tn.failReadWith("catalog broke");
+		await expect(bridge.userFields()).rejects.toThrow("catalog broke");
+		expect(fieldStatus(null)).toEqual({ kind: "unknown" });
+	});
+	test("preserves the catalog receiver and refuses user fields read across a TaskNotes reload", async () => {
+		const tn = createFakeTaskNotes({ userFields: [STAGED_DATE] });
+		const ctx = setup(tn.plugin);
+		ctx.bridge.probe();
+		const catalog = tn.api.catalog!;
+		let reload = false;
+		catalog.userFields = function () {
+			expect(this).toBe(catalog);
+			if (reload) ctx.setPlugin(createFakeTaskNotes().plugin);
+			return [STAGED_DATE];
+		};
+		await expect(ctx.bridge.userFields()).resolves.toEqual([STAGED_DATE]);
+		reload = true;
+		await expect(ctx.bridge.userFields()).rejects.toThrow();
+	});
+	test("rejects while TaskNotes is not connected", async () => {
+		const tn = createFakeTaskNotes({ ready: false });
+		const { bridge } = setup(tn.plugin);
+		bridge.probe();
+		await expect(bridge.userFields()).rejects.toThrow("TaskNotes is not connected");
+	});
+});
+
+describe("staging write contract (SC3)", () => {
+	const PATH = "TaskNotes/Tasks/A.md";
+	const STAGED_DATE = { id: "f1", displayName: "Staged", key: "staged", type: "date" };
+	const CTX = { source: "tasknotes-timer-pane", correlationId: "c1", reason: "stage" };
+	const TASK = { title: "A", status: "open", path: PATH, archived: false };
+	const readyBridge = (options: Parameters<typeof createFakeTaskNotes>[0] = {}) => {
+		const tn = createFakeTaskNotes({ version: "4.13.8", userFields: [STAGED_DATE], tasks: [structuredClone(TASK)], ...options });
+		const ctx = setup(tn.plugin);
+		ctx.bridge.probe();
+		return { tn, ...ctx };
+	};
+	const stored = async (tn: FakeTaskNotes) => (await tn.api.tasks!.get!(PATH)) as unknown as Record<string, unknown>;
+
+	test("a supported TaskNotes reports staging available and receives a staged write through tasks.update", async () => {
+		const { tn, bridge } = readyBridge();
+		expect(bridge.stagingAvailability().available).toBe(true);
+		expect(bridge.stagingAvailability()).toEqual({ available: true, reason: "Staging is available" });
+		await expect(bridge.updateTask(PATH, { staged: "2026-11-12" }, CTX)).resolves.toBeUndefined();
+		expect(tn.updateCalls).toEqual([{ path: PATH, patch: { staged: "2026-11-12" }, context: CTX }]);
+		expect((await stored(tn)).staged).toBe("2026-11-12");
+	});
+	test("unstaging writes null and keeps the key, as the 04-01 Pins record", async () => {
+		const { tn, bridge } = readyBridge();
+		await bridge.updateTask(PATH, { staged: "2026-11-12" }, CTX);
+		await bridge.updateTask(PATH, { staged: null }, CTX);
+		const task = await stored(tn);
+		expect(Object.prototype.hasOwnProperty.call(task, "staged")).toBe(true);
+		expect(task.staged).toBeNull();
+	});
+	test("an undefined value is skipped, not written", async () => {
+		const { tn, bridge } = readyBridge();
+		await bridge.updateTask(PATH, { staged: "2026-11-12" }, CTX);
+		await bridge.updateTask(PATH, { staged: undefined }, CTX);
+		expect((await stored(tn)).staged).toBe("2026-11-12");
+	});
+	test("an unregistered key is echoed but not stored (research F1/F5)", async () => {
+		const { tn, bridge } = readyBridge({ userFields: [] });
+		await expect(bridge.updateTask(PATH, { staged: "2026-11-12" }, CTX)).resolves.toBeUndefined();
+		expect(tn.updateCalls).toHaveLength(1);
+		const direct = (await tn.api.tasks!.update!(PATH, { staged: "2026-11-12" }, CTX)) as unknown as Record<string, unknown>;
+		expect(direct.staged).toBe("2026-11-12");
+		expect(Object.prototype.hasOwnProperty.call(await stored(tn), "staged")).toBe(false);
+	});
+	test("TaskNotes 4.12.3 stays ready and can start timers, but staging is unavailable", () => {
+		const { bridge } = readyBridge({ version: "4.12.3" });
+		expect(bridge.getState()).toEqual({ kind: "ready" });
+		expect(bridge.startAvailability().available).toBe(true);
+		expect(bridge.stagingAvailability()).toEqual({ available: false, reason: "TaskNotes 4.13.0 or newer is needed for staging" });
+	});
+	test.each(["tasks.read", "tasks.write", "catalog.read"])("without %s staging is unavailable and the bridge stays ready", capability => {
+		const { bridge } = readyBridge({ capabilities: DEFAULT_CAPABILITIES.filter(item => item !== capability) });
+		expect(bridge.getState()).toEqual({ kind: "ready" });
+		expect(bridge.stagingAvailability()).toEqual({ available: false, reason: "TaskNotes is missing " + capability });
+	});
+	test.each(["tasks.list", "tasks.update", "catalog.userFields"] as const)("without %s staging is unavailable", method => {
+		const { bridge } = readyBridge({ omitMethods: [method] });
+		expect(bridge.getState()).toEqual({ kind: "ready" });
+		expect(bridge.stagingAvailability()).toEqual({ available: false, reason: "TaskNotes does not provide " + method });
+	});
+	test("without tasks.update an updateTask call rejects", async () => {
+		const { bridge } = readyBridge({ omitMethods: ["tasks.update"] });
+		await expect(bridge.updateTask(PATH, { staged: "2026-11-12" }, CTX)).rejects.toThrow("TaskNotes does not provide tasks.update");
+	});
+	test("while loading or missing, staging is not connected and nothing throws", async () => {
+		const loading = readyBridge({ ready: false });
+		expect(loading.bridge.getState()).toEqual({ kind: "loading" });
+		expect(loading.bridge.stagingAvailability()).toEqual({ available: false, reason: "TaskNotes is not connected" });
+		await expect(loading.bridge.updateTask(PATH, { staged: "2026-11-12" }, CTX)).rejects.toThrow("TaskNotes is not connected");
+		const missing = setup(null);
+		missing.bridge.probe();
+		expect(missing.bridge.getState()).toEqual({ kind: "missing" });
+		expect(missing.bridge.stagingAvailability()).toEqual({ available: false, reason: "TaskNotes is not connected" });
+	});
+	test("a patch with a customFrontmatter member is refused before TaskNotes is called", async () => {
+		const { tn, bridge } = readyBridge();
+		await expect(bridge.updateTask(PATH, { customFrontmatter: { staged: null } }, CTX)).rejects.toThrow("Staging writes use registered fields only");
+		expect(tn.updateCalls).toHaveLength(0);
+	});
+	test("a TaskNotes update failure rejects", async () => {
+		const { tn, bridge } = readyBridge();
+		tn.failUpdateWith("write broke");
+		await expect(bridge.updateTask(PATH, { staged: "2026-11-12" }, CTX)).rejects.toThrow("write broke");
+	});
+});
+
+describe("recurring completion contract", () => {
+	const PATH = "TaskNotes/Tasks/Weekly.md";
+	const CTX = { source: "tasknotes-timer-pane", correlationId: "c2", reason: "complete-instance" };
+	const TASK = { title: "Weekly", status: "open", path: PATH, archived: false };
+	const readyBridge = (options: Parameters<typeof createFakeTaskNotes>[0] = {}) => {
+		const tn = createFakeTaskNotes({ version: "4.13.8", tasks: [structuredClone(TASK)], ...options });
+		const ctx = setup(tn.plugin);
+		ctx.bridge.probe();
+		return { tn, ...ctx };
+	};
+
+	test("a supported TaskNotes reports recurring completion available and receives the explicit day", async () => {
+		const { tn, bridge } = readyBridge();
+		expect(bridge.recurringAvailability().available).toBe(true);
+		expect(bridge.recurringAvailability()).toEqual({ available: true, reason: "Recurring completion is available" });
+		await expect(bridge.toggleCompleteInstance(PATH, "2026-11-11", CTX)).resolves.toMatchObject({ path: PATH });
+		expect(tn.toggleCalls).toEqual([{ path: PATH, date: "2026-11-11", context: CTX }]);
+		const task = (await tn.api.tasks!.get!(PATH)) as unknown as { complete_instances?: string[] };
+		expect(task.complete_instances).toEqual(["2026-11-11"]);
+	});
+	test.each(["2026-11-11T00:00:00Z", "11/11/2026", "", "2026-1-1", "2026-02-30", "2025-02-29", "2026-13-01"])("the date %j is refused before TaskNotes is called", async date => {
+		const { tn, bridge } = readyBridge();
+		await expect(bridge.toggleCompleteInstance(PATH, date, CTX)).rejects.toThrow("Recurring completion needs a YYYY-MM-DD day");
+		expect(tn.toggleCalls).toHaveLength(0);
+	});
+
+ test("completion wrappers preserve materialized identity and method receivers", async () => {
+  const { tn, bridge } = readyBridge({ capabilities: [...DEFAULT_CAPABILITIES, "recurring.materialize"] });
+  const occurrence = { ...TASK, path: "TaskNotes/Tasks/Weekly-instance.md", occurrence_date: "2026-11-11", recurrence_parent: "[[TaskNotes/Tasks/Weekly]]" };
+  tn.api.recurring!.materializeOccurrence = function(path, date) {
+   expect(this).toBe(tn.api.recurring); expect(path).toBe(PATH); expect(date).toBe("2026-11-11"); return Promise.resolve(occurrence);
+  };
+  tn.api.recurring!.toggleCompleteInstance = function() { expect(this).toBe(tn.api.recurring); return Promise.resolve(occurrence); };
+  tn.api.tasks!.complete = function() { expect(this).toBe(tn.api.tasks); return Promise.resolve({ ...occurrence, status: "done" }); };
+  expect(await bridge.materializeOccurrence(PATH, "2026-11-11", CTX)).toEqual(occurrence);
+  expect(await bridge.toggleCompleteInstance(PATH, "2026-11-11", CTX)).toEqual(occurrence);
+  expect(await bridge.completeTask(occurrence.path, "done", CTX)).toMatchObject({ path: occurrence.path, status: "done" });
+ });
+ test("a retired API return cannot be mistaken for fresh completion evidence", async () => {
+  const { tn, bridge } = readyBridge();
+  tn.api.recurring!.toggleCompleteInstance = () => { tn.emitLifecycle("unloading"); return Promise.resolve(TASK); };
+  await expect(bridge.toggleCompleteInstance(PATH, "2026-11-11", CTX)).rejects.toThrow("not connected");
+ });
+ test("materialization refuses missing capabilities and malformed returned identities", async () => {
+  const missing = readyBridge();
+  await expect(missing.bridge.materializeOccurrence(PATH, "2026-11-11", CTX)).rejects.toThrow("recurring.materialize");
+  const { tn, bridge } = readyBridge({ capabilities: [...DEFAULT_CAPABILITIES, "recurring.materialize"] });
+  tn.api.recurring!.materializeOccurrence = () => Promise.resolve({ ...TASK, path: "" });
+  await expect(bridge.materializeOccurrence(PATH, "2026-11-11", CTX)).rejects.toThrow("valid completion identity");
+  await expect(bridge.materializeOccurrence(PATH, "2026-02-30", CTX)).rejects.toThrow("YYYY-MM-DD");
+ });
+	test("TaskNotes 4.12.3 stays ready, but recurring completion is unavailable", () => {
+		const { bridge } = readyBridge({ version: "4.12.3" });
+		expect(bridge.getState()).toEqual({ kind: "ready" });
+		expect(bridge.recurringAvailability()).toEqual({ available: false, reason: "TaskNotes 4.13.0 or newer is needed for recurring completion" });
+	});
+	test("without recurring.write recurring completion is unavailable and the call rejects", async () => {
+		const { bridge } = readyBridge({ capabilities: DEFAULT_CAPABILITIES.filter(item => item !== "recurring.write") });
+		expect(bridge.getState()).toEqual({ kind: "ready" });
+		expect(bridge.recurringAvailability()).toEqual({ available: false, reason: "TaskNotes is missing recurring.write" });
+		await expect(bridge.toggleCompleteInstance(PATH, "2026-11-11", CTX)).rejects.toThrow("TaskNotes is missing recurring.write");
+	});
+	test("without recurring.toggleCompleteInstance recurring completion is unavailable", () => {
+		const { bridge } = readyBridge({ omitMethods: ["recurring.toggleCompleteInstance"] });
+		expect(bridge.getState()).toEqual({ kind: "ready" });
+		expect(bridge.recurringAvailability()).toEqual({ available: false, reason: "TaskNotes does not provide recurring.toggleCompleteInstance" });
+	});
+	test("with no recurring namespace the bridge stays ready and recurring completion is unavailable", async () => {
+		const { bridge } = readyBridge({ recurring: false });
+		expect(bridge.getState()).toEqual({ kind: "ready" });
+		expect(bridge.recurringAvailability().available).toBe(false);
+		await expect(bridge.toggleCompleteInstance(PATH, "2026-11-11", CTX)).rejects.toThrow("TaskNotes does not provide recurring.toggleCompleteInstance");
+	});
+	test("while not connected recurring completion is unavailable and nothing throws", () => {
+		const { bridge } = readyBridge({ ready: false });
+		expect(bridge.recurringAvailability()).toEqual({ available: false, reason: "TaskNotes is not connected" });
+		const missing = setup(null);
+		missing.bridge.probe();
+		expect(missing.bridge.recurringAvailability()).toEqual({ available: false, reason: "TaskNotes is not connected" });
+	});
+	test("a TaskNotes toggle failure rejects", async () => {
+		const { tn, bridge } = readyBridge();
+		tn.failToggleWith("toggle broke");
+		await expect(bridge.toggleCompleteInstance(PATH, "2026-11-11", CTX)).rejects.toThrow("toggle broke");
+	});
+});
+
+describe("Timers unaffected by staging (SC3)", () => {
+	test("REQUIRED_CAPABILITIES stays exactly the v0.2 set", () => {
+		expect([...REQUIRED_CAPABILITIES]).toEqual(["time.read", "time.write", "tasks.events", "lifecycle.events"]);
+	});
+	test("an older TaskNotes 4.12.3 without staging or recurring keeps every v0.2 timer path working", async () => {
+		const running = makeActiveEntry({ taskPath: "TaskNotes/Tasks/A.md", startTime: "2026-11-12T09:00:00.000Z", title: "A" });
+		const idle = { title: "B", status: "open", path: "TaskNotes/Tasks/B.md", archived: false };
+		const tn = createFakeTaskNotes({
+			version: "4.12.3",
+			active: [running],
+			tasks: [running.task, idle],
+			omitMethods: ["tasks.update", "catalog.userFields", "recurring.toggleCompleteInstance"],
+			recurring: false,
+			capabilities: DEFAULT_CAPABILITIES.filter(item => item !== "recurring.write"),
+		});
+		const { bridge } = setup(tn.plugin);
+		bridge.probe();
+		expect(bridge.getState()).toEqual({ kind: "ready" });
+		expect(tn.api.recurring).toBeUndefined();
+		const active = await bridge.active();
+		expect(active.map(item => item.taskPath)).toEqual(["TaskNotes/Tasks/A.md"]);
+		expect(active[0]!.entry.startTime).toBe("2026-11-12T09:00:00.000Z");
+		expect(bridge.startAvailability().available).toBe(true);
+		const ctx = { source: "tasknotes-timer-pane", correlationId: "c3", reason: "switch" };
+		await bridge.stop("TaskNotes/Tasks/A.md", ctx);
+		await bridge.start("TaskNotes/Tasks/B.md", {}, ctx);
+		expect(tn.stopCalls).toEqual([{ path: "TaskNotes/Tasks/A.md", context: ctx }]);
+		expect(tn.startCalls).toEqual([{ path: "TaskNotes/Tasks/B.md", options: {}, context: ctx }]);
+		expect((await bridge.active()).map(item => item.taskPath)).toEqual(["TaskNotes/Tasks/B.md"]);
+		expect(bridge.stagingAvailability().available).toBe(false);
+		expect(bridge.stagingAvailability().reason).toBe("TaskNotes 4.13.0 or newer is needed for staging");
+		expect(bridge.recurringAvailability().available).toBe(false);
+		expect(bridge.getState()).toEqual({ kind: "ready" });
+	});
+	test("a 4.13.8 TaskNotes missing every staging method still stays ready and times tasks", async () => {
+		const tn = createFakeTaskNotes({ omitMethods: ["tasks.update", "catalog.userFields", "recurring.toggleCompleteInstance"] });
+		const { bridge } = setup(tn.plugin);
+		bridge.probe();
+		expect(bridge.getState()).toEqual({ kind: "ready" });
+		expect(bridge.startAvailability().available).toBe(true);
+		expect(bridge.stagingAvailability()).toEqual({ available: false, reason: "TaskNotes does not provide tasks.update" });
+		expect(bridge.recurringAvailability()).toEqual({ available: false, reason: "TaskNotes does not provide recurring.toggleCompleteInstance" });
+	});
+});
+
+test("inline creation and optional metadata require capability plus function without blocking readiness", async () => {
+ const tn = createFakeTaskNotes({ capabilities: [...DEFAULT_CAPABILITIES, "nlp.parse", "relationships.read"] });
+ Object.assign(tn.api, { nlp: { parse: (text: string) => ({ title: text, status: "open", priority: "high" }) }, relationships: { subtasks: () => Promise.resolve([]) } });
+ tn.api.tasks!.create = vi.fn((data: import("../src/tasknotes/runtime-api.types").TaskCreationData) => Promise.resolve({ ...data, path: "Created.md", status: data.status ?? "open", archived: false }));
+ tn.api.catalog!.priorities = () => [{ value: "high", label: "High", color: "#ff0000" }];
+ const { bridge } = setup(tn.plugin); bridge.probe();
+ expect(bridge.getState().kind).toBe("ready"); expect(bridge.inlineCreationAvailability().available).toBe(true);
+ expect(await bridge.parseTask("Draft")).toEqual({ title: "Draft", status: "open", priority: "high" });
+ expect((await bridge.createTask({ title: "Draft" }, { source: "test" })).path).toBe("Created.md");
+ expect(await bridge.priorities()).toHaveLength(1); expect(await bridge.subtasks("Created.md")).toEqual([]);
+ delete tn.api.tasks!.create; expect(bridge.inlineCreationAvailability().available).toBe(false); expect(bridge.getState().kind).toBe("ready");
+ delete tn.api.catalog!.priorities; await expect(bridge.priorities()).rejects.toThrow("catalog.priorities");
+ const old = setup(createFakeTaskNotes().plugin); old.bridge.probe();
+ expect(old.bridge.inlineCreationAvailability().available).toBe(false); expect(old.bridge.getState().kind).toBe("ready");
+ await expect(old.bridge.subtasks("A.md")).rejects.toThrow("relationships.read");
+ bridge.dispose(); old.bridge.dispose();
 });

@@ -1,0 +1,10 @@
+{
+  "command": "node ../../../node_modules/vitest/vitest.mjs run --dir tests timerPaneView --reporter=tap-flat",
+  "exitCode": 1,
+  "output": "TAP version 13\n1..3\nok 1 - tests/timerPaneView.test.ts > mounted view dispatches current targets and keeps session DOM through pause/resume # time=10.76ms\nok 2 - tests/timerPaneView.test.ts > removing a card immediately unloads pending title render exactly once # time=1.67ms\nnot ok 3 - tests/timerPaneView.test.ts > disposed list handles cannot change the shared saved order # time=7.43ms\n    ---\n    error:\n        name: \"AssertionError\"\n        message: \"expected '' to be 'a,b' // Object.is equality\"\n    at: \"C:/Users/ja384/Home/obsidian-tasknotes-timer-pane/.claude/worktrees/phase-05-discuss/tests/timerPaneView.test.ts:67:38\"\n    actual: \n    expected: \"a,b\"\n    ...\n",
+  "targetTest": "tests/timerPaneView.test.ts > disposed list handles cannot change the shared saved order",
+  "targetFile": "tests/timerPaneView.test.ts",
+  "expected": "Saved order remains a,b after closed view handle event",
+  "actual": "Saved order cleared to []",
+  "semanticAssessment": "Target dispatches a retained handle after close and fails shared-order preservation assertion. Existing two mounted tests pass; no fixture/collection errors."
+}

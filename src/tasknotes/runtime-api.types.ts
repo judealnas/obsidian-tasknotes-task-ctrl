@@ -29,6 +29,16 @@ export interface TaskInfo {
 	tags?: string[];
 	timeEstimate?: number;
 	timeEntries?: TimeEntry[];
+ /** Public TaskNotes recurrence/occurrence fields; see tasknotes.dev/settings/property-types-reference/. */
+ recurrence?: string;
+ recurrence_anchor?: "scheduled" | "completion";
+ complete_instances?: string[];
+ skipped_instances?: string[];
+ completedDate?: string;
+ scheduled?: string;
+ recurrence_parent?: string;
+ occurrence_date?: string;
+ occurrence_materialization?: "manual" | "on_completion" | "rolling";
 }
 
 /** One open time entry, as returned by `time.active()`. */
@@ -70,8 +80,20 @@ export type TaskNotesRuntimeLifecycleEventName =
 	| "unloading";
 
 export type TaskNotesRuntimeTaskEventName = "task.updated" | "task.deleted";
+export type TaskNotesRuntimeCreationEventName = "task.created";
 /** Only the public time/Pomodoro event names used by this companion. */
 export type TaskNotesRuntimeEventName = TaskNotesRuntimeTaskEventName | "time.started" | "time.stopped" | "pomodoro.started" | "pomodoro.completed" | "pomodoro.interrupted";
+
+/** Minimal public Runtime API payload used to capture a task saved by TaskNotes' creation modal. */
+export interface TaskNotesTaskCreatedPayload {
+	event: "task.created";
+	task?: TaskInfo;
+}
+
+/** Minimal event catalog entry returned by the public `events.list()` API. */
+export interface TaskNotesRuntimeEventDefinition {
+	name: string;
+}
 
 /** Payload passed to `lifecycle.on` handlers (the settings field is omitted). */
 export interface TaskNotesRuntimeLifecyclePayload {
@@ -98,6 +120,20 @@ export interface TaskStatus {
 	isCompleted: boolean;
 }
 
+/**
+ * One entry of `catalog.userFields()` (TaskNotes 4.13.0+), pinned to the shape the
+ * 04-01 dev-vault spike observed on 4.13.8 (04-SPIKE-FINDINGS.md, Pins). `type` is
+ * widened to string ("date", "text", ...). Without a default the `defaultValue` key
+ * is still present with value undefined, so decide "has a default" by the value.
+ */
+export interface TaskNotesUserField {
+	id: string;
+	displayName: string;
+	key: string;
+	type: string;
+	defaultValue?: string;
+}
+
 /** Trimmed from public PomodoroState/Session; ownership is the task entry timestamp. */
 export interface PomodoroSession {
  timeTrackingStartTime?: string;
@@ -114,6 +150,45 @@ export interface PomodoroState {
 }
 export interface CompleteTaskOptions { status?: string; }
 
+/** Optional public creation/relationship surface pinned to TaskNotes a2414b67 (4.18.2). */
+export interface ParsedTaskData {
+ title: string;
+ status?: string;
+ priority?: string;
+ dueDate?: string;
+ dueTime?: string;
+ scheduledDate?: string;
+ scheduledTime?: string;
+ contexts?: string[];
+ projects?: string[];
+ tags?: string[];
+ details?: string;
+ recurrence?: string;
+ estimate?: number;
+ userFields?: Record<string, unknown>;
+}
+export interface TaskCreationData {
+ title: string;
+ status?: string;
+ priority?: string;
+ due?: string;
+ scheduled?: string;
+ contexts?: string[];
+ projects?: string[];
+ tags?: string[];
+ details?: string;
+ recurrence?: string;
+ timeEstimate?: number;
+ customFrontmatter?: Record<string, unknown>;
+}
+export interface TaskPriority { value: string; label: string; color: string; }
+
+/**
+ * A `tasks.update` patch: TaskInfo fields plus any other key. TaskNotes 4.13.x stores
+ * only TaskInfo fields and registered user fields; other keys are echoed, not written.
+ */
+export type TaskNotesTaskPatch = Partial<TaskInfo> & Record<string, unknown>;
+
 export interface TaskNotesRuntimeApiV1 {
 	readonly apiVersion: 1;
 	readonly capabilities: readonly string[];
@@ -126,21 +201,41 @@ export interface TaskNotesRuntimeApiV1 {
 	};
 
 	readonly tasks?: {
+		create?(data: TaskCreationData, context?: TaskNotesMutationContext): Promise<TaskInfo>;
 		list(): Promise<TaskInfo[]>;
 		/** 4.13.8: null when the path is not a cached task (also while TaskNotes' cache warms). */
 		get?(path: string): Promise<TaskInfo | null>;
   complete?(path: string, options?: CompleteTaskOptions, context?: TaskNotesMutationContext): Promise<TaskInfo>;
+		/** 4.13.x: writes registered user fields only; null is written, undefined skipped; returns the merged task even when nothing was written. */
+		update?(path: string, updates: TaskNotesTaskPatch, context?: TaskNotesMutationContext): Promise<TaskInfo>;
 	};
 	readonly catalog?: {
+		priorities?(): TaskPriority[];
 		statuses(): TaskStatus[];
+		/** 4.13.0+: TaskNotes' registered user fields (shallow copies). Gate on catalog.read. */
+		userFields?(): TaskNotesUserField[];
+	};
+
+	/**
+	 * 4.13.0+. Gate on recurring.write. A toggle; an omitted date targets the scheduled
+	 * date; the date string goes through new Date(), so pass a bare YYYY-MM-DD.
+	 */
+	readonly recurring?: {
+		toggleCompleteInstance(path: string, date?: string, context?: TaskNotesMutationContext): Promise<TaskInfo>;
+  /** Public recurring.materialize capability; returns the actual occurrence identity. */
+  materializeOccurrence?(path: string, date: string, context?: TaskNotesMutationContext): Promise<TaskInfo>;
 	};
 
 	readonly pomodoro?: { status(): Promise<PomodoroState>; };
+	readonly nlp?: { parse(text: string): ParsedTaskData };
+	readonly relationships?: { subtasks(path: string): Promise<TaskInfo[]> };
 
 	readonly events: {
 		/** The payload is left as unknown: the pane only re-derives from `time.active()`. */
 		on(event: TaskNotesRuntimeEventName, handler: (payload: unknown) => void): EventRef;
 		off(ref: EventRef): void;
+		/** Added after the original 4.13.8 vendored contract; callers must fail closed when absent. */
+		list?(): readonly TaskNotesRuntimeEventDefinition[];
 	};
 
 	readonly lifecycle: {

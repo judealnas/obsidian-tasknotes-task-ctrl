@@ -11,15 +11,15 @@ export const MAX_STORED_ORDER = 1000;
  * their incoming order), then the rest in saved order. Saved keys with no live item are
  * ignored. Returns a new array.
  */
-export function orderTimers<T extends { sessionKey: string }>(timers: readonly T[], saved: readonly string[]): T[] {
+export function orderTimers<T>(timers: readonly T[], saved: readonly string[], identity: (timer: T) => string = timer => (timer as { sessionKey: string }).sessionKey): T[] {
 	if (saved.length === 0) return [...timers];
 	const rank = new Map<string, number>();
 	for (const key of saved) if (!rank.has(key)) rank.set(key, rank.size);
 	const fresh: T[] = [];
 	const known: T[] = [];
-	for (const timer of timers) (rank.has(timer.sessionKey) ? known : fresh).push(timer);
+	for (const timer of timers) (rank.has(identity(timer)) ? known : fresh).push(timer);
 	// Stable sort keeps the incoming order of equal ranks (duplicate live keys).
-	known.sort((a, b) => (rank.get(a.sessionKey) ?? 0) - (rank.get(b.sessionKey) ?? 0));
+	known.sort((a, b) => (rank.get(identity(a)) ?? 0) - (rank.get(identity(b)) ?? 0));
 	return [...fresh, ...known];
 }
 

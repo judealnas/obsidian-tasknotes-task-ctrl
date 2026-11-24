@@ -5,19 +5,30 @@
  * gateway. Runtime Obsidian-free (type-only imports) so Vitest can load it.
  */
 import { errorMessage } from "../model/errors";
+import { parseStagedValue } from "../model/staging";
+import { normalizeTimerPath } from "../model/pomodoroOwnership";
 import { getPomodoroOwnedEntryId, type Ownership } from "../model/pomodoroOwnership";
 import type {
 	ActiveTimeEntry,
 	TaskInfo,
+	ParsedTaskData,
+	TaskCreationData,
+	TaskPriority,
 	TaskStatus,
 	TaskNotesMutationContext,
+	TaskNotesTaskPatch,
+	TaskNotesUserField,
 	TaskNotesRuntimeApiV1,
+	TaskNotesRuntimeCreationEventName,
 	TaskNotesRuntimeLifecycleEventName,
 	TaskNotesRuntimeEventName,
+	TaskNotesTaskCreatedPayload,
 } from "./runtime-api.types";
 
 export const TASKNOTES_PLUGIN_ID = "tasknotes";
 export const MIN_TASKNOTES_VERSION = "4.10.0";
+/** Staging and recurring completion need TaskNotes 4.13.0+. Feature-gated only; never required for ready. */
+export const STAGING_MIN_TASKNOTES_VERSION = "4.13.0";
 export const REQUIRED_CAPABILITIES = ["time.read", "time.write", "tasks.events", "lifecycle.events"] as const;
 /** Optional: TaskNotes' native task menu (4.11+). Not required for ready. */
 export const TASK_MENU_CAPABILITY = "ui.task-menu";
@@ -43,6 +54,11 @@ export interface TaskNotesPluginLike {
 }
 
 export interface TaskNotesGateway {
+	inlineCreationAvailability?(): { available: boolean; reason: string };
+	parseTask?(text: string): Promise<ParsedTaskData>;
+	createTask?(data: TaskCreationData, context: TaskNotesMutationContext): Promise<TaskInfo>;
+	priorities?(): Promise<TaskPriority[]>;
+	subtasks?(path: string): Promise<TaskInfo[]>;
 	getState(): BridgeState;
 	onState(listener: (state: BridgeState) => void): () => void;
 	onData(listener: () => void): () => void;
@@ -54,8 +70,35 @@ export interface TaskNotesGateway {
 	/** One task through api.tasks.get; null when TaskNotes has no such cached task (including while its cache warms). */
 	getTask(path: string): Promise<TaskInfo | null>;
 	statuses(): Promise<TaskStatus[]>;
+	/** TaskNotes' user fields via catalog.read, feature-gated and not required for ready; consumers pass a rejection to fieldStatus as null. */
+	userFields(): Promise<TaskNotesUserField[]>;
 	completionAvailable(): boolean;
-	completeTask(path: string, status: string, context: TaskNotesMutationContext): Promise<void>;
+	completeTask(path: string, status: string, context: TaskNotesMutationContext): Promise<TaskInfo>;
+	/**
+	 * Whether this TaskNotes can stage tasks (4.13.0+, tasks.read/list, tasks.write/update,
+	 * catalog.read/userFields). Feature-gated, not required for ready. Never throws.
+	 */
+	stagingAvailability(): { available: boolean; reason: string };
+	/**
+	 * Writes a patch through TaskNotes' own tasks.update (tasks.write), forwarding the
+	 * context. Refuses a customFrontmatter member, so the only unstage write is
+	 * {staged: null}. Resolves void: re-read the task instead of trusting TaskNotes' echo.
+	 */
+	updateTask(path: string, patch: TaskNotesTaskPatch, context: TaskNotesMutationContext): Promise<void>;
+	/**
+	 * Whether this TaskNotes can complete recurring instances (4.13.0+,
+	 * recurring.write/toggleCompleteInstance). Feature-gated, not required for ready. Never throws.
+	 */
+	recurringAvailability(): { available: boolean; reason: string };
+	/**
+	 * TaskNotes' recurring.toggleCompleteInstance for an explicit bare YYYY-MM-DD day,
+	 * forwarding the context. It is a toggle (calling it twice can un-complete), so the
+	 * caller checks complete_instances first; Phase 7 decides the semantics from the
+	 * 04-01 Q4 finding. Preserves returned identity; callers still confirm through fresh reads.
+	 */
+	toggleCompleteInstance(path: string, date: string, context: TaskNotesMutationContext): Promise<TaskInfo>;
+ materializeOccurrence?(path: string, date: string, context: TaskNotesMutationContext): Promise<TaskInfo>;
+ materializationAvailability?(): { available: boolean; reason: string };
 	start(path: string, options: Record<string, never>, context: TaskNotesMutationContext): Promise<void>;
 	/** Stops the task's open entry through TaskNotes' own api.time.stop; resolves the task as TaskNotes saved it. */
 	stop(taskPath: string, context: TaskNotesMutationContext): Promise<TaskInfo>;
@@ -138,6 +181,8 @@ export class TaskNotesBridge implements TaskNotesGateway {
 	private disposed = false;
 	private readonly stateListeners = new Set<(state: BridgeState) => void>();
 	private readonly dataListeners = new Set<() => void>();
+	/** Request-scoped TaskNotes subscriptions, released on request end or bridge detach. */
+	private readonly transientOffs = new Set<() => void>();
 
 	constructor(deps: TaskNotesBridgeDeps) {
 		this.lookupPlugin = deps.lookupPlugin;
@@ -162,6 +207,64 @@ export class TaskNotesBridge implements TaskNotesGateway {
 		return () => {
 			this.dataListeners.delete(listener);
 		};
+	}
+
+	taskCreationAvailability(): { available: boolean; reason: string } {
+		try {
+			const api = this.connectedApi();
+			if (!api.hasCapability("tasks.events")) return { available: false, reason: "TaskNotes is missing tasks.events" };
+			if (typeof api.events?.on !== "function" || typeof api.events?.off !== "function") {
+				return { available: false, reason: "TaskNotes does not provide task events" };
+			}
+			const catalog = this.taskCreatedCatalogAvailability(api);
+			if (!catalog.available) return catalog;
+			return { available: true, reason: "Create a new TaskNotes task" };
+		} catch {
+			return { available: false, reason: "TaskNotes is not connected" };
+		}
+	}
+
+	onTaskCreated(listener: (task: TaskInfo) => void): () => void {
+		const api = this.featureApi("tasks.events", "events.on", candidate => typeof candidate.events?.on === "function" && typeof candidate.events?.off === "function");
+		const catalog = this.taskCreatedCatalogAvailability(api);
+		if (!catalog.available) throw new Error(catalog.reason);
+		let active = true;
+		const events = api.events as typeof api.events & {
+			on(event: TaskNotesRuntimeCreationEventName, handler: (payload: TaskNotesTaskCreatedPayload) => void): ReturnType<typeof api.events.on>;
+		};
+		const ref = events.on("task.created", value => {
+			if (!active || this.api !== api) return;
+			const payload = value as Partial<TaskNotesTaskCreatedPayload>;
+			const task = payload.event === "task.created" ? payload.task : undefined;
+			if (!task || typeof task.path !== "string" || task.path === "" || typeof task.title !== "string" ||
+				typeof task.status !== "string" || typeof task.archived !== "boolean") return;
+			listener(task);
+		});
+		const off = () => {
+			if (!active) return;
+			active = false;
+			this.transientOffs.delete(off);
+			try { api.events.off(ref); }
+			catch (error) { this.log("Releasing a task creation subscription failed: " + describeError(error)); }
+		};
+		this.transientOffs.add(off);
+		return off;
+	}
+
+	private taskCreatedCatalogAvailability(api: TaskNotesRuntimeApiV1): { available: boolean; reason: string } {
+		if (typeof api.events?.list !== "function") {
+			return { available: false, reason: "TaskNotes does not provide the event catalog needed for task creation" };
+		}
+		try {
+			const events: unknown = api.events.list();
+			if (!Array.isArray(events) || !events.some((event: unknown) => typeof event === "object" && event !== null &&
+				"name" in event && (event as { name?: unknown }).name === "task.created")) {
+				return { available: false, reason: "TaskNotes does not advertise the task.created event" };
+			}
+			return { available: true, reason: "TaskNotes advertises task.created" };
+		} catch {
+			return { available: false, reason: "TaskNotes event catalog could not be read" };
+		}
 	}
 
 	/** Re-evaluates TaskNotes availability. Safe to call at any time and as often as needed. */
@@ -233,6 +336,39 @@ export class TaskNotesBridge implements TaskNotesGateway {
   return tasks;
  }
 
+ inlineCreationAvailability(): { available: boolean; reason: string } {
+  try {
+   this.featureApi("nlp.parse", "nlp.parse", api => typeof api.nlp?.parse === "function");
+   this.featureApi("tasks.write", "tasks.create", api => typeof api.tasks?.create === "function");
+   return { available: true, reason: "Create a task without starting a timer" };
+  } catch (error) { return { available: false, reason: describeError(error) }; }
+ }
+ async parseTask(text: string): Promise<ParsedTaskData> {
+  const api = this.featureApi("nlp.parse", "nlp.parse", api => typeof api.nlp?.parse === "function");
+  const parsed = await Promise.resolve(api.nlp!.parse(text));
+  if (this.connectedApi() !== api) throw new Error("TaskNotes changed while parsing");
+  return parsed;
+ }
+ async createTask(data: TaskCreationData, context: TaskNotesMutationContext): Promise<TaskInfo> {
+  const api = this.featureApi("tasks.write", "tasks.create", api => typeof api.tasks?.create === "function");
+  // Keep returned identity even after disconnect: the caller must not retry creation.
+  const task = await api.tasks!.create!(data, context);
+  if (!task || typeof task.path !== "string" || !normalizeTimerPath(task.path)) throw new Error("TaskNotes returned no created task identity");
+  return task;
+ }
+ async priorities(): Promise<TaskPriority[]> {
+  const api = this.featureApi("catalog.read", "catalog.priorities", api => typeof api.catalog?.priorities === "function");
+  const result = await Promise.resolve(api.catalog!.priorities!());
+  if (this.connectedApi() !== api) throw new Error("TaskNotes changed while reading priorities");
+  return result;
+ }
+ async subtasks(path: string): Promise<TaskInfo[]> {
+  const api = this.featureApi("relationships.read", "relationships.subtasks", api => typeof api.relationships?.subtasks === "function");
+  const result = await api.relationships!.subtasks(path);
+  if (this.connectedApi() !== api) throw new Error("TaskNotes changed while reading subtasks");
+  return result;
+ }
+
  async getTask(path: string): Promise<TaskInfo | null> {
   const readApi = () => this.featureApi("tasks.read", "tasks.get", api => typeof api.tasks?.get === "function");
   const api = readApi();
@@ -249,6 +385,15 @@ export class TaskNotesBridge implements TaskNotesGateway {
   return statuses;
  }
 
+ /** TaskNotes' registered user fields (4.13.0+). Feature-gated on catalog.read; not required for ready. */
+ async userFields(): Promise<TaskNotesUserField[]> {
+  const readApi = () => this.featureApi("catalog.read", "catalog.userFields", api => typeof api.catalog?.userFields === "function");
+  const api = readApi();
+  const fields = await Promise.resolve(api.catalog!.userFields!());
+  if (readApi() !== api) throw new Error("TaskNotes changed while loading user fields");
+  return fields;
+ }
+
  async start(path: string, options: Record<string, never>, context: TaskNotesMutationContext): Promise<void> {
   const api = this.featureApi("time.write", "time.start", api => typeof api.time.start === "function");
   await api.time.start!(path, options, context);
@@ -263,9 +408,82 @@ export class TaskNotesBridge implements TaskNotesGateway {
 		} catch { return false; }
 	}
 
-	async completeTask(path: string, status: string, context: TaskNotesMutationContext): Promise<void> {
+	async completeTask(path: string, status: string, context: TaskNotesMutationContext): Promise<TaskInfo> {
 		const api = this.featureApi("tasks.write", "tasks.complete", api => typeof api.tasks?.complete === "function");
-		await api.tasks!.complete!(path, { status }, context);
+  const result = await api.tasks!.complete!(path, { status }, context);
+  return this.completionResult(api, result);
+	}
+
+	/** Same shape as startAvailability, plus the 4.13.0 floor read from TaskNotes' manifest. */
+	stagingAvailability(): { available: boolean; reason: string } {
+		try {
+			const api = this.connectedApi();
+			if (this.olderThanStagingFloor()) return { available: false, reason: "TaskNotes " + STAGING_MIN_TASKNOTES_VERSION + " or newer is needed for staging" };
+			for (const [capability, method, callable] of [
+				["tasks.read", "tasks.list", typeof api.tasks?.list === "function"],
+				["tasks.write", "tasks.update", typeof api.tasks?.update === "function"],
+				["catalog.read", "catalog.userFields", typeof api.catalog?.userFields === "function"],
+			] as const) {
+				if (!api.hasCapability(capability)) return { available: false, reason: "TaskNotes is missing " + capability };
+				if (!callable) return { available: false, reason: "TaskNotes does not provide " + method };
+			}
+			return { available: true, reason: "Staging is available" };
+		} catch { return { available: false, reason: "TaskNotes is not connected" }; }
+	}
+
+	async updateTask(path: string, patch: TaskNotesTaskPatch, context: TaskNotesMutationContext): Promise<void> {
+		// customFrontmatter writes unregistered keys (research F4); the only unstage write is {staged: null}.
+		if (Object.prototype.hasOwnProperty.call(patch, "customFrontmatter")) throw new Error("Staging writes use registered fields only");
+		const api = this.featureApi("tasks.write", "tasks.update", api => typeof api.tasks?.update === "function");
+		// Called as a method so TaskNotes keeps its receiver; the echoed TaskInfo is dropped (Pitfall 1).
+		await api.tasks!.update!(path, patch, context);
+	}
+
+	recurringAvailability(): { available: boolean; reason: string } {
+		try {
+			const api = this.connectedApi();
+			if (this.olderThanStagingFloor()) return { available: false, reason: "TaskNotes " + STAGING_MIN_TASKNOTES_VERSION + " or newer is needed for recurring completion" };
+			for (const [capability, method, callable] of [
+				["recurring.write", "recurring.toggleCompleteInstance", typeof api.recurring?.toggleCompleteInstance === "function"],
+			] as const) {
+				if (!api.hasCapability(capability)) return { available: false, reason: "TaskNotes is missing " + capability };
+				if (!callable) return { available: false, reason: "TaskNotes does not provide " + method };
+			}
+			return { available: true, reason: "Recurring completion is available" };
+		} catch { return { available: false, reason: "TaskNotes is not connected" }; }
+	}
+
+	async toggleCompleteInstance(path: string, date: string, context: TaskNotesMutationContext): Promise<TaskInfo> {
+		// An omitted date targets the scheduled date and a datetime can shift a day (research F11, F13).
+		if (!parseStagedValue(date)) throw new Error("Recurring completion needs a YYYY-MM-DD day");
+		const api = this.featureApi("recurring.write", "recurring.toggleCompleteInstance", api => typeof api.recurring?.toggleCompleteInstance === "function");
+		const result = await api.recurring!.toggleCompleteInstance(path, date, context);
+  return this.completionResult(api, result);
+	}
+ async materializeOccurrence(path: string, date: string, context: TaskNotesMutationContext): Promise<TaskInfo> {
+  if (!parseStagedValue(date)) throw new Error("Materialization needs a YYYY-MM-DD day");
+  const api = this.featureApi("recurring.materialize", "recurring.materializeOccurrence", api => typeof api.recurring?.materializeOccurrence === "function");
+  if (this.olderThanStagingFloor()) throw new Error("TaskNotes 4.13.0 or newer is needed for materialization");
+  return this.completionResult(api, await api.recurring!.materializeOccurrence!(path, date, context));
+ }
+ materializationAvailability(): { available: boolean; reason: string } {
+  try {
+   if (this.olderThanStagingFloor()) return { available: false, reason: "TaskNotes 4.13.0 or newer is needed for materialization" };
+   this.featureApi("recurring.materialize", "recurring.materializeOccurrence", api => typeof api.recurring?.materializeOccurrence === "function");
+   return { available: true, reason: "Occurrence materialization is available" };
+  } catch { return { available: false, reason: "TaskNotes occurrence materialization is unavailable" }; }
+ }
+ private completionResult(api: TaskNotesRuntimeApiV1, result: TaskInfo): TaskInfo {
+  if (this.connectedApi() !== api) throw new Error("TaskNotes changed during completion");
+  if (!result || typeof result.path !== "string" || !result.path || normalizeTimerPath(result.path) !== result.path || typeof result.status !== "string") throw new Error("TaskNotes did not return a valid completion identity");
+  return result;
+ }
+
+	/** True only for a parseable manifest version below 4.13.0; an unknown version is not "older". */
+	private olderThanStagingFloor(): boolean {
+		const plugin = this.lookupPlugin();
+		const version = plugin ? readVersion(plugin) : null;
+		return typeof version === "string" && isVersionOlder(version, STAGING_MIN_TASKNOTES_VERSION);
 	}
 
 	normalizeError(error: unknown): { code: string | null; message: string } {
@@ -438,6 +656,9 @@ export class TaskNotesBridge implements TaskNotesGateway {
 
 	/** Releases every TaskNotes ref, each in its own try/catch so a dead emitter cannot throw out. */
 	private detach(): void {
+		const transientOffs = [...this.transientOffs];
+		this.transientOffs.clear();
+		for (const off of transientOffs) off();
 		const offs = this.offs;
 		this.offs = [];
 		this.api = null;

@@ -13,6 +13,8 @@ import type {
 	TaskNotesRuntimeLifecyclePayload,
  TaskNotesRuntimeEventName,
  TaskStatus,
+ TaskNotesUserField,
+ TaskNotesTaskPatch,
  PomodoroState,
 	TimeEntry,
 } from "../../src/tasknotes/runtime-api.types";
@@ -24,6 +26,7 @@ export const DEFAULT_CAPABILITIES: readonly string[] = [
 	"tasks.read",
 	"catalog.read",
  "tasks.write",
+ "recurring.write",
  "pomodoro.read",
  "pomodoro.events",
 	"time.read",
@@ -42,8 +45,12 @@ export interface FakeTaskNotesOptions {
 	active?: ActiveTimeEntry[];
  tasks?: TaskInfo[];
  statuses?: TaskStatus[];
+ /** What catalog.userFields() returns (deep-copied per call). Default []. */
+ userFields?: TaskNotesUserField[];
  pomodoro?: PomodoroState;
- omitMethods?: Array<"tasks.list" | "tasks.get" | "tasks.complete" | "catalog.statuses" | "time.start" | "pomodoro.status">;
+ omitMethods?: Array<"tasks.list" | "tasks.get" | "tasks.complete" | "tasks.update" | "catalog.statuses" | "catalog.userFields" | "time.start" | "pomodoro.status" | "recurring.toggleCompleteInstance">;
+	/** False builds an api with no `recurring` namespace, like TaskNotes before 4.13. Default true. */
+	recurring?: boolean;
 	/** False builds an api with no `ui` namespace, like TaskNotes 4.10. Default true. */
 	ui?: boolean;
 }
@@ -52,6 +59,23 @@ export interface StopCall {
 	path: string;
 	context?: TaskNotesMutationContext;
 }
+
+export interface UpdateCall {
+	path: string;
+	patch: TaskNotesTaskPatch;
+	context?: TaskNotesMutationContext;
+}
+
+export interface ToggleCall {
+	path: string;
+	date?: string;
+	context?: TaskNotesMutationContext;
+}
+
+/** The vendored TaskInfo fields: tasks.update stores these, like TaskNotes' core fields. */
+const TASK_INFO_KEYS: ReadonlySet<string> = new Set([
+	"title", "status", "path", "archived", "due", "priority", "contexts", "projects", "tags", "timeEstimate", "timeEntries",
+]);
 
 export interface MenuCall {
 	taskPath: string;
@@ -69,11 +93,21 @@ export interface FakeTaskNotes {
 	setReady(ready: boolean): void;
  setTasks(tasks: TaskInfo[]): void;
  setStatuses(statuses: TaskStatus[]): void;
+ /** What later catalog.userFields() calls return. */
+ setUserFields(fields: TaskNotesUserField[]): void;
  setPomodoro(state: PomodoroState): void;
  failReadWith(error: string | null): void;
  failStartWith(error: string | null): void;
  failCompleteWith(error: string | null): void;
  readonly completeCalls: Array<{path: string; status: string | undefined; context?: TaskNotesMutationContext}>;
+ /** Every `tasks.update` call so far, in order (patch deep-copied). */
+ readonly updateCalls: UpdateCall[];
+ /** Makes every later `tasks.update` reject with `new Error(message)`; null restores success. */
+ failUpdateWith(error: string | null): void;
+ /** Every `recurring.toggleCompleteInstance` call so far, in order. */
+ readonly toggleCalls: ToggleCall[];
+ /** Makes every later `recurring.toggleCompleteInstance` reject with `new Error(message)`; null restores success. */
+ failToggleWith(error: string | null): void;
 	setActive(entries: ActiveTimeEntry[]): void;
 	emitLifecycle(name: TaskNotesRuntimeLifecycleEventName): void;
 	emitTaskEvent(name: TaskNotesRuntimeEventName): void;
@@ -114,11 +148,16 @@ export function createFakeTaskNotes(options: FakeTaskNotesOptions = {}): FakeTas
 	let activeCalls = 0;
  let tasks = options.tasks ?? fixture.map(item => item.task);
  let statuses: TaskStatus[] = options.statuses ?? [{ value: "done", isCompleted: true }];
+ let userFields: TaskNotesUserField[] = options.userFields ?? [];
  let pomodoro: PomodoroState = options.pomodoro ?? { isRunning: false, timeRemaining: 0 };
  let readFailure: string | null = null;
  let startFailure: string | null = null;
  let completeFailure: string | null = null;
  const completeCalls: FakeTaskNotes["completeCalls"] = [];
+ let updateFailure: string | null = null;
+ const updateCalls: UpdateCall[] = [];
+ let toggleFailure: string | null = null;
+ const toggleCalls: ToggleCall[] = [];
 	let stopFailure: string | null = null;
 	const stopCalls: StopCall[] = [];
 	const startCalls: Array<{ path: string; options: Record<string, never>; context?: TaskNotesMutationContext }> = [];
@@ -204,6 +243,20 @@ export function createFakeTaskNotes(options: FakeTaskNotesOptions = {}): FakeTas
 		},
 	};
 
+	const recurring: NonNullable<TaskNotesRuntimeApiV1["recurring"]> = {
+		toggleCompleteInstance(path, date, context) {
+			toggleCalls.push({ path, ...(date !== undefined ? { date } : {}), ...(context ? { context } : {}) });
+			if (toggleFailure !== null) return Promise.reject(new Error(toggleFailure));
+			const task: (TaskInfo & { complete_instances?: string[] }) | undefined = tasks.find(task => task.path === path);
+			if (!task) return Promise.reject(new Error("Task not found: " + path));
+			// Toggles the exact date given. No occurrence snapping: the 04-01 Q4 finding leaves that to Phase 7 research.
+			const day = date ?? "";
+			const instances = task.complete_instances ?? [];
+			task.complete_instances = instances.includes(day) ? instances.filter(item => item !== day) : [...instances, day];
+			return Promise.resolve(structuredClone(task));
+		},
+	};
+
 	const api: TaskNotesRuntimeApiV1 = {
 		// The option lets tests fake a future apiVersion; the contract type pins the literal 1.
 		apiVersion: apiVersion as 1,
@@ -227,26 +280,55 @@ export function createFakeTaskNotes(options: FakeTaskNotesOptions = {}): FakeTas
     for (const entry of fixture) if (entry.taskPath === path) entry.task.status = status;
     return Promise.resolve(structuredClone(task));
    },
+   update(path, patch, context) {
+    updateCalls.push({ path, patch: structuredClone(patch), ...(context ? { context } : {}) });
+    if (updateFailure !== null) return Promise.reject(new Error(updateFailure));
+    const task = tasks.find(task => task.path === path);
+    if (!task) return Promise.reject(new Error("Task not found: " + path));
+    const storedBefore = structuredClone(task);
+    // 04-SPIKE-FINDINGS Pins (b): TaskInfo fields and registered user fields are written,
+    // null as null (the key stays); undefined is skipped; any other key is not stored.
+    const registered = new Set(userFields.map(field => field.key));
+    const writes: Record<string, unknown> = {};
+    for (const [key, value] of Object.entries(patch)) {
+     if (value === undefined) continue;
+     if (TASK_INFO_KEYS.has(key) || registered.has(key)) writes[key] = structuredClone(value);
+    }
+    Object.assign(task, writes);
+    for (const entry of fixture) if (entry.taskPath === path) Object.assign(entry.task, structuredClone(writes));
+    // The echo is the merged task even when nothing was written (research F1/F5).
+    return Promise.resolve(structuredClone({ ...storedBefore, ...patch }));
+   },
   },
-  catalog: { statuses: () => { if (readFailure !== null) throw new Error(readFailure); return structuredClone(statuses); } },
+  catalog: {
+   statuses: () => { if (readFailure !== null) throw new Error(readFailure); return structuredClone(statuses); },
+   // TaskNotes 4.13.8 returns synchronously.
+   userFields: () => { if (readFailure !== null) throw new Error(readFailure); return structuredClone(userFields); },
+  },
   pomodoro: { status: () => readFailure !== null ? Promise.reject(new Error(readFailure)) : Promise.resolve(structuredClone(pomodoro)) },
 		time,
 		events,
 		lifecycle,
 		errors,
 		...(options.ui === false ? {} : { ui }),
+		...(options.recurring === false ? {} : { recurring }),
 	};
 
  for (const method of options.omitMethods ?? []) {
   const [namespace, key] = method.split(".");
-  const target = namespace === "tasks" ? api.tasks : namespace === "catalog" ? api.catalog : namespace === "time" ? api.time : api.pomodoro;
+  const target = namespace === "tasks" ? api.tasks : namespace === "catalog" ? api.catalog : namespace === "time" ? api.time : namespace === "recurring" ? api.recurring : api.pomodoro;
   if (target && key) Reflect.deleteProperty(target, key);
  }
 
 	return {
   completeCalls,
+  updateCalls,
+  failUpdateWith(error) { updateFailure = error; },
+  toggleCalls,
+  failToggleWith(error) { toggleFailure = error; },
   setTasks(next) { tasks = next; },
   setStatuses(next) { statuses = next; },
+  setUserFields(next) { userFields = next; },
   setPomodoro(next) { pomodoro = next; },
   failReadWith(error) { readFailure = error; },
   failStartWith(error) { startFailure = error; },

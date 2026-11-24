@@ -1,0 +1,10 @@
+{
+  "command": "node ../../../node_modules/vitest/vitest.mjs run --dir tests timerPaneView --reporter=tap-flat",
+  "exitCode": 1,
+  "output": "TAP version 13\n1..2\nok 1 - tests/timerPaneView.test.ts > mounted view dispatches current targets and keeps session DOM through pause/resume # time=9.83ms\nnot ok 2 - tests/timerPaneView.test.ts > removing a card immediately unloads pending title render exactly once # time=6.28ms\n    ---\n    error:\n        name: \"AssertionError\"\n        message: \"expected +0 to be 1 // Object.is equality\"\n    at: \"C:/Users/ja384/Home/obsidian-tasknotes-timer-pane/.claude/worktrees/phase-05-discuss/tests/timerPaneView.test.ts:53:35\"\n    actual: \"0\"\n    expected: \"1\"\n    ...\n",
+  "targetTest": "tests/timerPaneView.test.ts > removing a card immediately unloads pending title render exactly once",
+  "targetFile": "tests/timerPaneView.test.ts",
+  "expected": "Pending title component unloads immediately on removal exactly once",
+  "actual": "unloads is 0 instead of 1",
+  "semanticAssessment": "Target executes and fails on immediate cleanup assertion; mounted happy path passes. No collection or fixture failure."
+}

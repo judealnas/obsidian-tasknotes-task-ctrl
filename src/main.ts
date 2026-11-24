@@ -1,4 +1,5 @@
-import { Notice, Plugin } from "obsidian";
+import { configureStagedField } from "./tasknotes/configureStagedField";
+import { Notice, Plugin, TFile } from "obsidian";
 import { PauseStore } from "./state/PauseStore";
 import { CardOrderStore } from "./state/CardOrderStore";
 import { loadCardOrder } from "./model/cardOrder";
@@ -10,9 +11,16 @@ import { TimerPaneView, VIEW_TYPE_TIMER_PANE } from "./ui/TimerPaneView";
 import { DEFAULT_SETTINGS, loadSettings, type TimerPaneSettings } from "./settings";
 import { TimerPaneSettingTab } from "./ui/TimerPaneSettingTab";
 import { PAUSE_RECORDS_VERSION, loadPauseRecords } from "./model/pauseLedger";
+import { StagingStore } from "./state/StagingStore";
+import { StagingController } from "./state/StagingController";
+import { StagedOrderStore, loadStagedOrder } from "./state/StagedOrderStore";
+import { CompletionController } from "./state/CompletionController";
+import { CompletionStore } from "./state/CompletionStore";
+import { IdleCardStore } from "./state/IdleCardStore";
+import { PickerCreationController } from "./state/PickerCreationController";
 
 /** The data.json keys this plugin owns; everything else is kept as found. */
-const OWNED_KEYS = new Set(["completionStatus", "pauseRecordsVersion", "pauseRecords", "cardOrder"]);
+const OWNED_KEYS = new Set(["completionStatus", "rolloverHour", "pauseRecordsVersion", "pauseRecords", "cardOrder", "stagedOrder", "completionRecordsVersion", "completionRecords", "idleTaskPathsVersion", "idleTaskPaths"]);
 
 function extrasOf(data: unknown): Record<string, unknown> {
 	if (typeof data !== "object" || data === null || Array.isArray(data)) return {};
@@ -29,10 +37,14 @@ declare module "obsidian" {
 }
 
 export default class TaskNotesTimerPanePlugin extends Plugin {
+	private idleCards: IdleCardStore | null = null;
+	private dataReadable = false;
+ private completions: CompletionStore | null = null;
 	private paneSettings: TimerPaneSettings = { ...DEFAULT_SETTINGS };
 	private settingsReady: Promise<void> = Promise.resolve();
 	private pauses: PauseStore | null = null;
 	private cardOrder: CardOrderStore | null = null;
+	private stagedOrder: StagedOrderStore | null = null;
 	/** Settings as last written to data.json; a pause-only save writes these. */
 	private fileSettings: TimerPaneSettings = { ...DEFAULT_SETTINGS };
 	/** Keys in the loaded data.json that this plugin does not own, preserved on every save. */
@@ -48,15 +60,21 @@ export default class TaskNotesTimerPanePlugin extends Plugin {
 	 */
 	private persistAll(settings?: TimerPaneSettings): Promise<void> {
 		const result = this.saveChain.then(async () => {
+			await this.settingsReady;
+			if (!this.dataReadable) throw new Error("Saved plugin data is unreadable");
 			const written = settings ? { ...settings } : this.fileSettings;
 			const order = this.cardOrder?.serialize() ?? [];
+			const stagedOrder = this.stagedOrder?.serialize() ?? [];
 			await this.saveData({
 				...this.extras,
+				...this.idleCards?.serialize(),
+    ...this.completions?.serialize(),
 				completionStatus: written.completionStatus,
 				pauseRecordsVersion: PAUSE_RECORDS_VERSION,
 				pauseRecords: this.pauses?.serialize() ?? [],
 				// Omitted when empty, so a user who never reorders keeps an unchanged data.json.
 				...(order.length > 0 ? { cardOrder: order } : {}),
+				...(stagedOrder.length > 0 ? { stagedOrder } : {}),
 			});
 			this.fileSettings = written;
 		});
@@ -86,6 +104,10 @@ export default class TaskNotesTimerPanePlugin extends Plugin {
 		// Pane-local card order, persisted through the same single writer.
 		const cardOrder = new CardOrderStore({ log, persist: () => this.persistAll() });
 		this.cardOrder = cardOrder;
+		const stagedOrder = new StagedOrderStore({ log, persist: () => this.persistAll() });
+		this.stagedOrder = stagedOrder;
+  const completions = new CompletionStore({ persist: () => this.persistAll(), log });
+  this.completions = completions;
 		// The vault can only tell a deleted note from one not yet indexed once the layout is ready (Pitfall 2).
 		let layoutReady = false;
 		const store = new TimerStore({
@@ -97,36 +119,85 @@ export default class TaskNotesTimerPanePlugin extends Plugin {
 		});
 		// The one serial queue every pane write goes through.
 		const queue = new WriteQueue();
+		const staging = new StagingStore({ gateway: bridge, log, schedule, completions, resolveLink: (reference, sourcePath) => this.app.metadataCache.getFirstLinkpathDest(reference.replace(/^\[\[|\]\]$/g, "").split("|")[0]!.split("#")[0]!, sourcePath)?.path ?? null, ready: () => this.settingsReady, order: stagedOrder,
+			fileCheck: () => (layoutReady ? (path: string) => this.app.vault.getFileByPath(path) !== null : null) });
 		// The only place the plugin creates Notices; state and model code receive this function.
 		const notify = (message: string) => {
 			new Notice(message);
 		};
 		const newCorrelationId = () => crypto.randomUUID();
+		const taskCreation = new PickerCreationController({ gateway: bridge, queue, notify, newCorrelationId });
 		const controller = new TimerController({ gateway: bridge, store, queue, notify, newCorrelationId, log, pauses,
 			getSettings: () => this.paneSettings, settingsReady: () => this.settingsReady });
+		const idleCards = new IdleCardStore({ gateway: bridge, pauses, order: cardOrder, controller, notify, log,
+			persist: () => this.persistAll(), fileCheck: () => layoutReady ? path => this.app.vault.getFileByPath(path) !== null : null,
+			visibleKeys: () => { const snapshot = store.getSnapshot(); return snapshot?.primary ? [snapshot.primary, ...snapshot.others].map(timer => timer.sessionKey) : []; } });
+		this.idleCards = idleCards;
+		this.register(bridge.onState(() => { idleCards.invalidate(); void idleCards.refresh(); }));
+		this.register(bridge.onData(() => { void idleCards.refresh(); }));
+		const stagingController = new StagingController({ gateway: bridge, store, staging, queue, newCorrelationId, log, pauses, notify,
+			getSettings: () => this.paneSettings, settingsReady: () => this.settingsReady, timerBusy: () => controller.isBusy(),
+			commitOrder: async (path, action, beforePath) => { if (action === "stage") stagedOrder.insertBefore(path, beforePath); else stagedOrder.removePath(path, false); await stagedOrder.commit(); } });
+		// TaskNotes exposes its Note actions submenu through Obsidian's file-menu event.
+		this.registerEvent(this.app.workspace.on("file-menu", (menu, file, source) => {
+			if (source !== "tasknotes-context-menu" || !(file instanceof TFile)) return;
+			menu.addItem(item => item
+				.setTitle("Stage task")
+				.setIcon("list-plus")
+				.setDisabled(!bridge.stagingAvailability().available || stagingController.isBusy() || controller.isBusy())
+				.onClick(async () => {
+					const result = await stagingController.stage({ taskPath: file.path, title: file.basename });
+					if (result.warning) notify(result.warning);
+					else if (result.message) notify(result.message);
+					else if (result.kind === "already-staged") notify("This task is already staged.");
+				}));
+		}));
+  const completion = new CompletionController({ gateway: bridge, queue, timer: controller, notify, log, newCorrelationId,
+   settingsReady: () => this.settingsReady, getSettings: () => this.paneSettings,
+   getRecords: () => completions.records(), storageAvailable: () => completions.available(),
+   saveRecord: record => completions.saveRecord(record),
+   otherBusy: () => stagingController.isBusy(), clearPause: path => pauses.remove(path),
+   resolveLink: (reference, sourcePath) => this.app.metadataCache.getFirstLinkpathDest(reference.replace(/^\[\[|\]\]$/g, "").split("|")[0]!.split("#")[0]!, sourcePath)?.path ?? null,
+   refresh: async () => { await Promise.all([store.refreshNow(), staging.refreshNow()]); } });
+  controller.setCompletionHandler(target => completion.complete({ sourcePath: target.taskPath, title: target.title,
+   entry: target.startTime ? { taskPath: target.taskPath, startTime: target.startTime } : undefined }));
 		this.register(() => {
+			taskCreation.dispose();
+			idleCards.dispose();
 			store.dispose();
+			staging.dispose();
 			bridge.dispose();
 		});
 
 		// Registered synchronously so Obsidian can restore a saved pane leaf (PANE-03).
-		this.registerView(VIEW_TYPE_TIMER_PANE, (leaf) => new TimerPaneView(leaf, { gateway: bridge, store, controller, cardOrder }));
+		this.registerView(VIEW_TYPE_TIMER_PANE, (leaf) => new TimerPaneView(leaf, { gateway: bridge, store, controller, completion, completions, cardOrder, stagedOrder, staging, stagingController, idleCards, taskCreation }));
 		this.settingsReady = this.loadData().then((data: unknown) => {
+			this.dataReadable = true;
 			this.paneSettings = loadSettings(data);
 			this.fileSettings = { ...this.paneSettings };
 			this.extras = extrasOf(data);
+   completions.load(data);
 			pauses.load(loadPauseRecords(data));
 			cardOrder.load(loadCardOrder(data));
-		}).catch(() => { log("Loading timer pane settings failed; using defaults."); pauses.load([]); cardOrder.load([]); });
+			stagedOrder.load(loadStagedOrder(data));
+			idleCards.load(data); void idleCards.refresh();
+		}).catch(() => { idleCards.load({}, false); completions.load({ completionRecordsVersion: "unreadable" }); log("Loading timer pane settings failed; using defaults."); pauses.load([]); cardOrder.load([]); stagedOrder.load([]); });
 		this.addSettingTab(new TimerPaneSettingTab(this.app, this, {
 			gateway: bridge,
 			getSettings: () => this.paneSettings,
+			configureStaged: async () => {
+				const message = await configureStagedField(this.app.plugins?.getPlugin(TASKNOTES_PLUGIN_ID));
+				await staging.refreshNow();
+				return message;
+			},
 			ready: () => this.settingsReady,
 			saveSettings: async settings => {
 				await this.settingsReady;
 				await this.persistAll(settings);
 				this.paneSettings = { ...settings };
+    staging.checkDay();
 				await store.refreshNow();
+				await staging.refreshNow();
 			},
 		}));
 
@@ -135,27 +206,35 @@ export default class TaskNotesTimerPanePlugin extends Plugin {
 			void this.activateView().catch((error: unknown) =>
 				log("Opening the timer pane failed: " + (error instanceof Error ? error.message : String(error))),
 			);
-		this.addRibbonIcon("timer", "Open TaskNotes timer", open);
+		this.addRibbonIcon("timer", "Open TaskNotes Task Control", open);
 		this.addCommand({ id: "open-timer-pane", name: "Open timer pane", callback: open });
 
 		this.app.workspace.onLayoutReady(() => {
 			layoutReady = true;
 			bridge.probe();
+			void idleCards.refresh();
 		});
 		this.registerInterval(window.setInterval(() => bridge.probe(), PROBE_INTERVAL_MS));
 		// Backstop for anything no event reports; a no-op unless TaskNotes is ready.
 		this.registerInterval(window.setInterval(() => store.resync(), SAFETY_RESYNC_MS));
+		this.registerInterval(window.setInterval(() => staging.resync(), SAFETY_RESYNC_MS));
 		// Deleting or renaming a note in Obsidian emits no TaskNotes runtime event (Pitfall 4).
 		// These are Obsidian-owned events, so Obsidian's registry releases them on unload.
 		// The pause changes synchronously, before TaskNotes re-indexes the note under its new
 		// path and before the next refresh reads it (D-12). Also works for folders.
 		this.registerEvent(this.app.vault.on("delete", file => {
+			idleCards.removePath(file.path);
 			pauses.removePath(file.path);
 			store.requestRefresh();
+			staging.invalidate(); staging.requestRefresh();
 		}));
 		this.registerEvent(this.app.vault.on("rename", (file, oldPath) => {
+			idleCards.renamePath(oldPath, file.path);
 			pauses.renamePath(oldPath, file.path);
+			staging.renamePath(oldPath, file.path);
+			stagedOrder.renamePath(oldPath, file.path);
 			store.requestRefresh();
+			staging.requestRefresh();
 		}));
 	}
 

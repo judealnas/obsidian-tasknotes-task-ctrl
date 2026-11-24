@@ -1,0 +1,105 @@
+(async () => {
+ const api = app.plugins.getPlugin('tasknotes').api;
+ const plugin = app.plugins.getPlugin('tasknotes-timer-pane');
+ const leaves = app.workspace.getLeavesOfType('tasknotes-timer-pane');
+ for (const leaf of leaves) await leaf.loadIfDeferred();
+ const view = leaves.find(l => l.view.getState().tab === 'staged').view;
+ const services = view.services;
+ const paths = ['TaskNotes/Tasks/Phase 6 Layout Short.md', 'TaskNotes/Tasks/Phase 6 Layout A long task title that should wrap safely beside separate reorder and Unstage controls.md'];
+ const created = [];
+ const measurements = [];
+ const results = [];
+ const pause = ms => new Promise(r => setTimeout(r, ms));
+ const wait = async (predicate, name) => { for (let i=0;i<100;i++) { if (await predicate()) return; await pause(100); } throw Error(name); };
+ const assert = (value, name) => { if (!value) throw Error(name); results.push(name); };
+ const cards = () => [...view.contentEl.querySelectorAll('.tntp-card')];
+ const cardFor = path => cards().find(c => c.innerText.includes(path.split('/').pop().replace(/\.md$/, '')));
+ const overlaps = (a,b) => a.left < b.right && a.right > b.left && a.top < b.bottom && a.bottom > b.top;
+ const oldTab = leaves.map(l => l.view.getState().tab);
+ const panel = view.contentEl.querySelector('.tntp-panel--staged');
+ const oldPanelStyle = panel.getAttribute('style');
+ try {
+  assert((await api.time.active()).length===0, 'Precondition: no existing active timers');
+  await app.workspace.revealLeaf(view.leaf);
+  for (const path of paths) {
+   if (app.vault.getFileByPath(path)) throw Error('Fixture exists: '+path);
+   await app.vault.create(path, ['---','status: open','priority: normal','tags:','  - task','staged: 2026-11-12','---',''].join('\n'));
+   created.push(path);
+  }
+  await wait(async () => (await api.tasks.list()).filter(t => paths.includes(t.path)).length===2, 'Fixtures indexed');
+  await services.staging.refreshNow();
+  await wait(() => paths.every(p=>cardFor(p)), 'Fixture cards shown');
+  // Keep long cards fully on screen for elementFromPoint; each fixture is scrolled into view below.
+  for (const path of paths) {
+   for (const state of ['idle','running','paused']) {
+    let card=cardFor(path);
+    if (state !== 'idle') {
+     card.querySelector('.tntp-pause-resume').click();
+     await wait(() => !services.controller.isBusy() && cardFor(path).querySelector('.tntp-pause-resume').innerText===(state==='running'?'Pause':'Resume'), 'Transition to '+state);
+    }
+    card=cardFor(path);
+    if (state==='running') {
+     const timerLeaf=leaves.find(l=>l.view.getState().tab==='timers');
+     const timerCard=[...timerLeaf.view.contentEl.querySelectorAll('.tntp-card')].find(c=>c.innerText.includes(path.split('/').pop().replace(/\.md$/,'')));
+     assert(!!timerCard?.querySelector('.tntp-handle'), 'Timers retains lone handle for '+path);
+    }
+    const oldStyle=card.getAttribute('style');
+    try {
+     for (const dir of ['ltr','rtl']) for (const width of [448,320,240]) {
+      panel.style.direction=dir;
+      card.style.width=width+'px'; card.style.maxWidth='none'; card.style.boxSizing='border-box';
+      card.scrollIntoView({block:'center',inline:'nearest'});
+      await pause(30);
+      const handle=card.querySelector('.tntp-handle'), unstage=card.querySelector('.tntp-unstage');
+      const hr=handle.getBoundingClientRect(), ur=unstage.getBoundingClientRect();
+      const gap=Math.max(hr.left,ur.left)-Math.min(hr.right,ur.right);
+      const label=path.includes('A long')?'long':'short';
+      const context=label+'/'+state+'/'+dir+'/'+width;
+      assert(gap>0 && !overlaps(hr,ur), 'Separated controls '+context);
+      for (const button of [handle,unstage]) {
+       const r=button.getBoundingClientRect();const hit=document.elementFromPoint(r.x+r.width/2,r.y+r.height/2);
+       assert(hit===button || button.contains(hit), 'Button center hit '+button.className+' '+context);
+       button.focus();const style=getComputedStyle(button);
+       assert(document.activeElement===button && (style.boxShadow!=='none' || (style.outlineStyle!=='none' && parseFloat(style.outlineWidth)>0)), 'Visible focus '+button.className+' '+context);
+      }
+      // Ranges inspect actual painted text fragments, not the padded title container.
+      const walker=document.createTreeWalker(card.querySelector('.tntp-title'),NodeFilter.SHOW_TEXT);
+      let node;let textRects=[];
+      while(node=walker.nextNode()) {if(!node.textContent.trim())continue;const range=document.createRange();range.selectNodeContents(node);textRects.push(...range.getClientRects());}
+      assert(textRects.length>0 && textRects.every(r=>!overlaps(r,hr)&&!overlaps(r,ur)), 'Title clears controls '+context);
+      measurements.push({title:label,state,dir,width:card.getBoundingClientRect().width,gap,handleWidth:hr.width,unstageWidth:ur.width});
+     }
+    } finally {if(oldStyle===null)card.removeAttribute('style');else card.setAttribute('style',oldStyle);}
+   }
+  }
+  if(oldPanelStyle===null)panel.removeAttribute('style');else panel.setAttribute('style',oldPanelStyle);
+  const card=cardFor(paths[0]);card.scrollIntoView({block:'center'});
+  const handle=card.querySelector('.tntp-handle');handle.focus();
+  const oldIndex=cards().indexOf(card);const key=oldIndex===0?'ArrowDown':'ArrowUp';
+  handle.dispatchEvent(new KeyboardEvent('keydown',{key,bubbles:true}));
+  assert(cards().indexOf(card)===(key==='ArrowDown'?oldIndex+1:oldIndex-1), 'Arrow reorder moves intended card');
+  assert(document.activeElement===handle, 'Arrow reorder keeps native focus');
+  const idlePath='TaskNotes/Tasks/Phase 6 Layout Idle Unstage.md';
+  if(app.vault.getFileByPath(idlePath))throw Error('Idle fixture exists');
+  await app.vault.create(idlePath,['---','status: open','priority: normal','tags:','  - task','staged: 2026-11-12','---',''].join('\n'));
+  created.push(idlePath);
+  await wait(async()=>!!(await api.tasks.get(idlePath)), 'Idle fixture indexed');
+  await services.staging.refreshNow();
+  await wait(()=>!!cardFor(idlePath), 'Idle fixture visible');
+  assert(cardFor(idlePath).querySelector('.tntp-pause-resume').innerText==='Start','Unstage fixture is idle');
+  cardFor(idlePath).querySelector('.tntp-unstage').click();
+  await wait(()=>!services.stagingController.isBusy()&&!cardFor(idlePath), 'Unstage removes intended fixture');
+  assert(!!cardFor(paths[1]), 'Unstage leaves other fixture present');
+  assert((await api.tasks.get(idlePath)).staged===null, 'Unstage clears only membership');
+  assert(leaves.every((l,i)=>l.view.getState().tab===oldTab[i]), 'Native checks retain independent tabs');
+  return {passed:results.length,configurations:measurements.length,minGap:Math.min(...measurements.map(m=>m.gap)),maxGap:Math.max(...measurements.map(m=>m.gap)),measurements,results};
+ } finally {
+  if(oldPanelStyle===null)panel.removeAttribute('style');else panel.setAttribute('style',oldPanelStyle);
+  for(const path of created) {
+   if((await api.time.active()).some(t=>t.taskPath===path))await api.time.stop(path);
+   const file=app.vault.getFileByPath(path);if(file)await app.vault.delete(file);
+   plugin.stagedOrder.removePath(path);
+  }
+  await services.staging.refreshNow();await plugin.saveChain;
+ }
+})()

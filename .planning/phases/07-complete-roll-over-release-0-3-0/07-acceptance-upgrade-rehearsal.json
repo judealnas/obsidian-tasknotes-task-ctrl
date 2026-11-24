@@ -1,0 +1,379 @@
+{
+  "label": "upgrade-rehearsal",
+  "observedAt": "2026-11-15T06:45:38.114Z",
+  "realOvernightVerified": false,
+  "physicalSleepVerified": false,
+  "sourceCommit": "eda8da20957d10139bdb20d43069373db595751f",
+  "assets": {
+    "main.js": {
+      "source": "0d49928c2d505bf0972705e7e5edeaccf0596b6eff042cbdab3e8fc6188d7bee",
+      "installed": "0d49928c2d505bf0972705e7e5edeaccf0596b6eff042cbdab3e8fc6188d7bee"
+    },
+    "manifest.json": {
+      "source": "e70688449ceee914ff762cb6d8896c92c2cbee1b64c9d3a3186829165211f677",
+      "installed": "e70688449ceee914ff762cb6d8896c92c2cbee1b64c9d3a3186829165211f677"
+    },
+    "styles.css": {
+      "source": "db55f2d65882845be635814cd9e6006f74cf27ff21487ee7e88402a274ec29fb",
+      "installed": "db55f2d65882845be635814cd9e6006f74cf27ff21487ee7e88402a274ec29fb"
+    }
+  },
+  "inspect": {
+    "at": "2026-11-15T06:45:38.098Z",
+    "timezone": "America/New_York",
+    "vaultPath": "C:\\Users\\ja384\\Home\\obsidian-tasknotes-timer-pane\\dev-vault",
+    "product": {
+      "id": "tasknotes-timer-pane",
+      "name": "TaskNotes Task Control",
+      "version": "0.3.0",
+      "minAppVersion": "1.12.2",
+      "description": "Stage daily tasks, control regular task timers, and review completed work.",
+      "author": "Jude Alnas",
+      "isDesktopOnly": false,
+      "dir": ".obsidian/plugins/tasknotes-timer-pane"
+    },
+    "tasknotesVersion": "4.18.2",
+    "apiVersion": 1,
+    "ready": true,
+    "settings": {
+      "completionStatus": null,
+      "rolloverHour": 6
+    },
+    "stagedOrder": [
+      "TaskNotes/Tasks/P7-contract-1794715327261-exact.md",
+      "TaskNotes/Tasks/P7-contract-1794715327261-off-schedule.md",
+      "TaskNotes/Tasks/P7-contract-1794715327261-completion-anchor.md",
+      "TaskNotes/Tasks/P7-contract-1794715327261-existing.md",
+      "TaskNotes/Tasks/P7-contract-1794715327261-existing-2.md",
+      "TaskNotes/Tasks/P7-contract-1794715327261-auto.md",
+      "TaskNotes/Tasks/P7-contract-1794715327261-existing-next.md",
+      "TaskNotes/Tasks/P7-contract-1794715327261-off-schedule-materialize.md",
+      "TaskNotes/Tasks/P7-contract-1794715327261-off-schedule-materialize-2.md",
+      "TaskNotes/Tasks/P7-contract-1794715327261-regular-timing.md",
+      "TaskNotes/Tasks/P7-contract-1794715327261-pomodoro.md",
+      "TaskNotes/Tasks/P7-contract-1794715327261-ordinary-callback.md",
+      "TaskNotes/Tasks/P7-contract-1794715327261-coordinator-virtual.md",
+      "TaskNotes/Tasks/P7-contract-1794715327261-coordinator-on_completion.md",
+      "TaskNotes/Tasks/P7-contract-1794715327261-coordinator-existing-next.md",
+      "TaskNotes/Tasks/P7-contract-1794715327261-protected-pomodoro.md",
+      "TaskNotes/Tasks/P7-contract-1794725038353-exact.md",
+      "TaskNotes/Tasks/P7-contract-1794725038353-off-schedule.md",
+      "TaskNotes/Tasks/P7-contract-1794725038353-completion-anchor.md",
+      "TaskNotes/Tasks/P7-contract-1794725038353-existing.md",
+      "TaskNotes/Tasks/P7-contract-1794725038353-existing-2.md",
+      "TaskNotes/Tasks/P7-contract-1794725038353-existing-next.md",
+      "TaskNotes/Tasks/P7-contract-1794725038353-off-schedule-materialize.md",
+      "TaskNotes/Tasks/P7-contract-1794725038353-off-schedule-materialize-2.md",
+      "TaskNotes/Tasks/P7-contract-1794725038353-regular-timing.md",
+      "TaskNotes/Tasks/P7-contract-1794725038353-pomodoro.md",
+      "TaskNotes/Tasks/P7-contract-1794725038353-ordinary-callback.md",
+      "TaskNotes/Tasks/P7-contract-1794725038353-coordinator-on_completion.md",
+      "TaskNotes/Tasks/P7-contract-1794725038353-coordinator-existing.md",
+      "TaskNotes/Tasks/P7-contract-1794725038353-coordinator-existing-next.md",
+      "TaskNotes/Tasks/P7-contract-1794725038353-protected-pomodoro.md"
+    ],
+    "cardOrder": [
+      "TaskNotes/Tasks/Staging spike scratch.md\u00002026-11-13T20:05:31.448Z",
+      "TaskNotes/Tasks/Staging spike weekly.md\u00002026-11-13T20:05:31.459Z"
+    ],
+    "leaves": [
+      {
+        "state": {
+          "tab": "timers"
+        },
+        "name": "TaskNotes Task Control",
+        "bridge": {
+          "kind": "ready"
+        },
+        "text": "Staged 17Timers 0StageP7-contract-1794715327261-exactScheduled: Nov 16Recurring: Weekly on MondayOpen P7-contract-1794715327261-exactNov 14 · todaySessionPausedTotalStartStop timerComplete✕P7-contract-1794715327261-existingScheduled: Nov 16Recurring: Weekly on MondayOpen P7-contract-1794715327261-existingNov 14 · todaySessionPausedTotalStartStop timerComplete✕P7-contract-1794715327261-existingOccurrence: Nov 9Scheduled: Nov 9 (past)Open P7-contract-1794715327261-existingNov 14 · todaySessionPausedTotalStartStop timerComplete✕P7-contract-1794715327261-autoScheduled: Nov 16Recurring: Weekly on MondayOpen P7-contract-1794715327261-autoNov 14 · todaySessionPausedTotalStartStop timerComplete✕P7-contract-1794715327261-existing-nextScheduled: Nov 16Recurring: Weekly on MondayOpen P7-contract-1794715327261-existing-nextNov 14 · todaySessionPausedTotalStartStop timerComplete✕P7-contract-1794715327261-off-schedule-materializeScheduled: Nov 9 (past)Recurring: Weekly on MondayOpen P7-contract-1794715327261-off-schedule-materializeNov 14 · todaySessionPausedTotalStartStop timerComplete✕P7-contract-1794715327261-off-schedule-materializeOccurrence: Nov 14Scheduled: Nov 14 (past)Open P7-contract-1794715327261-off-schedule-materializeNov 14 · todaySessionPausedTotalStartStop timerComplete✕P7-contract-1794715327261-regular-timingScheduled: Nov 16Recurring: Weekly on MondayOpen P7-contract-1794715327261-regular-timingNov 14 · todaySessionPausedTotalStartStop timerComplete✕P7-contract-1794715327261-pomodoroScheduled: Nov 16Recurring: Weekly on MondayOpen P7-contract-1794715327261-pomodoroNov 14 · todaySessionPausedTotalStartStop timerComplete✕P7-contract-1794715327261-protected-pomodoroScheduled: Nov 9 (past)Recurring: Weekly on MondayOpen P7-contract-1794715327261-protected-pomodoroNov 14 · todaySessionPausedTotalStartStop timerComplete✕P7-contract-1794725038353-exactScheduled: Nov 16Recurring: Weekly on MondayOpen P7-contract-1794725038353-exactNov 14 · todaySessionPausedTotalStartStop timerComplete✕P7-contract-1794725038353-existingScheduled: Nov 16Recurring: Weekly on MondayOpen P7-contract-1794725038353-existingNov 14 · todaySessionPausedTotalStartStop timerComplete✕P7-contract-1794725038353-existingOccurrence: Nov 9Scheduled: Nov 9 (past)Open P7-contract-1794725038353-existingNov 14 · todaySessionPausedTotalStartStop timerComplete✕P7-contract-1794725038353-off-schedule-materializeScheduled: Nov 9 (past)Recurring: Weekly on MondayOpen P7-contract-1794725038353-off-schedule-materializeNov 14 · todaySessionPausedTotalStartStop timerComplete✕P7-contract-1794725038353-off-schedule-materializeOccurrence: Nov 14Scheduled: Nov 14 (past)Open P7-contract-1794725038353-off-schedule-materializeNov 14 · todaySessionPausedTotalStartStop timerComplete✕P7-contract-1794725038353-regular-timingScheduled: Nov 16Recurring: Weekly on MondayOpen P7-contract-1794725038353-regular-timingNov 14 · todaySessionPausedTotalStartStop timerComplete✕P7-contract-1794725038353-protected-pomodoroScheduled: Nov 9 (past)Recurring: Weekly on MondayOpen P7-contract-1794725038353-protected-pomodoroNov 14 · todaySessionPausedTotalStartStop timerComplete✕RetryDone todayNothing completed yetP7-contract-1794725038353-coordinator-existing-nextOccurrence: Nov 14Scheduled: Nov 14Open P7-contract-1794725038353-coordinator-existing-nextP7-contract-1794725038353-coordinator-existingOccurrence: Nov 14Scheduled: Nov 14Open P7-contract-1794725038353-coordinator-existingP7-contract-1794725038353-coordinator-on_completionOccurrence: Nov 14Scheduled: Nov 14Open P7-contract-1794725038353-coordinator-on_completionP7-contract-1794725038353-coordinator-virtualScheduled: Nov 16Recurring: Weekly on MondayOpen P7-contract-1794725038353-coordinator-virtualP7-contract-1794725038353-ordinary-callbackScheduled: Nov 9Open P7-contract-1794725038353-ordinary-callbackP7-contract-1794725038353-pomodoroScheduled: Nov 16Recurring: Weekly on MondayOpen P7-contract-1794725038353-pomodoroP7-contract-1794725038353-existing-nextOccurrence: Nov 14Scheduled: Nov 14Open P7-contract-1794725038353-existing-nextP7-contract-1794725038353-completion-anchorScheduled: Nov 16Recurring: Every 2 daysOpen P7-contract-1794725038353-completion-anchorP7-contract-1794725038353-off-scheduleScheduled: Nov 23Recurring: Weekly on MondayOpen P7-contract-1794725038353-off-scheduleP7-contract-1794725038353-off-scheduleScheduled: Nov 23Recurring: Weekly on MondayOpen P7-contract-1794725038353-off-scheduleP7-contract-1794715327261-autoOccurrence: Nov 14Scheduled: Nov 14Open P7-contract-1794715327261-autoP7-contract-1794715327261-completion-anchorScheduled: Nov 16Recurring: Every 2 daysOpen P7-contract-1794715327261-completion-anchorP7-contract-1794715327261-existing-nextOccurrence: Nov 14Scheduled: Nov 14Open P7-contract-1794715327261-existing-nextP7-contract-1794715327261-coordinator-existing-nextOccurrence: Nov 14Scheduled: Nov 14Open P7-contract-1794715327261-coordinator-existing-nextP7-contract-1794715327261-coordinator-existingOccurrence: Nov 14Scheduled: Nov 14Open P7-contract-1794715327261-coordinator-existingP7-contract-1794715327261-coordinator-on_completionOccurrence: Nov 14Scheduled: Nov 14Open P7-contract-1794715327261-coordinator-on_completionP7-contract-1794715327261-coordinator-virtualScheduled: Nov 16Recurring: Weekly on MondayOpen P7-contract-1794715327261-coordinator-virtualP7-contract-1794715327261-ordinary-callbackScheduled: Nov 9Open P7-contract-1794715327261-ordinary-callbackStart taskPause allResume allStop allCan't check Pomodoro. Showing all timers.No task is being timedChoose Start task above to start a timer.Check for TaskNotes"
+      },
+      {
+        "state": {
+          "tab": "staged"
+        },
+        "name": "TaskNotes Task Control",
+        "bridge": {
+          "kind": "ready"
+        },
+        "text": "Staged 17Timers 0StageP7-contract-1794715327261-exactScheduled: Nov 16Recurring: Weekly on MondayOpen P7-contract-1794715327261-exactNov 14 · todaySessionPausedTotalStartStop timerComplete✕P7-contract-1794715327261-existingScheduled: Nov 16Recurring: Weekly on MondayOpen P7-contract-1794715327261-existingNov 14 · todaySessionPausedTotalStartStop timerComplete✕P7-contract-1794715327261-existingOccurrence: Nov 9Scheduled: Nov 9 (past)Open P7-contract-1794715327261-existingNov 14 · todaySessionPausedTotalStartStop timerComplete✕P7-contract-1794715327261-autoScheduled: Nov 16Recurring: Weekly on MondayOpen P7-contract-1794715327261-autoNov 14 · todaySessionPausedTotalStartStop timerComplete✕P7-contract-1794715327261-existing-nextScheduled: Nov 16Recurring: Weekly on MondayOpen P7-contract-1794715327261-existing-nextNov 14 · todaySessionPausedTotalStartStop timerComplete✕P7-contract-1794715327261-off-schedule-materializeScheduled: Nov 9 (past)Recurring: Weekly on MondayOpen P7-contract-1794715327261-off-schedule-materializeNov 14 · todaySessionPausedTotalStartStop timerComplete✕P7-contract-1794715327261-off-schedule-materializeOccurrence: Nov 14Scheduled: Nov 14 (past)Open P7-contract-1794715327261-off-schedule-materializeNov 14 · todaySessionPausedTotalStartStop timerComplete✕P7-contract-1794715327261-regular-timingScheduled: Nov 16Recurring: Weekly on MondayOpen P7-contract-1794715327261-regular-timingNov 14 · todaySessionPausedTotalStartStop timerComplete✕P7-contract-1794715327261-pomodoroScheduled: Nov 16Recurring: Weekly on MondayOpen P7-contract-1794715327261-pomodoroNov 14 · todaySessionPausedTotalStartStop timerComplete✕P7-contract-1794715327261-protected-pomodoroScheduled: Nov 9 (past)Recurring: Weekly on MondayOpen P7-contract-1794715327261-protected-pomodoroNov 14 · todaySessionPausedTotalStartStop timerComplete✕P7-contract-1794725038353-exactScheduled: Nov 16Recurring: Weekly on MondayOpen P7-contract-1794725038353-exactNov 14 · todaySessionPausedTotalStartStop timerComplete✕P7-contract-1794725038353-existingScheduled: Nov 16Recurring: Weekly on MondayOpen P7-contract-1794725038353-existingNov 14 · todaySessionPausedTotalStartStop timerComplete✕P7-contract-1794725038353-existingOccurrence: Nov 9Scheduled: Nov 9 (past)Open P7-contract-1794725038353-existingNov 14 · todaySessionPausedTotalStartStop timerComplete✕P7-contract-1794725038353-off-schedule-materializeScheduled: Nov 9 (past)Recurring: Weekly on MondayOpen P7-contract-1794725038353-off-schedule-materializeNov 14 · todaySessionPausedTotalStartStop timerComplete✕P7-contract-1794725038353-off-schedule-materializeOccurrence: Nov 14Scheduled: Nov 14 (past)Open P7-contract-1794725038353-off-schedule-materializeNov 14 · todaySessionPausedTotalStartStop timerComplete✕P7-contract-1794725038353-regular-timingScheduled: Nov 16Recurring: Weekly on MondayOpen P7-contract-1794725038353-regular-timingNov 14 · todaySessionPausedTotalStartStop timerComplete✕P7-contract-1794725038353-protected-pomodoroScheduled: Nov 9 (past)Recurring: Weekly on MondayOpen P7-contract-1794725038353-protected-pomodoroNov 14 · todaySessionPausedTotalStartStop timerComplete✕RetryDone todayNothing completed yetP7-contract-1794725038353-coordinator-existing-nextOccurrence: Nov 14Scheduled: Nov 14Open P7-contract-1794725038353-coordinator-existing-nextP7-contract-1794725038353-coordinator-existingOccurrence: Nov 14Scheduled: Nov 14Open P7-contract-1794725038353-coordinator-existingP7-contract-1794725038353-coordinator-on_completionOccurrence: Nov 14Scheduled: Nov 14Open P7-contract-1794725038353-coordinator-on_completionP7-contract-1794725038353-coordinator-virtualScheduled: Nov 16Recurring: Weekly on MondayOpen P7-contract-1794725038353-coordinator-virtualP7-contract-1794725038353-ordinary-callbackScheduled: Nov 9Open P7-contract-1794725038353-ordinary-callbackP7-contract-1794725038353-pomodoroScheduled: Nov 16Recurring: Weekly on MondayOpen P7-contract-1794725038353-pomodoroP7-contract-1794725038353-existing-nextOccurrence: Nov 14Scheduled: Nov 14Open P7-contract-1794725038353-existing-nextP7-contract-1794725038353-completion-anchorScheduled: Nov 16Recurring: Every 2 daysOpen P7-contract-1794725038353-completion-anchorP7-contract-1794725038353-off-scheduleScheduled: Nov 23Recurring: Weekly on MondayOpen P7-contract-1794725038353-off-scheduleP7-contract-1794725038353-off-scheduleScheduled: Nov 23Recurring: Weekly on MondayOpen P7-contract-1794725038353-off-scheduleP7-contract-1794715327261-autoOccurrence: Nov 14Scheduled: Nov 14Open P7-contract-1794715327261-autoP7-contract-1794715327261-completion-anchorScheduled: Nov 16Recurring: Every 2 daysOpen P7-contract-1794715327261-completion-anchorP7-contract-1794715327261-existing-nextOccurrence: Nov 14Scheduled: Nov 14Open P7-contract-1794715327261-existing-nextP7-contract-1794715327261-coordinator-existing-nextOccurrence: Nov 14Scheduled: Nov 14Open P7-contract-1794715327261-coordinator-existing-nextP7-contract-1794715327261-coordinator-existingOccurrence: Nov 14Scheduled: Nov 14Open P7-contract-1794715327261-coordinator-existingP7-contract-1794715327261-coordinator-on_completionOccurrence: Nov 14Scheduled: Nov 14Open P7-contract-1794715327261-coordinator-on_completionP7-contract-1794715327261-coordinator-virtualScheduled: Nov 16Recurring: Weekly on MondayOpen P7-contract-1794715327261-coordinator-virtualP7-contract-1794715327261-ordinary-callbackScheduled: Nov 9Open P7-contract-1794715327261-ordinary-callbackStart taskPause allResume allStop allCan't check Pomodoro. Showing all timers.No task is being timedChoose Start task above to start a timer.Check for TaskNotes"
+      }
+    ],
+    "files": [
+      {
+        "path": "TaskNotes/Tasks/P7-contract-1794725038353-protected-pomodoro.md",
+        "sha256": "5ae4eb8d586a83be3ee1aa58574753b780111f549c0f162533b2b9925573b01f"
+      },
+      {
+        "path": "TaskNotes/Tasks/P7-contract-1794725038353-coordinator-existing-next-2.md",
+        "sha256": "4880fbe306b54ab5c29cca94f1e1fbadc523c1bd2f40165c61ee4f1a21a8344a"
+      },
+      {
+        "path": "TaskNotes/Tasks/P7-contract-1794725038353-coordinator-existing-2.md",
+        "sha256": "dd3e295679340c6a0faf4d103a1ac9672c7bdb0b1358229dd130c94823ba9de0"
+      },
+      {
+        "path": "TaskNotes/Tasks/P7-contract-1794725038353-pomodoro.md",
+        "sha256": "ec631ec6dcb2e718ad8c7661fbd26679e1bc225da4e5ae82fa8c9e594ba8231e"
+      },
+      {
+        "path": "TaskNotes/Tasks/P7-contract-1794725038353-regular-timing.md",
+        "sha256": "8b2a6f3eba956c684969155c5d814527f64721ee7cb8a64a546ff951085ee82e"
+      },
+      {
+        "path": "TaskNotes/Tasks/P7-contract-1794725038353-off-schedule-materialize-2.md",
+        "sha256": "787d536f67b196b6b5a89e32259b1988a4758a6ece742a81abd556b9c9bb4094"
+      },
+      {
+        "path": "TaskNotes/Tasks/P7-contract-1794725038353-off-schedule-materialize.md",
+        "sha256": "22c2b1689cf0b8f1184866df62d0da67923d86a57336eec3e149a7508d8ca09b"
+      },
+      {
+        "path": "TaskNotes/Tasks/P7-contract-1794725038353-existing-next-3.md",
+        "sha256": "81e9e01f1b3d50f9c5e210788b820ab38cb29c2cd84c36077d109ea3eff08fa7"
+      },
+      {
+        "path": "TaskNotes/Tasks/P7-contract-1794725038353-existing-next-2.md",
+        "sha256": "e1dd1daa3e70f20bdfe6b5aa720b5756d8469f3ee091a8c97de68b87f66e1369"
+      },
+      {
+        "path": "TaskNotes/Tasks/P7-contract-1794725038353-existing-next.md",
+        "sha256": "09edeb6eab735b9d0547a84be62d85741641f05e36eca2bf85084a076a6eeedb"
+      },
+      {
+        "path": "TaskNotes/Tasks/P7-contract-1794725038353-auto-3.md",
+        "sha256": "f0b8a449b660cb24e1d7ce30709a73c78a75f3d49c160a357bb1292f4837bff4"
+      },
+      {
+        "path": "TaskNotes/Tasks/P7-contract-1794725038353-auto.md",
+        "sha256": "6b4305893da70f78185e419064b2491589049439c4f7d137344ad9bffce8ba0c"
+      },
+      {
+        "path": "TaskNotes/Tasks/P7-contract-1794725038353-existing-2.md",
+        "sha256": "907c3f69401b32d10c3ca47daeb05c5c1b6ccf62b46e8de49d14b4e8abce2ba0"
+      },
+      {
+        "path": "TaskNotes/Tasks/P7-contract-1794725038353-existing.md",
+        "sha256": "1b465d579f31b2e45a7a5a9d2b5d22d009228c39af3f22f46b785f207603b862"
+      },
+      {
+        "path": "TaskNotes/Tasks/P7-contract-1794725038353-completion-anchor.md",
+        "sha256": "9932311f6823d9d81e5c5a5fee4b50dabc01a2ce9e57b4bfe9e01aa35eb9072f"
+      },
+      {
+        "path": "TaskNotes/Tasks/P7-contract-1794725038353-off-schedule.md",
+        "sha256": "69fa6c9efb47fe0a42ba32c47fcad2e00f7c7bd573ebe400b2454e19b4e192c1"
+      },
+      {
+        "path": "TaskNotes/Tasks/P7-contract-1794725038353-exact.md",
+        "sha256": "45ddc0200338217972eb8f56a14a8c27937cafb240bb013bec853bbeb716c662"
+      },
+      {
+        "path": "TaskNotes/Tasks/P7-contract-1794715327261-regular-timing.md",
+        "sha256": "c8138c0943bd396bda16c0384ed8ea5f84a4b3f7c738fe96dc4fa5dc3c39ea3f"
+      },
+      {
+        "path": "TaskNotes/Tasks/P7-contract-1794715327261-protected-pomodoro.md",
+        "sha256": "793a07c47aebfde00bdcdcecf4d6b60146bb0cc8857f38fef918a8b2d0cfb3f6"
+      },
+      {
+        "path": "TaskNotes/Tasks/P7-contract-1794715327261-pomodoro.md",
+        "sha256": "fe576e396d947e26a537e0d6151f44f52371e6cd12cc9b9eef6469c1718e6b2e"
+      },
+      {
+        "path": "TaskNotes/Tasks/P7-contract-1794715327261-off-schedule.md",
+        "sha256": "b421fb0eefd7fc7d348848bee2583bb84e212a4a69fd566b3f78cf6a16798fca"
+      },
+      {
+        "path": "TaskNotes/Tasks/P7-contract-1794715327261-off-schedule-materialize.md",
+        "sha256": "d35353b792139dabb587e36247ece27567f8cf56980c6e17732d5ca796185b9a"
+      },
+      {
+        "path": "TaskNotes/Tasks/P7-contract-1794715327261-off-schedule-materialize-2.md",
+        "sha256": "218d31dfdbd46be9cc24658739de5fa612dd8f112ad6dc83727717015624cf7a"
+      },
+      {
+        "path": "TaskNotes/Tasks/P7-contract-1794715327261-existing.md",
+        "sha256": "fe2dcaa226b617eef1f76e47d43d70034f1d68ba261b4e9ba96a6341162ef08b"
+      },
+      {
+        "path": "TaskNotes/Tasks/P7-contract-1794715327261-existing-next.md",
+        "sha256": "618ac7210871da10ffa0e1166d208185584ea0518290c4545e8f8c4bdaa2d447"
+      },
+      {
+        "path": "TaskNotes/Tasks/P7-contract-1794715327261-existing-next-3.md",
+        "sha256": "7ea99299d5f30c7adad46de2a9bfd4bbc1f774fe9cf1c6323dfba241b05e33c3"
+      },
+      {
+        "path": "TaskNotes/Tasks/P7-contract-1794715327261-existing-next-2.md",
+        "sha256": "a2e1694bcce847e1d06231701f7e7618ede56d23b52789babbf6a55c5fb02da7"
+      },
+      {
+        "path": "TaskNotes/Tasks/P7-contract-1794715327261-existing-2.md",
+        "sha256": "f6635f450d37d6a81c27a70eda15c10ee617c8dd3ce274a144bcf8c67fb83192"
+      },
+      {
+        "path": "TaskNotes/Tasks/P7-contract-1794715327261-exact.md",
+        "sha256": "a97bbafcfbdcb07dc264df5e592048e7a518451d683438fe9680a1aee10c55fc"
+      },
+      {
+        "path": "TaskNotes/Tasks/P7-contract-1794715327261-coordinator-existing-next-2.md",
+        "sha256": "ffac4a0bd59c64815c080d91b72107c6ca52575141813c7a95b405cfad0b34f7"
+      },
+      {
+        "path": "TaskNotes/Tasks/P7-contract-1794715327261-coordinator-existing-2.md",
+        "sha256": "512dfa44219ab40096b75f9f7c90f514a93aaded1370f7adb80d8c773305e4ae"
+      },
+      {
+        "path": "TaskNotes/Tasks/P7-contract-1794715327261-completion-anchor.md",
+        "sha256": "6d9413d24f51e33c36645b4ed16e204b93f407decfe44df7686b7422f145a061"
+      },
+      {
+        "path": "TaskNotes/Tasks/P7-contract-1794715327261-auto.md",
+        "sha256": "e40bcf29c76907a9aa24418beae21cb7ffb50f69916367ae126d1bdb2df2ec0b"
+      },
+      {
+        "path": "TaskNotes/Tasks/P7-contract-1794715327261-auto-3.md",
+        "sha256": "1ffbfb1d37e766e970a2a1b87f3b22182b1daa41a260529c3201a0bda4dd85b7"
+      }
+    ]
+  },
+  "upgrade": {
+    "mode": "actual released 0.2.0 assets to local 0.3.0 assets; not a BRAT published-release upgrade",
+    "oldAssets": {
+      "main.js": "13a0de697199c4b968717e82da93851933f411f9c79355df2d2e6d684c31f4d2",
+      "manifest.json": "4d76b252b054a9e6a7eb0b021e74a9dc9d55ed2e711b67c957f5c3ad1d7990d2",
+      "styles.css": "696e3c27308651664fd727b546512546ca3ee787dce2abdeb6f49e256c7ac08a"
+    },
+    "before": {
+      "manifest": {
+        "id": "tasknotes-timer-pane",
+        "name": "TaskNotes Task Control",
+        "version": "0.3.0",
+        "minAppVersion": "1.12.2",
+        "description": "Stage daily tasks, control regular task timers, and review completed work.",
+        "author": "Jude Alnas",
+        "isDesktopOnly": false,
+        "dir": ".obsidian/plugins/tasknotes-timer-pane"
+      },
+      "data": {
+        "rolloverHour": 6,
+        "stagedOrder": [
+          "TaskNotes/Tasks/P7-upgrade-1794725138344.md",
+          "P7-preserved-hidden-slot.md"
+        ],
+        "acceptanceExtra": {
+          "keep": "upgrade sentinel"
+        },
+        "completionStatus": "done",
+        "pauseRecordsVersion": 1,
+        "pauseRecords": [
+          {
+            "state": "paused",
+            "taskPath": "TaskNotes/Tasks/P7-upgrade-1794725138344.md",
+            "title": "P7-upgrade-1794725138344",
+            "sessionStartedAt": "2026-11-15T06:45:38.713Z",
+            "accumulatedMs": 1621,
+            "pausedAt": "2026-11-15T06:45:40.334Z",
+            "lastEntryStart": "2026-11-15T06:45:38.713Z"
+          }
+        ],
+        "cardOrder": [
+          "legacy-first",
+          "legacy-second"
+        ]
+      },
+      "leaves": [
+        {
+          "type": "tasknotes-timer-pane",
+          "state": {}
+        },
+        {
+          "type": "tasknotes-timer-pane",
+          "state": {}
+        }
+      ]
+    },
+    "dataUnchangedByAssetInstall": true,
+    "after": {
+      "manifest": {
+        "id": "tasknotes-timer-pane",
+        "name": "TaskNotes Task Control",
+        "version": "0.3.0",
+        "minAppVersion": "1.12.2",
+        "description": "Stage daily tasks, control regular task timers, and review completed work.",
+        "author": "Jude Alnas",
+        "isDesktopOnly": false,
+        "dir": ".obsidian/plugins/tasknotes-timer-pane"
+      },
+      "pauses": [
+        {
+          "state": "paused",
+          "taskPath": "TaskNotes/Tasks/P7-upgrade-1794725138344.md",
+          "title": "P7-upgrade-1794725138344",
+          "sessionStartedAt": "2026-11-15T06:45:38.713Z",
+          "accumulatedMs": 1621,
+          "pausedAt": "2026-11-15T06:45:40.334Z",
+          "lastEntryStart": "2026-11-15T06:45:38.713Z"
+        }
+      ],
+      "cardOrder": [
+        "legacy-first",
+        "legacy-second"
+      ],
+      "stagedOrder": [
+        "TaskNotes/Tasks/P7-upgrade-1794725138344.md",
+        "P7-preserved-hidden-slot.md"
+      ],
+      "settings": {
+        "completionStatus": "done",
+        "rolloverHour": 6
+      },
+      "data": {
+        "acceptanceExtra": {
+          "keep": "upgrade sentinel"
+        },
+        "completionStatus": "done",
+        "rolloverHour": 6,
+        "pauseRecordsVersion": 1,
+        "pauseRecords": [
+          {
+            "state": "paused",
+            "taskPath": "TaskNotes/Tasks/P7-upgrade-1794725138344.md",
+            "title": "P7-upgrade-1794725138344",
+            "sessionStartedAt": "2026-11-15T06:45:38.713Z",
+            "accumulatedMs": 1621,
+            "pausedAt": "2026-11-15T06:45:40.334Z",
+            "lastEntryStart": "2026-11-15T06:45:38.713Z"
+          }
+        ],
+        "cardOrder": [
+          "legacy-first",
+          "legacy-second"
+        ],
+        "stagedOrder": [
+          "TaskNotes/Tasks/P7-upgrade-1794725138344.md",
+          "P7-preserved-hidden-slot.md"
+        ]
+      },
+      "leaves": [
+        {
+          "type": "tasknotes-timer-pane",
+          "state": {
+            "tab": "timers"
+          },
+          "name": "TaskNotes Task Control"
+        },
+        {
+          "type": "tasknotes-timer-pane",
+          "state": {
+            "tab": "timers"
+          },
+          "name": "TaskNotes Task Control"
+        }
+      ]
+    },
+    "preserved": true,
+    "restored": true,
+    "restoredDataImmediately": true
+  }
+}

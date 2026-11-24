@@ -1,0 +1,48 @@
+{
+  "contract": "1.0.0",
+  "flavor": "core",
+  "milestone": "v0.3 \u2014 Staging Tasks",
+  "phases": [
+    {
+      "number": "1",
+      "name": "Live Timer Pane",
+      "status": "complete"
+    },
+    {
+      "number": "2",
+      "name": "Start, Switch & Complete",
+      "status": "complete"
+    },
+    {
+      "number": "3",
+      "name": "Pause & Resume",
+      "status": "complete"
+    },
+    {
+      "number": "4",
+      "name": "Staging Foundations",
+      "status": "complete"
+    },
+    {
+      "number": "5",
+      "name": "Two-Tab Shell",
+      "status": "complete"
+    },
+    {
+      "number": "6",
+      "name": "Staged Tab Core",
+      "status": "complete"
+    },
+    {
+      "number": "7",
+      "name": "Complete, Roll Over & Release 0.3.0",
+      "status": "in_progress"
+    }
+  ],
+  "next": {
+    "command": "$gsd-execute-phase 7",
+    "label": "Review dev-vault recovery, then finish native acceptance",
+    "reason": "Phase 7 has 4/6 complete plans; Plan 05 task 3 remains open; 89% of milestone plans complete"
+  },
+  "updated_at": "2026-11-15T06:57:17.291877Z"
+}

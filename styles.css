@@ -1,27 +1,151 @@
 /* TaskNotes Timer Pane: tntp- BEM classes, Obsidian CSS variables only (01-UI-SPEC.md). */
 
 /* Root */
+.tntp-card.tntp-card--mobile {
+	padding-inline-start: calc(var(--size-4-12) + var(--size-4-4));
+	min-height: calc(var(--size-4-12) * 2 + var(--size-4-4));
+}
+.tntp-reorder {
+	position: absolute;
+	inset-inline-start: var(--size-4-2);
+	inset-block-start: var(--size-4-2);
+	display: flex;
+	flex-direction: column;
+	gap: var(--size-4-1);
+}
+.tntp-reorder button {
+	width: var(--size-4-12);
+	min-height: var(--size-4-12);
+	padding: var(--size-4-1);
+}
+.workspace-leaf-content[data-type="tasknotes-timer-pane"] > .view-content {
+	padding: 0;
+	overflow: hidden;
+}
 .tntp-pane {
-	padding: var(--size-4-4);
+	display: flex;
+	flex-direction: column;
+	height: 100%;
+	min-height: 0;
+	padding: var(--size-4-2) var(--size-4-4) 0;
 	max-width: 480px;
+	width: 100%;
+	min-width: 0;
+	box-sizing: border-box;
+	container: tntp-pane / inline-size;
 }
 
-/* Visibility is driven only by the root modifier class. */
-.tntp-pane--running .tntp-message,
-.tntp-pane:not(.tntp-pane--running) .tntp-cards {
+/* Each panel owns its content state; hidden always wins over layout display. */
+.tntp-header[hidden],
+.tntp-panel[hidden],
+.tntp-panel--running .tntp-message,
+.tntp-panel--has-cards .tntp-message,
+.tntp-panel--timers:not(.tntp-panel--has-cards) .tntp-cards {
 	display: none;
 }
 
-.tntp-pane--loading .tntp-message__heading {
+.tntp-panel--loading .tntp-message__heading {
 	display: none;
 }
 
-.tntp-pane:not(.tntp-pane--missing):not(.tntp-pane--incompatible) .tntp-message__retry {
+.tntp-panel:not(.tntp-panel--missing):not(.tntp-panel--incompatible):not(.tntp-panel--staging-retry) .tntp-message__retry {
 	display: none;
+}
+
+.tntp-tabs {
+	display: flex;
+}
+
+.tntp-tab-row {
+	flex-shrink: 0;
+	display: flex;
+	flex-direction: column;
+	align-items: stretch;
+	gap: var(--size-4-1);
+	margin-bottom: var(--size-4-3);
+}
+
+.tntp-panel {
+	flex: 1;
+	min-height: 0;
+	overflow-y: auto;
+	padding-bottom: var(--size-4-4);
+}
+
+.tntp-tabs .tntp-tabs__tab {
+	flex: 1;
+	min-width: 0;
+	background: transparent;
+	box-shadow: none;
+	border: 0;
+	border-radius: 0;
+	border-bottom: var(--border-width) solid transparent;
+	color: var(--text-muted);
+}
+
+.tntp-tabs__count { margin-inline-start: 0.35em; }
+
+.tntp-insert {
+	display: flex;
+	width: 100%;
+	min-height: var(--input-height);
+	align-items: center;
+	justify-content: center;
+	padding: 0;
+	border-radius: var(--radius-m);
+	font-size: var(--font-ui-large);
+	color: var(--text-muted);
+	text-align: center;
+}
+
+.tntp-panel--missing .tntp-insert,
+.tntp-panel--incompatible .tntp-insert,
+.tntp-panel--loading .tntp-insert { display: none; }
+
+.tntp-tabs .tntp-tabs__tab--active {
+	color: var(--text-normal);
+	border-bottom-color: var(--interactive-accent);
+}
+
+.tntp-tabs__count--running { color: var(--text-accent); }
+
+.tntp-tabs__tab:focus-visible,
+.tntp-panel:focus-visible {
+	outline: var(--border-width) solid var(--background-modifier-border-focus);
+	outline-offset: var(--size-2-1);
 }
 
 .tntp-message__meta:empty {
 	display: none;
+}
+
+.tntp-panel--has-staged .tntp-cards { display: flex; }
+.tntp-panel--staging-retry .tntp-message__retry { display: inline-block; }
+.tntp-card--idle .tntp-stat,
+.tntp-card--idle .tntp-stop,
+.tntp-staged-metadata:empty { display: none; }
+.tntp-staged-metadata { margin-block: var(--size-4-1); overflow-wrap: anywhere; }
+.tntp-card:not(.tntp-card--staged):not(.tntp-card--pending) .tntp-unstage,
+.tntp-card--staged.tntp-card--paused .tntp-stop { display: none; }
+.tntp-card--staged .tntp-handle, .tntp-card--pending .tntp-handle { inset-inline-end: calc(var(--size-4-6) + var(--size-4-3)); }
+.tntp-card--staged .tntp-title, .tntp-card--pending .tntp-title { padding-inline-end: calc(var(--size-4-6) * 2); }
+.tntp-unstage {
+	position: absolute;
+	inset-block-start: var(--size-4-2);
+	inset-inline-end: var(--size-4-2);
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	box-sizing: border-box;
+	width: var(--size-4-6);
+	height: var(--size-4-6);
+	min-width: 0;
+	min-height: 0;
+	padding: 0;
+	color: var(--text-muted);
+	background: transparent;
+	box-shadow: none;
+	border: 0;
 }
 
 /* D-15: the Pomodoro line shows only while ownership is unreadable and TaskNotes is ready. */
@@ -50,6 +174,8 @@
 }
 
 .tntp-card {
+	min-width: 0;
+	box-sizing: border-box;
 	background-color: var(--background-primary);
 	border: var(--border-width) solid var(--background-modifier-border);
 	border-radius: var(--radius-m);
@@ -134,10 +260,10 @@
 	margin: 0;
 }
 
-/* A plain link keeps the title look; accent and underline come from the container. */
+/* Keep a plain link visibly distinct from ordinary card-title text. */
 .tntp-title a.internal-link {
-	color: inherit;
-	text-decoration: none;
+	color: var(--link-color);
+	text-decoration: underline;
 }
 
 /* TaskNotes' chip owns the title: keep its cursor, and keep keyboard focus visible. */
@@ -153,7 +279,12 @@
 /* TaskNotes keeps inline chips on one line; let a long title wrap inside the card instead. */
 .tntp-pane .tntp-title .task-card--layout-inline {
 	white-space: normal;
+	min-width: 0;
+	max-width: 100%;
 }
+
+.tntp-title__md,
+.tntp-title__md .task-card__title { min-width: 0; max-width: 100%; overflow-wrap: anywhere; }
 
 /* Every chip in the pane is being tracked, so TaskNotes' tracking outline adds nothing here. */
 .tntp-pane .tntp-title .task-card--actively-tracked::before {
@@ -184,6 +315,7 @@
 
 .tntp-stat--total {
 	display: flex;
+	flex-wrap: wrap;
 	align-items: baseline;
 	gap: var(--size-4-2);
 	margin-top: var(--size-4-4);
@@ -200,25 +332,39 @@
 .tntp-actions {
 	margin-top: var(--size-4-4);
 	display: flex;
+	flex-wrap: wrap;
 	gap: var(--size-4-2);
 }
 
 .tntp-pause-resume,
 .tntp-stop,
 .tntp-complete {
-	flex: 1;
+	flex: 1 1 7rem;
+	min-width: 0;
+	max-width: 100%;
+	height: auto;
+	white-space: normal;
+	overflow-wrap: anywhere;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	gap: var(--size-4-1);
 	min-height: var(--input-height);
 }
 
-/* Paused cards keep their place and only change style (D-06): muted, with a "Paused" label. */
-.tntp-card--paused .tntp-title,
+.tntp-actions .svg-icon { flex-shrink: 0; }
+
+@container tntp-pane (max-width: 240px) {
+	.tntp-card .tntp-title {
+		padding-inline-end: 0;
+		padding-block-start: var(--size-4-6);
+	}
+}
+
+/* Paused cards keep their height; muted timer numbers indicate the state. */
 .tntp-card--paused .tntp-clock,
 .tntp-card--paused .tntp-total {
 	color: var(--text-muted);
-}
-
-.tntp-card:not(.tntp-card--paused) .tntp-card__paused {
-	display: none;
 }
 
 /* Message states (idle, loading, missing, incompatible) */
@@ -248,10 +394,26 @@
 	margin-top: var(--size-4-6);
 }
 
-.tntp-header { display: flex; gap: var(--size-4-2); margin-bottom: var(--size-4-4); flex-wrap: wrap; }
-.tntp-picker-row { display: flex; align-items: center; gap: var(--size-4-2); }
-.tntp-picker-chip { min-width: 0; overflow-wrap: anywhere; }
-.tntp-picker-chip__md > p { margin: 0; }
-.tntp-picker-due { color: var(--text-muted); font-size: var(--font-ui-small); white-space: nowrap; }
+.tntp-header {
+	display: grid;
+	grid-template-columns: repeat(3, minmax(0, 1fr));
+	gap: var(--size-4-2);
+}
+
+.tntp-header > button {
+	min-width: 0;
+	height: auto;
+	min-height: var(--input-height);
+	white-space: normal;
+}
 .tntp-picker-pomodoro { color: var(--text-muted); font-size: var(--font-ui-small); white-space: nowrap; }
 .tntp-pomodoro-note { color: var(--text-muted); font-size: var(--font-ui-smaller); margin-bottom: var(--size-4-2); }
+
+/* Owned selector styles; TaskNotes layout adaptation attributed in THIRD_PARTY_NOTICES.md. */
+.tntp-picker-row { display: block; min-height: 44px; min-width: 0; padding: 8px 10px; overflow: hidden; }
+.tntp-picker-title { font-weight: 500; overflow-wrap: anywhere; }
+.tntp-picker-metadata { display: flex; flex-wrap: wrap; gap: 4px 8px; margin-top: 4px; min-width: 0; }
+.tntp-picker-meta { color: var(--tntp-picker-priority, var(--text-muted)); font-size: var(--font-ui-smaller); max-width: 100%; overflow-wrap: anywhere; }
+.tntp-picker-error { padding: 4px 12px; overflow-wrap: anywhere; }
+
+.tntp-settings-success { color: var(--color-green); margin-top: var(--size-4-1); }

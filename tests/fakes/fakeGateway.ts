@@ -3,7 +3,13 @@
 import { errorMessage } from "../../src/model/errors";
 import type { Ownership } from "../../src/model/pomodoroOwnership";
 import type { BridgeState, TaskNotesGateway } from "../../src/tasknotes/TaskNotesBridge";
-import type { ActiveTimeEntry, TaskInfo, TaskNotesMutationContext } from "../../src/tasknotes/runtime-api.types";
+import type { ActiveTimeEntry, TaskInfo, TaskNotesMutationContext, TaskNotesTaskPatch, TaskNotesUserField } from "../../src/tasknotes/runtime-api.types";
+
+export interface GatewayUpdateCall {
+	taskPath: string;
+	patch: TaskNotesTaskPatch;
+	context: TaskNotesMutationContext;
+}
 
 export interface GatewayStopCall {
 	taskPath: string;
@@ -47,6 +53,24 @@ export interface FakeGateway extends TaskNotesGateway {
 	readonly menuCalls: GatewayMenuCall[];
 	/** Whether `showTaskMenu()` reports TaskNotes' menu as available (default true). */
 	setTaskMenuAvailable(available: boolean): void;
+	/** What later `userFields()` calls resolve to (deep-copied on set and per call). Default []. */
+	setUserFields(fields: TaskNotesUserField[]): void;
+	/** Makes every later `userFields()` reject with `error`; null restores success. */
+	failUserFieldsWith(error: unknown): void;
+	/** Every `updateTask()` call so far, in order (patch deep-copied). */
+	readonly updateCalls: GatewayUpdateCall[];
+	/** Whether `stagingAvailability()` reports available while ready (default true). */
+	setStagingAvailable(available: boolean): void;
+	/** Every `toggleCompleteInstance()` call so far, in order. */
+	readonly toggleCalls: GatewayToggleCall[];
+	/** Whether `recurringAvailability()` reports available while ready (default true). */
+	setRecurringAvailable(available: boolean): void;
+}
+
+export interface GatewayToggleCall {
+	taskPath: string;
+	date: string;
+	context: TaskNotesMutationContext;
 }
 
 export function createFakeGateway(initial: BridgeState = { kind: "ready" }): FakeGateway {
@@ -61,11 +85,19 @@ export function createFakeGateway(initial: BridgeState = { kind: "ready" }): Fak
 	const taskFixtures = new Map<string, TaskInfo | null>();
 	let ownership: Ownership = { readable: true, owner: null };
 	let taskMenuAvailable = true;
+	let userFields: TaskNotesUserField[] = [];
+	let userFieldsFailure: { error: unknown } | null = null;
 	const menuCalls: GatewayMenuCall[] = [];
+	const updateCalls: GatewayUpdateCall[] = [];
+	let stagingAvailable = true;
+	const toggleCalls: GatewayToggleCall[] = [];
+	let recurringAvailable = true;
 	const stateListeners = new Set<(state: BridgeState) => void>();
 	const dataListeners = new Set<() => void>();
 
 	return {
+		inlineCreationAvailability: () => ({ available: false, reason: "Inline creation is not enabled in this fake" }),
+		priorities: () => Promise.resolve([]),
 		get activeCalls() {
 			return activeCalls;
 		},
@@ -75,8 +107,49 @@ export function createFakeGateway(initial: BridgeState = { kind: "ready" }): Fak
 		startAvailability: () => ({ available: state.kind === "ready", reason: "TaskNotes is not connected" }),
 		listTasks: () => Promise.resolve([]),
 		statuses: () => Promise.resolve([]),
+		userFields() {
+			if (userFieldsFailure) {
+				const { error } = userFieldsFailure;
+				return Promise.reject(error instanceof Error ? error : new Error(String(error)));
+			}
+			return Promise.resolve(structuredClone(userFields));
+		},
+		setUserFields(fields) {
+			userFields = structuredClone(fields);
+		},
+		failUserFieldsWith(error) {
+			userFieldsFailure = error === null ? null : { error };
+		},
+		stagingAvailability() {
+			if (state.kind !== "ready") return { available: false, reason: "TaskNotes is not connected" };
+			return stagingAvailable
+				? { available: true, reason: "Staging is available" }
+				: { available: false, reason: "TaskNotes 4.13.0 or newer is needed for staging" };
+		},
+		setStagingAvailable(available) {
+			stagingAvailable = available;
+		},
+		updateCalls,
+		updateTask(taskPath, patch, context) {
+			updateCalls.push({ taskPath, patch: structuredClone(patch), context });
+			return Promise.resolve();
+		},
+		recurringAvailability() {
+			if (state.kind !== "ready") return { available: false, reason: "TaskNotes is not connected" };
+			return recurringAvailable
+				? { available: true, reason: "Recurring completion is available" }
+				: { available: false, reason: "TaskNotes 4.13.0 or newer is needed for recurring completion" };
+		},
+		setRecurringAvailable(available) {
+			recurringAvailable = available;
+		},
+		toggleCalls,
+		toggleCompleteInstance(taskPath, date, context) {
+			toggleCalls.push({ taskPath, date, context });
+			return Promise.resolve(structuredClone(taskFixtures.get(taskPath) ?? { path: taskPath, title: taskPath, status: "open", archived: false }));
+		},
 		completionAvailable: () => state.kind === "ready",
-		completeTask: () => Promise.resolve(),
+		completeTask: (taskPath, status) => Promise.resolve(structuredClone(taskFixtures.get(taskPath) ?? { path: taskPath, title: taskPath, status, archived: false })),
 		start(taskPath, _options, context) {
 			startCalls.push({ taskPath, context });
 			return Promise.resolve();

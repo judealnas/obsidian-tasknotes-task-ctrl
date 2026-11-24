@@ -6,8 +6,11 @@ export const DEFAULT_SETTINGS: TimerPaneSettings = { completionStatus: null };
 
 export function loadSettings(data: unknown): TimerPaneSettings {
 	if (!data || typeof data !== "object" || Array.isArray(data)) return { ...DEFAULT_SETTINGS };
-	const value = (data as Record<string, unknown>).completionStatus;
-	return { completionStatus: typeof value === "string" ? value : null };
+	const record = data as Record<string, unknown>;
+	const value = record.completionStatus;
+	return {
+		completionStatus: typeof value === "string" ? value : null,
+	};
 }
 
 export function resolveCompletionStatus(statuses: readonly TaskStatus[], preference: string | null): TaskStatus | null {

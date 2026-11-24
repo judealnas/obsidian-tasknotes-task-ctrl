@@ -6,6 +6,8 @@ import { globalIgnores, defineConfig } from "eslint/config";
 export default defineConfig(
 	globalIgnores([
 		".claude/worktrees/**",
+		".planning/**",
+		".vault-switch/**",
 		"node_modules",
 		"dev-vault",
 		"dev-vault-seed",
@@ -54,7 +56,7 @@ export default defineConfig(
 	},
 	{
 		rules: {
-			"obsidianmd/ui/sentence-case": ["warn", { brands: ["TaskNotes", "Obsidian"] }],
+			"obsidianmd/ui/sentence-case": ["warn", { brands: ["TaskNotes Task Control", "TaskNotes", "Obsidian"] }],
 		},
 	},
 );

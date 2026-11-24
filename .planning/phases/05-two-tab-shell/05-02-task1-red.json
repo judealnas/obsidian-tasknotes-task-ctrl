@@ -1,0 +1,10 @@
+{
+  "expected": "Staged,Timers text tabs and independent stable panels",
+  "semanticAssessment": "Target executes and fails on the tab-label assertion; no collection or fixture failure.",
+  "targetTest": "tests/timerPaneView.test.ts > switches stable panels with independent actions and empty states",
+  "command": "node ../../../node_modules/vitest/vitest.mjs run --dir tests timerPaneView --reporter=tap-flat",
+  "exitCode": 1,
+  "output": "TAP version 13\n1..7\nnot ok 1 - tests/timerPaneView.test.ts > switches stable panels with independent actions and empty states # time=11.84ms\n    ---\n    error:\n        name: \"AssertionError\"\n        message: \"expected '' to be 'Staged,Timers' // Object.is equality\"\n    at: \"C:/Users/ja384/Home/obsidian-tasknotes-timer-pane/.claude/worktrees/phase-05-discuss/tests/timerPaneView.test.ts:34:53\"\n    actual: \n    expected: \"Staged,Timers\"\n    ...\nok 2 - tests/timerPaneView.test.ts > mounted view dispatches current targets and keeps session DOM through pause/resume # time=3.34ms\nok 3 - tests/timerPaneView.test.ts > removing a card immediately unloads pending title render exactly once # time=2.48ms\nok 4 - tests/timerPaneView.test.ts > disposed list handles cannot change the shared saved order # time=0.92ms\nok 5 - tests/timerPaneView.test.ts > two mounted views share persisted order but retain their own DOM and drag authority # time=3.90ms\nok 6 - tests/timerPaneView.test.ts > ready loading/idle states and duplicate session reconciliation never dispatch writes # time=1.34ms\nok 7 - tests/timerPaneView.test.ts > header guards retain Pause all, Resume all and Stop all dispatch # time=0.98ms\n",
+  "actual": "No tab elements exist",
+  "targetFile": "tests/timerPaneView.test.ts"
+}
