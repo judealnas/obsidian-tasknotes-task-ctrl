@@ -74,7 +74,7 @@ In either task picker, **Enter** selects a result and **Shift+Enter** creates a 
 
 ### Daily staging
 
-In TaskNotes settings → Task Properties → Custom User Fields, register **key `staged`**, type **Date**, with **no default value**. The key is fixed. Incorrect or unreadable setup disables the + controls and explains how to recover; timer controls remain usable.
+In the Timer Pane settings, use **Configure staged field** to register **key `staged`**, type **Date**, with **no default value** in TaskNotes. The key is fixed. Setup only adds the field registration; it preserves existing TaskNotes fields, notes and task form layouts. If setup cannot run or the key conflicts with an existing field, configure it in TaskNotes settings → Task Properties → Custom User Fields. Incorrect or unreadable setup disables the + controls and explains how to recover; timer controls remain usable.
 
 - Full-width **+** buttons open a searchable batch picker before, between or after staged cards. The empty Staged tab shows a single + button. Multiple choices keep their selection order and the picker stays open. Completed, archived and already-staged tasks are hidden.
 - Staging writes `staged: YYYY-MM-DD` through TaskNotes. Staged tasks stay until completed or unstaged; future dates stay hidden until that local calendar date. Cards show the number of calendar days since staging.

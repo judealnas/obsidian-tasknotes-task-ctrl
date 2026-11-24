@@ -1,3 +1,4 @@
+import { configureStagedField } from "./tasknotes/configureStagedField";
 import { Notice, Plugin, TFile } from "obsidian";
 import { PauseStore } from "./state/PauseStore";
 import { CardOrderStore } from "./state/CardOrderStore";
@@ -184,6 +185,11 @@ export default class TaskNotesTimerPanePlugin extends Plugin {
 		this.addSettingTab(new TimerPaneSettingTab(this.app, this, {
 			gateway: bridge,
 			getSettings: () => this.paneSettings,
+			configureStaged: async () => {
+				const message = await configureStagedField(this.app.plugins?.getPlugin(TASKNOTES_PLUGIN_ID));
+				await staging.refreshNow();
+				return message;
+			},
 			ready: () => this.settingsReady,
 			saveSettings: async settings => {
 				await this.settingsReady;

@@ -18,7 +18,7 @@ function setup(preference: string | null = null) {
 	gateway.statuses = vi.fn(() => Promise.resolve(catalog));
 	let current: settings.TimerPaneSettings = { completionStatus: preference };
 	const saveSettings = vi.fn(async (next: settings.TimerPaneSettings) => { current = next; });
-	const tab = new TimerPaneSettingTab({} as App, {} as Plugin, { gateway, getSettings: () => current, saveSettings, ready: () => Promise.resolve() });
+	const tab = new TimerPaneSettingTab({} as App, {} as Plugin, { gateway, configureStaged: vi.fn(), getSettings: () => current, saveSettings, ready: () => Promise.resolve() });
 	return { gateway, saveSettings, tab, current: () => current };
 }
 
@@ -35,29 +35,29 @@ describe("completion settings", () => {
 	});
 	test("reads each display and lists sentinel followed by completed statuses in live order", async () => {
 		const ctx = setup("done-a"); ctx.tab.display(); await flush();
-		expect(host.settings[0]!.dropdown.options).toEqual([{ value: "default", label: "Same as TaskNotes" }, { value: "0", label: "Done B" }, { value: "1", label: "Done A" }]);
-		expect(host.settings[0]!.dropdown.value).toBe("1");
+		expect(host.settings[1]!.dropdown.options).toEqual([{ value: "default", label: "Same as TaskNotes" }, { value: "0", label: "Done B" }, { value: "1", label: "Done A" }]);
+		expect(host.settings[1]!.dropdown.value).toBe("1");
 		ctx.gateway.statuses = vi.fn(() => Promise.resolve([catalog[2]!, catalog[1]!]));
 		ctx.tab.display(); await flush();
-		expect(host.settings[0]!.dropdown.options.map(option => option.label)).toEqual(["Same as TaskNotes", "Done A", "Done B"]);
+		expect(host.settings[1]!.dropdown.options.map(option => option.label)).toEqual(["Same as TaskNotes", "Done A", "Done B"]);
 	});
 	test("persists exact choice, then sentinel; display alone never writes stale fallback", async () => {
 		const ctx = setup("removed"); ctx.tab.display(); await flush();
-		expect(host.settings[0]!.dropdown.value).toBe("default");
-		expect(host.settings[0]!.description).toContain("saved status is unavailable");
+		expect(host.settings[1]!.dropdown.value).toBe("default");
+		expect(host.settings[1]!.description).toContain("saved status is unavailable");
 		expect(ctx.saveSettings).not.toHaveBeenCalled();
-		host.settings[0]!.dropdown.change("1"); await flush(); await flush();
+		host.settings[1]!.dropdown.change("1"); await flush(); await flush();
 		expect(ctx.saveSettings).toHaveBeenLastCalledWith({ completionStatus: "done-a" });
-		host.settings[0]!.dropdown.change("default"); await flush();
+		host.settings[1]!.dropdown.change("default"); await flush();
 		expect(ctx.saveSettings).toHaveBeenLastCalledWith({ completionStatus: null });
 	});
 	test.each(["empty", "failure"])("%s catalog keeps a safe sentinel and normalized explanation", async mode => {
 		const ctx = setup("removed");
 		ctx.gateway.statuses = () => mode === "empty" ? Promise.resolve([]) : Promise.reject(new Error("private/path status"));
 		ctx.tab.display(); await flush();
-		expect(host.settings[0]!.dropdown.options).toEqual([{ value: "default", label: "Same as TaskNotes" }]);
-		expect(host.settings[0]!.description).not.toContain("private");
-		expect(host.settings[0]!.description).toContain(mode === "empty" ? "no completed statuses" : "unavailable");
+		expect(host.settings[1]!.dropdown.options).toEqual([{ value: "default", label: "Same as TaskNotes" }]);
+		expect(host.settings[1]!.description).not.toContain("private");
+		expect(host.settings[1]!.description).toContain(mode === "empty" ? "no completed statuses" : "unavailable");
 	});
 	test("hide and redisplay discard stale asynchronous catalog reads", async () => {
 		const ctx = setup();
@@ -67,14 +67,14 @@ describe("completion settings", () => {
 		expect(host.settings).toEqual([]);
 		ctx.gateway.statuses = () => Promise.resolve([]);
 		ctx.tab.display(); await flush();
-		expect(host.settings[0]!.dropdown.options).toHaveLength(1);
+		expect(host.settings[1]!.dropdown.options).toHaveLength(1);
 	});
 	test("failed save keeps old choice and emits no raw error", async () => {
 		const ctx = setup("done-b");
 		ctx.saveSettings.mockRejectedValue(new Error("private/path status"));
-		ctx.tab.display(); await flush(); host.settings[0]!.dropdown.change("1"); await flush(); await flush();
+		ctx.tab.display(); await flush(); host.settings[1]!.dropdown.change("1"); await flush(); await flush();
 		expect(host.notices).toEqual(["Couldn't save the completion status. Try again."]);
-		expect(host.settings[0]!.dropdown.value).toBe("0");
+		expect(host.settings[1]!.dropdown.value).toBe("0");
 	});
 });
 

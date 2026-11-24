@@ -415,3 +415,5 @@
 .tntp-picker-metadata { display: flex; flex-wrap: wrap; gap: 4px 8px; margin-top: 4px; min-width: 0; }
 .tntp-picker-meta { color: var(--tntp-picker-priority, var(--text-muted)); font-size: var(--font-ui-smaller); max-width: 100%; overflow-wrap: anywhere; }
 .tntp-picker-error { padding: 4px 12px; overflow-wrap: anywhere; }
+
+.tntp-settings-success { color: var(--color-green); margin-top: var(--size-4-1); }

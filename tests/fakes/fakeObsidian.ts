@@ -38,7 +38,15 @@ export class Dropdown {
 	setDisabled(value: boolean): this { this.disabled = value; return this; }
 	onChange(callback: (value: string) => void): this { this.change = callback; return this; }
 }
+class SettingsButton {
+	setCta(): this { return this; }
+	setButtonText(_text: string): this { return this; }
+	setDisabled(_disabled: boolean): this { return this; }
+	onClick(_callback: () => Promise<void>): this { return this; }
+}
 export class Setting {
+	descEl = { createDiv: (_options: unknown) => undefined };
+	addButton(callback: (button: SettingsButton) => void): this { callback(new SettingsButton()); return this; }
 	name = "";
 	description = "";
 	dropdown = new Dropdown();
