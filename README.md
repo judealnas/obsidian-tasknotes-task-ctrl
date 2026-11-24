@@ -4,11 +4,13 @@
 
 An Obsidian plugin that adds a dockable pane for monitoring and controlling TaskNotes' regular (non-Pomodoro) task time tracking. TaskNotes already has a Pomodoro pane, but for normal task timing the only sign that a task is being timed is a small status-bar indicator in the bottom right of the window. This pane fills that gap: keep it open beside your notes to see what you are timing and how long you've spent on it, and start, pause, resume, stop or complete a task's timer in one or two clicks.
 
-![TaskNotes Task Control showing two running task timers and controls to start, pause, stop and complete tasks](docs/assets/panel.png)
+![Staged tasks in TaskNotes Task Control, with the full-width add button](docs/assets/panel.png)
+
+![Two running task timers with Pause all, Resume all and Stop all controls](docs/assets/timers.png)
 
 ## Requirements
 
-- Obsidian 1.12.2 or later. Desktop use is verified; mobile is not.
+- Obsidian 1.12.2 or later. The current pane layouts have been checked in a running Obsidian vault. The Configure staged field settings button and physical mobile behavior remain unverified.
 - TaskNotes 4.10.0 or later, installed and enabled. The pane is a companion to TaskNotes. If TaskNotes is missing, disabled or too old, the pane explains the issue and connects when TaskNotes becomes ready.
 
 ## Installation
@@ -20,11 +22,11 @@ An Obsidian plugin that adds a dockable pane for monitoring and controlling Task
 3. Open the command palette and run **BRAT: Add a beta plugin for testing**.
 4. Enter `judealnas/obsidian-tasknotes-timer-pane` and add the plugin.
 5. In **Settings → BRAT**, choose which release to track:
-   - **Latest** follows the newest version and can include prereleases. It currently selects `0.3.0-beta.3`.
-   - **Frozen version** stays on one release tag. Use `0.2.0` to stay on stable or `0.3.0-beta.3` to test the current beta.
+   - **Latest** follows the newest version and can include prereleases.
+   - **Frozen version** stays on one release tag. Choose an available tag from the repository’s GitHub releases.
 6. Open **Settings → Community plugins** and enable **TaskNotes Task Control**.
 
-See the [BRAT guide](https://github.com/TfTHacker/obsidian42-brat/blob/main/BRAT-DEVELOPER-GUIDE.md) for details about latest and frozen versions. The [0.3.0-beta.3 release notes](docs/releases/0.3.0-beta.3.md) list the beta's outstanding acceptance checks.
+See the [BRAT guide](https://github.com/TfTHacker/obsidian42-brat/blob/main/BRAT-DEVELOPER-GUIDE.md) for details about latest and frozen versions. See the [0.3.0 release notes](docs/releases/0.3.0.md) for the release summary and verification limits.
 
 ### Manual install
 
@@ -74,9 +76,9 @@ In either task picker, **Enter** selects a result and **Shift+Enter** creates a 
 
 ### Daily staging
 
-In the Timer Pane settings, use **Configure staged field** to register **key `staged`**, type **Date**, with **no default value** in TaskNotes. The key is fixed. Setup only adds the field registration; it preserves existing TaskNotes fields, notes and task form layouts. If setup cannot run or the key conflicts with an existing field, configure it in TaskNotes settings → Task Properties → Custom User Fields. Incorrect or unreadable setup disables the + controls and explains how to recover; timer controls remain usable.
+At the top of **Settings → TaskNotes Task Control**, use **Configure staged field** to register **key `staged`**, type **Date**, with **no default value** in TaskNotes. The key is fixed. Setup only adds the field registration; it preserves existing TaskNotes fields, notes and task form layouts. If setup cannot run or the key conflicts with an existing field, configure it in TaskNotes settings → Task Properties → Custom User Fields. The button uses the theme accent color while setup is needed. Once configured, it becomes disabled with a green confirmation message. Setup uses TaskNotes internals and runs when you press the button. Incorrect or unreadable setup disables staging and explains how to recover.
 
-- Full-width **+** buttons open a searchable batch picker before, between or after staged cards. The empty Staged tab shows a single + button. Multiple choices keep their selection order and the picker stays open. Completed, archived and already-staged tasks are hidden.
+- The full-width **+** button below the tabs opens a searchable batch picker when **Staged** is selected. Selected tasks are appended to the list. Multiple choices keep their selection order and the picker stays open. Completed, archived and already-staged tasks are hidden.
 - Staging writes `staged: YYYY-MM-DD` through TaskNotes. Staged tasks stay until completed or unstaged; future dates stay hidden until that local calendar date. Cards show the number of calendar days since staging.
 - Right-click a task and choose **Note actions → Stage task** to stage it without opening the picker. This also works from task titles in the timer pane. Already-staged tasks keep their existing date and order.
 - Start, pause, resume, stop or complete from each staged card. **✕** unstages immediately, stopping regular timing or clearing a saved pause while protecting Pomodoro timing. It writes `staged: null`.
@@ -90,11 +92,13 @@ Staging and recurring completion require TaskNotes **4.13.0+** and the relevant 
 
 ### Timer controls
 
+With **Timers** selected, **Pause all**, **Resume all** and **Stop all** share one full-width row beneath **+**. The tabs and controls stay visible while the cards scroll.
+
 - Open it with the ribbon icon "Open TaskNotes Task Control" or the command "Open timer pane". It opens in the right sidebar. If the pane is already open, it is revealed where it is instead of opening a second copy, and it stays in place across restarts.
 - While a timer runs, the card shows the task title (click it to open the note; Ctrl/Cmd-click opens it in a new tab), the current session as H:MM:SS ticking every second, and the task's total tracked time including the running session.
 - "Stop timer" stops only the timer the card displays.
 - Several timers at once: the pane shows one card per timer, new timers at the top. Drag a card's handle (or press Up/Down arrow on it) to reorder; the order is remembered.
-- "Add task" opens a searchable picker and adds an idle card to Timers without starting time tracking. Completed tasks remain selectable at the end of the list. Adding an already running or paused task leaves it unchanged.
+- With **Timers** selected, **+** below the tabs opens a searchable picker and adds an idle card to Timers without starting time tracking. Completed tasks remain selectable at the end of the list. Adding an already running or paused task leaves it unchanged.
 - Added cards and their order are remembered across pane closure and Obsidian restarts. Choose **Start** on an idle card to start its timer through the normal TaskNotes controls. A failed Start keeps the card available to retry.
 - The **✕** button on an idle Timers card removes it only from this local list. It does not change the task, its staging, or its time entries. Added cards follow note and folder renames and are removed when their notes are deleted. A save-failure Notice means the latest local changes may not survive a restart.
 - "Stop all" stops regular timers sequentially and preserves the timer owned by an active Pomodoro. It is disabled when ownership cannot be verified or there is nothing eligible to stop.
@@ -104,7 +108,7 @@ Staging and recurring completion require TaskNotes **4.13.0+** and the relevant 
 - "Pause all" and "Resume all" in the header pause every regular running timer, or resume every paused card, one at a time.
 - Pauses are remembered across restarts. A pause follows its note when the note is renamed or moved, and is cleared when the note is deleted, the task gets a completed status, or a Pomodoro starts on that task. Starting the task's timer elsewhere in TaskNotes turns the paused card back into a running one.
 - "Stop timer" on a paused card clears the pause without another TaskNotes write. "Complete" works on paused cards too. "Stop all" also clears every pause. Pause all, Resume all and Stop all leave idle added cards in place.
-- A timer owned by an active Pomodoro is hidden from the pane and left alone by Stop all and Pause all. The Add task picker marks the Pomodoro's task "Pomodoro"; adding it does not start another timer. Idle Start uses the existing Pomodoro protections. If the pane can't check Pomodoro ownership it shows every timer with the note "Can't check Pomodoro. Showing all timers."
+- A timer owned by an active Pomodoro is hidden from the pane and left alone by Stop all and Pause all. The Timers picker marks the Pomodoro's task "Pomodoro"; adding it does not start another timer. Idle Start uses the existing Pomodoro protections. If the pane can't check Pomodoro ownership it shows every timer with the note "Can't check Pomodoro. Showing all timers."
 - The pane never stops a timer without a click. TaskNotes' own completion and archive settings still govern actions made elsewhere. All pane write controls are disabled while an action runs.
 
 Differences from TaskNotes' own displays, all expected:
@@ -115,7 +119,7 @@ Differences from TaskNotes' own displays, all expected:
 
 ## Development
 
-Develop only in the repo's `dev-vault/` folder, never in your real vault. The build scripts only ever write into `dev-vault/.obsidian/plugins/tasknotes-timer-pane/` (and `main.js` at the repo root for `npm run build`). There is no setting or environment variable that points them at another vault, so a bug in the stop path can't damage real time entries.
+Develop only in the repo's `dev-vault/` folder, never in your real vault. The build scripts only ever write into `dev-vault/.obsidian/plugins/tasknotes-timer-pane/` (and `main.js` at the repo root for `npm run build`). The vault-switch commands install into the vault you explicitly configure. Run development tests in the disposable dev vault.
 
 1. `npm install`
 2. `npm run seed` creates `dev-vault/` with four seed tasks in `TaskNotes/Tasks/`. Re-running it leaves existing notes alone. `npm run seed -- --reset` restores the seed notes to their tracked contents. Neither deletes anything or touches `dev-vault/.obsidian/`.
@@ -126,7 +130,7 @@ Develop only in the repo's `dev-vault/` folder, never in your real vault. The bu
 5. In Settings → Community plugins, enable TaskNotes, Hot Reload and TaskNotes Task Control.
 6. `npm run dev` builds in watch mode into the dev vault. Hot Reload reloads the plugin about 0.75 s after `main.js` or `styles.css` changes. A `manifest.json` change needs a manual plugin toggle off and on.
 7. `npm run deploy` does a one-shot build into the dev vault.
-8. `npm run check` is the definition of done: the build, `tsc -noEmit`, ESLint with eslint-plugin-obsidianmd at zero warnings, and Vitest must all pass.
+8. `npm run check` is the definition of done: the build, `tsc -noEmit`, ESLint with eslint-plugin-obsidianmd at zero warnings, Vitest, and the vault-switch tests must all pass.
 9. Never commit `dev-vault/`. It is git-ignored because it holds third-party plugins and TaskNotes' `data.json`. Seed notes are tracked in `dev-vault-seed/` instead.
 
 ### Automated UAT (Windows dev only)
@@ -154,7 +158,7 @@ The instance listens for DevTools connections on port 9333. That port is localho
 
 ### Releasing
 
-1. `npm version patch` (or `minor` / `major`) bumps `package.json`, `manifest.json` and `versions.json`, commits, and tags the version without a `v` prefix.
-2. `git push --follow-tags` pushes the commit and tag. The release workflow runs `npm run check`, confirms the tag matches `manifest.json`, and publishes a GitHub release with `main.js`, `manifest.json` and `styles.css`.
+1. `npm version patch` (or `minor` / `major`) bumps `package.json`, `package-lock.json`, `manifest.json` and `versions.json`, commits, and tags the version without a `v` prefix.
+2. `git push --follow-tags` pushes the commit and tag. The release workflow runs `npm run check`, confirms the tag matches `manifest.json`, and publishes a GitHub release with `main.js`, `manifest.json`, `styles.css` and `THIRD_PARTY_NOTICES.md`.
 
 For a beta, use the same prerelease version in `package.json`, `package-lock.json`, `manifest.json`, and the matching tag without a `v` prefix (for example, `0.3.0-beta.3`). Tags containing a hyphen are published as GitHub prereleases and do not replace GitHub's Latest release. Release notes come from `docs/releases/<tag>.md` when present. BRAT's latest tracking may still select prereleases. Beta publication does not close outstanding stable-release acceptance checks.

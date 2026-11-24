@@ -1,7 +1,7 @@
 {
 	"id": "tasknotes-timer-pane",
 	"name": "TaskNotes Task Control",
-	"version": "0.3.0-beta.3",
+	"version": "0.3.0",
 	"minAppVersion": "1.12.2",
 	"description": "Stage tasks and control regular task timers.",
 	"author": "Jude Alnas",
