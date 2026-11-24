@@ -1,5 +1,7 @@
 import { Component, Platform, setIcon, setTooltip, type App } from "obsidian";
 import { TaskTitle } from "./TaskTitle";
+import { CardRelationshipView } from "./CardRelationshipView";
+import type { CardRelationshipSource } from "../state/CardRelationships";
 import { formatHms, timerSessionMs, totalMs, type OpenTimer } from "../model/timeMath";
 import type { TimerPaneServices } from "./TimerPaneView";
 import type { TaskInfo } from "../tasknotes/runtime-api.types";
@@ -15,6 +17,7 @@ export type TaskCardModel = (OpenTimer | IdleTaskCard) & { stagedMetadata?: stri
 function cardKey(model: TaskCardModel): string { return model.state === "idle" ? model.taskPath : model.sessionKey; }
 
 export interface TaskCardOptions {
+ relationships?: CardRelationshipSource;
  app: App;
  gateway: TimerPaneServices["gateway"];
  controller: TimerPaneServices["controller"];
@@ -28,6 +31,7 @@ const STOP_LABEL = "Stop timer";
 const STOPPING_LABEL = "Stopping…";
 const UNKNOWN_TOTAL = "—";
 interface CardElements {
+ relationships: CardRelationshipView;
 	timer: TaskCardModel;
 	card: HTMLElement;
 	/** Drag handle; the only draggable element of the card. */
@@ -98,6 +102,7 @@ export class TaskCard extends Component {
   if (this.disposed) return;
   const card = this.elements;
   card.timer = timer;
+  card.relationships.update(timer.taskPath);
   this.completionReady = completionReady;
   card.titleOwner.update(timer);
   setTextIfChanged(card.titleLabel, `Open ${timer.title}`);
@@ -141,6 +146,7 @@ export class TaskCard extends Component {
  dispose(): void {
   if (this.disposed) return;
   this.disposed = true;
+  this.elements.relationships.dispose();
   this.elements.titleOwner.dispose(); this.elements.card.detach();
   this.unload();
  }
@@ -169,6 +175,8 @@ export class TaskCard extends Component {
 		const titleOwner = new TaskTitle(card, timer, { app: this.app, gateway: this.options.gateway });
 		const title = titleOwner.title; const titleLabel = titleOwner.titleLabel;
 		const metadata = card.createDiv({ cls: ["tntp-label", "tntp-staged-metadata"] });
+  const relationships = new CardRelationshipView(card, this.app, this.options.relationships);
+  relationships.update(timer.taskPath);
 
 		const session = card.createDiv({ cls: ["tntp-stat", "tntp-stat--session"] });
 		session.createSpan({ cls: "tntp-label", text: "Session" });
@@ -219,6 +227,7 @@ export class TaskCard extends Component {
 		});
 
 		return {
+   relationships,
 			timer,
 			card,
 			handle,

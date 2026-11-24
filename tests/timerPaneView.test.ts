@@ -90,6 +90,33 @@ test("the tab row plus opens the staging picker", async () => {
 	await s.view.onClose(); s.view.unload();
 });
 
+test("both tabs share task relationship reads without polling on timer ticks", async () => {
+ const task: TaskInfo = { path: "A.md", title: "Task A", status: "open", archived: false };
+ const parent: TaskInfo = { ...task, path: "Parent.md", title: "Research paper" };
+ const child: TaskInfo = { ...task, path: "Child.md", title: "Summarize measurements", status: "done" };
+ const s = setup([timer({ task })], undefined, true);
+ s.gateway.listTasks = () => Promise.resolve([{ ...task, staged: "2026-11-12" }]);
+ const readParents = vi.fn(() => Promise.resolve([parent])); s.gateway.parents = readParents;
+ const readSubtasks = vi.fn(() => Promise.resolve([child])); s.gateway.subtasks = readSubtasks;
+ s.gateway.statuses = () => Promise.resolve([{ value: "done", isCompleted: true }]);
+ await s.view.onOpen(); await s.staging.refreshNow(); await flush(); await flush();
+ for (const tab of ["staged", "timers"]) {
+  const card = s.root.querySelector(`.tntp-panel--${tab}`)!.querySelector(".tntp-card")!;
+  expect(card.textContent).toContain("Research paper");
+  expect(card.textContent).toContain("1 of 1 complete");
+  expect(card.textContent).toContain("Summarize measurements");
+ }
+ expect(readParents).toHaveBeenCalledTimes(1);
+ expect(readSubtasks).toHaveBeenCalledTimes(1);
+ await vi.advanceTimersByTimeAsync(3000); await flush();
+ expect(readParents).toHaveBeenCalledTimes(1);
+ expect(readSubtasks).toHaveBeenCalledTimes(1);
+ await s.view.onClose(); s.view.unload();
+ s.gateway.emitData(); await flush();
+ expect(readParents).toHaveBeenCalledTimes(1);
+ expect(readSubtasks).toHaveBeenCalledTimes(1);
+});
+
 test("mobile arrows reorder both owning lists, announce once and retain boundary focus", async () => {
  Platform.isMobile = true;
  const s = setup([timer(), timer({ taskPath: "B.md", sessionKey: "b", state: "paused", title: "Task B", segmentStartMs: null })], undefined, true);

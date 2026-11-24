@@ -59,6 +59,7 @@ export interface TaskNotesGateway {
 	createTask?(data: TaskCreationData, context: TaskNotesMutationContext): Promise<TaskInfo>;
 	priorities?(): Promise<TaskPriority[]>;
 	subtasks?(path: string): Promise<TaskInfo[]>;
+	parents?(path: string): Promise<TaskInfo[]>;
 	getState(): BridgeState;
 	onState(listener: (state: BridgeState) => void): () => void;
 	onData(listener: () => void): () => void;
@@ -366,6 +367,12 @@ export class TaskNotesBridge implements TaskNotesGateway {
   const api = this.featureApi("relationships.read", "relationships.subtasks", api => typeof api.relationships?.subtasks === "function");
   const result = await api.relationships!.subtasks(path);
   if (this.connectedApi() !== api) throw new Error("TaskNotes changed while reading subtasks");
+  return result;
+ }
+ async parents(path: string): Promise<TaskInfo[]> {
+  const api = this.featureApi("relationships.read", "relationships.parents", api => typeof api.relationships?.parents === "function");
+  const result = await api.relationships!.parents!(path);
+  if (this.connectedApi() !== api) throw new Error("TaskNotes changed while reading parents");
   return result;
  }
 

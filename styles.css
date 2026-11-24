@@ -417,3 +417,26 @@
 .tntp-picker-error { padding: 4px 12px; overflow-wrap: anywhere; }
 
 .tntp-settings-success { color: var(--color-green); margin-top: var(--size-4-1); }
+
+/* Relationship rows remain compact until the native disclosure is expanded. */
+.tntp-relationships {
+ margin-block: var(--size-4-2);
+ font-size: var(--font-ui-small);
+ color: var(--text-muted);
+ overflow-wrap: anywhere;
+ min-width: 0;
+}
+.tntp-relationships--empty,
+.tntp-relationships__parents:empty { display: none; }
+.tntp-relationships__subtasks { margin-block-start: var(--size-4-1); }
+.tntp-relationships__subtasks > summary { cursor: pointer; }
+.tntp-relationships__subtasks > summary:focus-visible,
+.tntp-relationships__link:focus-visible { outline: 2px solid var(--background-modifier-border-focus); outline-offset: 2px; }
+.tntp-relationships__list {
+ list-style: none;
+ padding-inline-start: var(--size-4-3);
+ margin-block: var(--size-4-1);
+}
+.tntp-relationships__list > li { display: flex; align-items: baseline; gap: var(--size-4-2); margin-block: var(--size-4-1); }
+.tntp-relationships__status { flex-shrink: 0; }
+.tntp-relationships__link { min-width: 0; }

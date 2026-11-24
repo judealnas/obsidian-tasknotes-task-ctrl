@@ -2,18 +2,19 @@ import { afterEach, beforeEach, expect, test, vi } from "vitest";
 vi.mock("obsidian", () => import("./fakes/viewHost"));
 import type { App } from "obsidian";
 import { TaskCard } from "../src/ui/TaskCard";
+import type { CardRelationshipSnapshot, CardRelationshipSource } from "../src/state/CardRelationships";
 import type { OpenTimer } from "../src/model/timeMath";
 import type { TimerPaneServices } from "../src/ui/TimerPaneView";
 import { createFakeGateway } from "./fakes/fakeGateway";
 import { Element, dom, event, flush, resetViewHost, viewHost, workspace } from "./fakes/viewHost";
 
 const model: OpenTimer = { taskPath: "Folder/A.md", title: "<script>title</script>", startTime: "entry1", startMs: 1000, state: "running", sessionStartedAt: "first", sessionKey: "a", sortMs: 1000, accumulatedMs: 2000, segmentStartMs: 1000, totalKnown: true, entries: [{ startMs: 1000, endMs: null }], displayKey: "" };
-function setup(unstage?: (target: { taskPath: string; title: string }) => Promise<unknown>, completion?: TimerPaneServices["completion"]) {
+function setup(unstage?: (target: { taskPath: string; title: string }) => Promise<unknown>, completion?: TimerPaneServices["completion"], relationships?: CardRelationshipSource) {
 	let busy = false;
 	const controller = { isBusy: () => busy, start: vi.fn(() => Promise.resolve()), pause: vi.fn(() => Promise.resolve()), resume: vi.fn(() => Promise.resolve()), stop: vi.fn(() => Promise.resolve()), stopPaused: vi.fn(() => Promise.resolve()), complete: vi.fn(() => Promise.resolve()) };
 	const gateway = createFakeGateway();
 	const root = new Element();
-	const card = new TaskCard(dom(root), model, { app: { workspace } as unknown as App, gateway, controller: controller as unknown as TimerPaneServices["controller"], unstage, completion });
+	const card = new TaskCard(dom(root), model, { app: { workspace } as unknown as App, gateway, controller: controller as unknown as TimerPaneServices["controller"], unstage, completion, relationships });
 	card.update(model, true);
 	return { card, root, el: root.children[0]!, controller, gateway, busy(value: boolean) { busy = value; card.update(card.currentModel, true); } };
 }
@@ -171,4 +172,50 @@ test.each([
  s.card.update({ ...model, task: { ...task, contexts: [] } }, true);
  expect(s.el.querySelector(".tntp-staged-metadata")!.textContent).toBe("");
  s.card.dispose();
+});
+
+test("relationship disclosure navigates safely, preserves expansion and releases subscriptions", () => {
+ const subscriptions: Array<{ path: string; show: (snapshot: CardRelationshipSnapshot | null) => void; off: ReturnType<typeof vi.fn> }> = [];
+ const relationships: CardRelationshipSource = { subscribe(path, show) { const off = vi.fn(); subscriptions.push({ path, show, off }); return off; } };
+ const s = setup(undefined, undefined, relationships);
+ const snapshot: CardRelationshipSnapshot = {
+  parents: [{ path: "Paper.md", title: "Research paper", status: "open", archived: false }],
+  subtasks: [
+   { path: "Figure.md", title: "<img src=x> figure", status: "finished", archived: false },
+   { path: "Text.md", title: "Write interpretation", status: "open", archived: false },
+  ], completedStatuses: ["finished"],
+ };
+ subscriptions[0]!.show(snapshot);
+ expect(s.el.querySelector(".tntp-relationships__parents")!.textContent).toBe("Parent: Research paper");
+ const details = s.el.querySelector("details")!;
+ expect(details.getAttribute("open")).toBeNull();
+ expect(details.querySelector("summary")!.textContent).toBe("Subtasks · 1 of 2 complete");
+ expect(details.querySelector("img")).toBeNull();
+ const parentLink = s.el.querySelector(".tntp-relationships__parents")!.querySelector("a")!;
+ event(parentLink, "click", { ctrlKey: true });
+ expect(workspace.openLinkText).toHaveBeenLastCalledWith("Paper.md", model.taskPath, true);
+ event(details.querySelector("a")!, "click");
+ expect(workspace.openLinkText).toHaveBeenLastCalledWith("Figure.md", model.taskPath, false);
+ expect(s.controller.complete).not.toHaveBeenCalled();
+ details.setAttribute("open", "");
+ s.card.update(model, true);
+ expect(subscriptions).toHaveLength(1);
+ subscriptions[0]!.show({ ...snapshot, subtasks: snapshot.subtasks.slice(0, 1) });
+ expect(s.el.querySelector("details")).toBe(details);
+ expect(details.getAttribute("open")).toBe("");
+ expect(details.querySelector("summary")!.textContent).toBe("Subtasks · 1 of 1 complete");
+ subscriptions[0]!.show({ ...snapshot, completedStatuses: null });
+ expect(details.querySelector("summary")!.textContent).toBe("Subtasks · 2");
+ s.card.update({ ...model, taskPath: "Changed.md" }, true);
+ expect(subscriptions[0]!.off).toHaveBeenCalledTimes(1);
+ expect(details.getAttribute("open")).toBeNull();
+ subscriptions[0]!.show(snapshot);
+ expect(s.el.querySelector(".tntp-relationships")!.classes.has("tntp-relationships--empty")).toBe(true);
+ subscriptions[1]!.show(snapshot);
+ subscriptions[1]!.show(null);
+ expect(s.el.querySelector(".tntp-relationships")!.classes.has("tntp-relationships--empty")).toBe(true);
+ s.card.dispose();
+ expect(subscriptions[1]!.off).toHaveBeenCalledTimes(1);
+ subscriptions[1]!.show(snapshot);
+ expect(s.root.children).toHaveLength(0);
 });

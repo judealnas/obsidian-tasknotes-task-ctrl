@@ -70,7 +70,9 @@ Run `npm run test:vault-switch` to exercise switching and recovery against tempo
 
 Version 0.3.0 added **Staged** beside **Timers**, with independent saved order, task/running-timer counts, and a running cue on Timers. Version 0.4.0 uses plugin ID `tasknotes-task-ctrl` and installs in `.obsidian/plugins/tasknotes-task-ctrl/`; Obsidian command IDs use the `tasknotes-task-ctrl:` prefix. The saved pane view type remains `tasknotes-timer-pane` for layout compatibility. The repository is `judealnas/obsidian-tasknotes-task-ctrl`.
 
-Cards use fixed details: staged date, relative age, and context on one line, for example **Nov 18 · today · @home**. Multiple contexts appear as **@home, @work**; missing contexts add no separator. Timer cards without a staged date show just their contexts. Tags and subtasks are not displayed.
+Cards use fixed details: staged date, relative age, and context on one line, for example **Nov 18 · today · @home**. Multiple contexts appear as **@home, @work**; missing contexts add no separator. Timer cards without a staged date show just their contexts. Tags are not displayed.
+
+Cards in both tabs show clickable parent task names and a collapsed subtask summary, for example **Subtasks · 1 of 3 complete**. Expand the summary to see immediate subtasks, their completion status, and links to their notes. Status symbols are informational; the card's Complete action still applies to its main task. Empty or unavailable relationship sections are omitted. This requires TaskNotes' public relationship API; timers continue to work when those optional features are unavailable.
 
 In either task picker, **Enter** selects a result and **Shift+Enter** creates a new task from the current search query using TaskNotes' natural-language parser. Creation waits for pending parsing; queries containing only properties must be edited to include a task title. The saved task is staged or added as an idle timer card. Creation happens inline; it does not open TaskNotes' separate creation window.
 

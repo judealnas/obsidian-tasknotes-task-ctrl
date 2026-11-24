@@ -18,6 +18,7 @@ import { normalizeTimerPath } from "../model/pomodoroOwnership";
 import { orderStaged } from "../model/staging";
 import type { StagedOrderStore } from "../state/StagedOrderStore";
 import { CardList } from "./CardList";
+import { CardRelationships } from "../state/CardRelationships";
 import {
 	derivePaneState,
 	detectWakeGap,
@@ -92,6 +93,7 @@ export class TimerPaneView extends ItemView {
 	/** Cards by timer key, in display order. */
 	private cards: CardList<TaskCardModel, TaskCard> | null = null;
 	private stagedCards: CardList<TaskCardModel, TaskCard> | null = null;
+	private relationships: CardRelationships | null = null;
 	private tab: PaneTab = "timers";
 	private readonly paneId = `tntp-pane-${++nextPaneId}`;
 	/** Wall-clock time of the previous tick, for sleep/wake gap detection. */
@@ -140,6 +142,10 @@ export class TimerPaneView extends ItemView {
 		this.cards?.dispose();
 		this.stagedCards?.dispose();
 		this.cards = null;
+		this.relationships?.dispose();
+		const relationships = new CardRelationships(gateway);
+		this.relationships = relationships;
+		this.register(() => relationships.dispose());
 		const root = this.contentEl.createDiv({ cls: ["tntp-pane", "tntp-pane--loading"] });
 		const reorderStatus = root.createDiv({ cls: ["tntp-visually-hidden", "tntp-reorder-status"], attr: { role: "status", "aria-live": "polite", "aria-atomic": "true" } });
 		const announceMove = (card: TaskCard, position: number, count: number) => reorderStatus.setText(`${card.currentModel.title}, position ${position} of ${count}`);
@@ -154,7 +160,7 @@ export class TimerPaneView extends ItemView {
 		const stagedList = stagedPanel.createDiv({ cls: "tntp-cards" });
 		this.stagedCards = new CardList(stagedList, {
 			key: timer => timer.taskPath,
-			create: (parent, timer) => new TaskCard(parent, timer, { app: this.app, gateway, controller: this.services.controller, completion: this.services.completion, isBusy: () => this.isBusy(), unstage: this.services.stagingController ? target => this.services.stagingController!.unstage(target) : undefined }),
+			create: (parent, timer) => new TaskCard(parent, timer, { app: this.app, gateway, relationships, controller: this.services.controller, completion: this.services.completion, isBusy: () => this.isBusy(), unstage: this.services.stagingController ? target => this.services.stagingController!.unstage(target) : undefined }),
 			update: (card, timer) => card.update(timer, false),
 			dispose: card => card.dispose(),
 			commitOrder: order => this.services.stagedOrder?.reorder(order),
@@ -189,7 +195,7 @@ export class TimerPaneView extends ItemView {
 		const cards = timersPanel.createDiv({ cls: "tntp-cards" });
 		this.cards = new CardList(cards, {
 			key: timerCardKey,
-			create: (parent, timer) => new TaskCard(parent, timer, { app: this.app, gateway, controller: this.services.controller, completion: this.services.completion, isBusy: () => this.isBusy(), removeIdle: path => this.services.idleCards!.remove(path), startIdle: (path, title) => this.services.idleCards!.start(path, title) }),
+			create: (parent, timer) => new TaskCard(parent, timer, { app: this.app, gateway, relationships, controller: this.services.controller, completion: this.services.completion, isBusy: () => this.isBusy(), removeIdle: path => this.services.idleCards!.remove(path), startIdle: (path, title) => this.services.idleCards!.start(path, title) }),
 			update: (card, timer) => card.update(timer, this.completionReady),
 			dispose: card => card.dispose(),
 			commitOrder: order => this.services.cardOrder.reorder(order),
@@ -266,6 +272,8 @@ export class TimerPaneView extends ItemView {
 		this.cards?.dispose();
 		this.stagedCards?.dispose();
 		this.stagedCards = null;
+		this.relationships?.dispose();
+		this.relationships = null;
 		this.els = null;
 		this.cards = null;
 		return Promise.resolve();
