@@ -1,24 +1,28 @@
-# Roadmap: TaskNotes Timer Pane
+# Roadmap: TaskNotes Task Control
 
 ## Milestones
 
 - ✅ **v0.2 MVP**: Phases 1-3 (shipped 2026-11-12). Full details: [milestones/v0.2-ROADMAP.md](milestones/v0.2-ROADMAP.md)
-- 🚧 **v0.3 Staging Tasks**: Phases 4-7 (in progress)
+- **v0.3 Staging Tasks**: Phases 4–7. Stable 0.3.0 published. Phase 7 acceptance and milestone closeout remain open. [Audit](v0.3-MILESTONE-AUDIT.md).
+- **0.4.0**: Published stable release with the repository and plugin ID rename.
+- **0.5.0-beta.1**: Published prerelease with card relationships. See the [current release and acceptance record](PROJECT.md#current-state).
+
+The local follow-up after 0.5.0-beta.1 uses TaskNotes title chips and task menus for parent and subtask rows. [Current project state](PROJECT.md#current-state).
 
 ## Beta feedback scope revision — 2026-11-15
 
-The user removed Done today and the configurable rollover feature. Staged tasks persist until completed or unstaged; age and recurring requests use local calendar dates. Midnight does not clear tasks or completion safety records. DONE-02 and ROLL-03 are removed, ROLL-01 is superseded by calendar dates, and ROLL-02 now means persistent staging with calendar age. Overnight/custom-rollover acceptance is no longer required for the removed feature. Physical mobile/touch and actual published BRAT-upgrade checks remain open.
+The user removed Done today and the configurable rollover feature. Staged tasks persist until completed or unstaged; age and recurring requests use local calendar dates. Midnight does not clear tasks or completion safety records. DONE-02 and ROLL-03 are removed, ROLL-01 is superseded by calendar dates, and ROLL-02 now means persistent staging with calendar age. Overnight/custom-rollover acceptance is superseded. Physical mobile/touch acceptance remains open.
 
 Quick task 261115-gpo also covers removing the Paused label, narrow-pane overflow, tab-count spacing, edge scrolling while dragging, and positional + insertion buttons. Historical completed-phase descriptions below record what beta.1 shipped; this revision governs the current source.
 
 ## Overview
 
-v0.3 adds a **Staged** tab beside the existing **Timers** tab and renames the plugin to "TaskNotes Task Control" (id unchanged). The user picks today's tasks, orders them, and works down the list. There are four phases:
+0.3.0 added **Staged** beside **Timers** and changed the display name to TaskNotes Task Control while retaining the original plugin ID. 0.4.0 later changed the ID to `tasknotes-task-ctrl`. The user selects and orders tasks and works down the list.
 
-- **Phase 4 lays the foundations without any new UI.** It adds the rollover-hour setting, the staging-day rule and the TaskNotes contract additions. It carries a dev-vault spike that confirms how TaskNotes actually writes the field.
+- **Phase 4 lays the foundations.** It confirms the TaskNotes staging contract and settings persistence. The beta feedback revision retired the original rollover-hour setting.
 - **Phase 5 refactors the pane into a two-tab shell.** The Timers tab must behave exactly as in v0.2. This phase is kept apart from new behavior so any regression is caught on its own.
 - **Phase 6 builds the Staged tab's core loop:** stage, order, then start, pause, stop or unstage from each card.
-- **Phase 7 adds completion, Done today and rollover, then mobile reordering, the rename and the 0.3.0 release.** The recurring-completion semantics in this phase need research first.
+- **Phase 7 adds recurring-safe completion and mobile reordering.** It prepares the display rename and stable 0.3.0 release.
 
 Two rules hold in every phase: refresh and render never write, and every write goes through the one shared `WriteQueue`.
 
@@ -37,16 +41,18 @@ Two rules hold in every phase: refresh and render never write, and every write g
 
 </details>
 
-### 🚧 v0.3 Staging Tasks (In Progress)
+### v0.3 Staging Tasks — Published, acceptance open
 
 **Milestone Goal:** Let me pick the tasks I'll tackle today, put them in order, and start, stop, pause, or complete each from that list, with the all-timers view one tab away.
 
-- [x] **Phase 4: Staging Foundations** - Rollover-hour setting, a DST-safe staging day, and a feature-gated TaskNotes staging contract for the fixed `staged` key (completed 2026-11-13)
+- [x] **Phase 4: Staging Foundations** - Settings persistence and a feature-gated TaskNotes contract for the fixed `staged` key (completed 2026-11-13)
 - [x] **Phase 5: Two-Tab Shell** - Pane split into Staged and Timers tabs, with Timers unchanged from v0.2 and the last-active tab remembered (completed 2026-11-13)
 - [x] **Phase 6: Staged Tab Core** - Stage from the picker, unstage, order, and start/pause/stop each staged task from its card, with setup notices, tab counts and staged markers (completed 2026-11-14)
-- [ ] **Phase 7: Complete, Roll Over & Release 0.3.0** - ✓ completion (recurring-safe on both tabs), Done today, daily rollover, mobile ▲▼ reordering, rename, and BRAT release
+- [ ] **Phase 7: Complete, Roll Over & Release 0.3.0** - Completion and calendar continuity verified, stable release and BRAT update verified, physical mobile check open in [07-UAT.md](phases/07-complete-roll-over-release-0-3-0/07-UAT.md).
 
 ## Phase Details
+
+The original phase plans below retain their historical scope and artifacts. The scope revision above and [REQUIREMENTS.md](REQUIREMENTS.md) govern current acceptance.
 
 ### Phase 4: Staging Foundations
 
@@ -163,17 +169,16 @@ Plans:
 
 ### Phase 7: Complete, Roll Over & Release 0.3.0
 
-**Goal**: The user can finish staged tasks with ✓ (recurring tasks safely), see what got done today, and trust the list to roll over each morning. The plugin then ships as "TaskNotes Task Control" 0.3.0.
+**Goal**: Finish staged tasks with ✓ (including recurring occurrences), retain unfinished staging across local calendar days, and ship as TaskNotes Task Control 0.3.0.
 **Depends on**: Phase 6
-**Requirements**: DONE-01, CTRL-13, DONE-02, ROLL-02, ROLL-03, ORDER-04, PANE-04
+**Requirements**: DONE-01, CTRL-13, ROLL-02, ORDER-04, PANE-04. DONE-02 and ROLL-03 were removed by the user.
 **Success Criteria** (what must be TRUE):
-  1. ✓ on a non-recurring staged task sets the configured completed status, stops its timer and clears `staged`. On either tab, ✓ on a recurring task completes only today's instance, never closes the series, and a repeated ✓ never un-completes it.
-  2. A "Done today" section on the Staged tab lists the staged tasks completed today, both from the pane and elsewhere (with no write by the pane). The section clears at the rollover hour.
-  3. Unfinished staged tasks carry over to the next staging day without any frontmatter writes, and their days-staged count goes up. Rollover takes effect promptly when Obsidian was left open overnight or the machine slept through the rollover hour.
-  4. On mobile, ▲▼ buttons let the user reorder cards on both the Staged and Timers tabs.
-  5. The plugin shows as "TaskNotes Task Control". The plugin id `tasknotes-timer-pane`, view type, command ids and saved data are unchanged, and upgrading from 0.2.0 through BRAT to the 0.3.0 release keeps the existing pause records and order.
+  1. ✓ on an ordinary staged task sets the completed status, stops its regular timer and clears `staged`. On either tab, recurring completion passes the local date to TaskNotes and completes only the occurrence TaskNotes resolves, with repeat protection.
+  2. Unfinished staged tasks stay in order and their calendar age updates without frontmatter writes.
+  3. On mobile, ▲▼ buttons let the user reorder cards on both tabs.
+  4. Published 0.3.0 shows as TaskNotes Task Control under the original plugin ID `tasknotes-timer-pane`, with the existing view type and command IDs. Updating 0.2.0 to 0.3.0 through BRAT preserves the populated installation.
 
-**Plans**: 4/6 plans executed across 6 execution waves
+**Plans**: 6/6 plans have summaries. Plan 07-05 retains partial acceptance.
 
 Plans:
 **Wave 1**
@@ -189,24 +194,15 @@ Plans:
 - [x] 07-04-PLAN.md — Accessible mobile reorder arrows on both tabs (wave 4)
 
 **Wave 5** *(blocked on Wave 4 completion)*
-- [ ] 07-05-PLAN.md — Rename/version candidate, review and native acceptance evidence (wave 5)
+- [ ] 07-05-PLAN.md — Candidate and desktop checks recorded. Physical mobile acceptance remains open.
 
 **Wave 6** *(blocked on Wave 5 completion)*
-- [ ] 07-06-PLAN.md — Explicit publication approval, released assets and BRAT upgrade (wave 6)
+- [x] 07-06-PLAN.md — Published assets and in-place BRAT upgrade verified.
 
 **UI hint**: yes
 **Notes**:
-- **Research flag:** run `/gsd-plan-phase --research-phase 7` before planning. It needs to cover:
-  - Occurrence snapping in `toggleCompleteInstance`.
-  - `occurrence_materialization` and occurrence notes that already exist.
-  - Whether the toggle stops timers (assume not; stop explicitly first).
-  - The date basis of `completedDate` near midnight (accept either the staging day or the calendar date).
-- Always pass the staging day explicitly, and skip the toggle if `complete_instances` already contains it.
-- CTRL-13 fixes the existing Timers-tab ✓ bug through one shared `completeTask`.
-- Done today comes from the plugin's own completion record, confirmed by TaskNotes status.
-- Day change is checked on the 1 s tick and on focus, visibility and wake. Never use a `setTimeout` to the rollover hour.
-- UAT includes a native overnight run and a sleep/wake run.
-- The release is tagged `0.3.0` with no `v` prefix. Command *names* must not contain the plugin name (lint rule).
+- [Contract findings](phases/07-complete-roll-over-release-0-3-0/07-CONTRACT-FINDINGS.md) record the recurrence investigation.
+- [Release record](phases/07-complete-roll-over-release-0-3-0/07-RELEASE.md) identifies the published tag, workflow and assets.
 
 ## Progress
 
@@ -221,14 +217,8 @@ Phases execute in numeric order: 4 → 5 → 6 → 7 (Phases 4 and 5 are indepen
 | 4. Staging Foundations | v0.3 | 5/5 | Complete    | 2026-11-13 |
 | 5. Two-Tab Shell | v0.3 | 3/3 | Complete    | 2026-11-13 |
 | 6. Staged Tab Core | v0.3 | 5/5 | Complete    | 2026-11-14 |
-| 7. Complete, Roll Over & Release 0.3.0 | v0.3 | 4/6 | In Progress | - |
+| 7. Complete, Roll Over & Release 0.3.0 | v0.3 | 5 complete, 1 partial | Published, mobile acceptance open | - |
 
 ## Backlog
 
-### Phase 999.1: Follow-up — Phase 04 deferred UAT follow-up: Test 6 (BACKLOG)
-
-**Goal:** Resolve the UAT checkpoint deferred during Phase 04 verification
-**Source phase:** 04
-**Deferred at:** 2026-11-13 during /gsd-verify-work 4 session completion
-**Follow-ups:**
-- [ ] Test 6: Pausing a task that is already completed drops its card: pauseLedger reconcile rule 4 (Phase 3 D-12 'completed elsewhere') deletes paused records for any completed-type status, even if completed before the pause. Make rule 4 drop only records completed after pausedAt (or block pause / hide completed tasks in the picker), plus a regression test. Pre-existing since v0.2. Debug: .planning/debug/pause-removes-card.md (deferred 2026-11-13)
+- [x] Former follow-up 999.1 (Phase 04 test 6) closed as expected behavior. The user confirmed that completed tasks should be removed from the pane. The open-task retest passed. [Diagnosis](debug/pause-removes-card.md).

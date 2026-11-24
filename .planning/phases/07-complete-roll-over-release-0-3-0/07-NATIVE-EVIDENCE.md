@@ -1,5 +1,7 @@
 # Phase 7 candidate acceptance — INCOMPLETE
 
+**Release follow-up (2026-11-24):** This file preserves candidate observations and the recovery incident. [07-UAT.md](07-UAT.md) records the current device and BRAT checks, and [07-RELEASE.md](07-RELEASE.md) records the subsequent stable publication. The user removed Done today and configurable rollover on 2026-11-15.
+
 Date: 2026-11-15. Candidate: TaskNotes Task Control 0.3.0, id/view type `tasknotes-timer-pane`, command `open-timer-pane`, minimum Obsidian 1.12.2. Product source commits: `f66824c` (assets) and `bc988d0` (display/legacy tests). Follow-up documentation and evidence commits do not change the built application.
 
 ## Verified local checks

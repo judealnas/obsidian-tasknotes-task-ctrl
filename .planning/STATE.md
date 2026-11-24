@@ -4,43 +4,43 @@ milestone: v0.3
 milestone_name: Staging Tasks
 current_phase: 07
 current_phase_name: Complete, Roll Over & Release 0.3.0
-status: executing
-stopped_at: Beta feedback implemented; Done today and custom rollover removed; mobile and BRAT acceptance open
-last_updated: "2026-11-18T18:12:58.945Z"
-last_activity: 2026-11-15
-last_activity_desc: Phase 07 execution started
-state_head: 9098c7a9cb9d2c33d0c4aa64a7162d63e99e5922
+status: verifying
+stopped_at: Stable 0.3.0 published and legacy BRAT update passed; Phase 7 physical mobile acceptance open
+last_updated: "2026-11-24T04:41:00Z"
+last_activity: 2026-11-24
+last_activity_desc: Reconciled published releases and Phase 7 verification
+state_head: 5430b4c44f8034d1381b71dcfdb5f5fa3b2bc37b
 progress:
   total_phases: 4
   completed_phases: 3
   total_plans: 19
-  completed_plans: 17
-  percent: 89
+  completed_plans: 18
+  percent: 95
 ---
 
 # Project State
 
 ## Project Reference
 
-See: .planning/PROJECT.md (updated 2026-11-13)
+See [PROJECT.md](PROJECT.md) for current releases and identity.
 
 **Core value:** With the pane open, I can always see what task is being timed and how long I've spent on it, and stop, pause, or switch tasks in one to two clicks, without leaving the pane.
-**Current focus:** Phase 07 — Complete, Roll Over & Release 0.3.0
+**Current focus:** Phase 7 acceptance and the follow-up checks on the published beta.
 
 ## Current Position
 
-Phase: 07 (Complete, Roll Over & Release 0.3.0) — EXECUTING
-Plan: 5 of 6 — tasks 1–2 implemented; task 3 native acceptance incomplete
-Status: Beta feedback revision; physical mobile and actual BRAT upgrade acceptance remain open
-Note: Phase 4 complete: UAT 6/6, VERIFICATION passed, SECURITY 19/19 closed. 04-01 spike cleanup done (`staged:` null line confirmed, `spikedefault` removed).
-Last activity: 2026-11-15 — Phase 07 execution started
+Phase: 07 (Complete, Roll Over & Release 0.3.0)
+Plan: 5 of 6 — all summaries recorded, with 07-05 partial
+Status: Published, physical mobile acceptance open
+Last activity: 2026-11-24 UTC — Release and acceptance reconciliation
 
-Progress (v0.3): 17/19 plans complete (89%). Phase 7 plans 01–04 have summaries. Plan 05 version/display/tests are committed; disabled-auto-stop and full native upgrade now pass. User removed Done today/custom rollover on 2026-11-15; those overnight/sleep acceptance checks are superseded. Physical mobile and actual BRAT upgrade acceptance remain open. Stable Plan 06 publication has not started. Milestone verification remains open. Separately authorized beta `0.3.0-beta.1` was published from milestone-v0.3 on 2026-11-15; stable 0.3.0 is not published.
+0.3.0 is published, 0.4.0 is GitHub Latest stable, and 0.5.0-beta.1 is the published card-relationships prerelease. Versions from 0.4.0 use plugin ID `tasknotes-task-ctrl`; the saved view type stays `tasknotes-timer-pane`. See the [release record](phases/07-complete-roll-over-release-0-3-0/07-RELEASE.md).
+
+All 19 v0.3 plans have summaries. Eighteen are complete, and 07-05 retains a physical mobile check. Phase 7 passed the disabled-auto-stop candidate matrix, the cold direct upgrade rehearsal and the published legacy BRAT upgrade. See the [milestone audit](v0.3-MILESTONE-AUDIT.md) and [current UAT](phases/07-complete-roll-over-release-0-3-0/07-UAT.md).
 
 ## Performance Metrics
 
-**Velocity:**
-- Total plans completed: 20
+**Historical execution timings:**
 - Average duration: -
 - Total execution time: 0.0 hours
 
@@ -87,6 +87,12 @@ Progress (v0.3): 17/19 plans complete (89%). Phase 7 plans 01–04 have summarie
 ## Accumulated Context
 
 ### Decisions
+
+Recent scope and product decisions govern the historical planning log below.
+
+- [2026-11-24]: The user confirmed that completed tasks should be removed from the pane. Former follow-up 999.1 closed as expected behavior.
+- [2026-11-15]: The user removed Done today and custom rollover. Staging persists and uses local calendar dates. Completion safety records remain.
+- [0.4.0]: The installed plugin identity moved to `tasknotes-task-ctrl`. The saved view type is still `tasknotes-timer-pane`.
 
 - [Phase 5 acceptance]: The two-tab shell and independent per-leaf selection are verified; Staged remains a disabled placeholder until Phase 6. All 13 UAT checks passed or were explicitly accepted. Physical Windows sleep was not exercised; its observation limit was accepted after native renderer suspension/reconnect passed.
 
@@ -155,9 +161,8 @@ None yet.
 
 - [Phase 1]: Check cold-start readiness timing by hand. `layout.ready` fires only once, and `isReady()` and `ready()` change at different points.
 - [Phase 3]: Deferred UAT follow-up: the muted can't-check Pomodoro line (unreadable ownership) has not been observed on desktop; logic is store-tested.
-- [Phase 4 UAT 2026-11-13]: Pausing an already-completed task drops its card (pauseLedger reconcile rule 4 ignores whether completion preceded the pause). Pre-existing since v0.2; deferred to ROADMAP backlog 999.1 (`.planning/debug/pause-removes-card.md`).
+- [Phase 7]: Physical mobile reorder remains open in UAT. The published legacy BRAT upgrade passed.
 - [Phase 4/5 UAT]: Dev vault runs TaskNotes 4.18.2; Phase 4 contract pins came from 4.13.8. Use npm run uat:start from the checkout under test: its tracked launcher builds that checkout and installs only main.js/manifest.json/styles.css into the main dev-vault. Drive it through CDP; no visible-window handoff is needed.
-- [Phase 7 research flag]: Run `/gsd-plan-phase --research-phase 7`. It covers recurring occurrence snapping, occurrence materialization, whether the toggle stops timers, and the date basis of `completedDate` near midnight.
 - [v0.2 close]: Phase 1 UAT partial and verification human_needed were acknowledged and deferred at milestone close (see Deferred Items); they carry into the next milestone as candidate work, not as blockers.
 
 ### Quick Tasks Completed
@@ -193,28 +198,14 @@ Items acknowledged and deferred at milestone close, most recent first:
 
 ## Session Continuity
 
-Last session: 2026-11-15T08:25:13.976Z
-Stopped at: 07-05 disabled-auto-stop matrix and cold upgrade passed; physical acceptance remains open
-Resume file: .planning/phases/07-complete-roll-over-release-0-3-0/.continue-here.md
+Last session: 2026-11-24 UTC
+Stopped at: Phase 7 acceptance and milestone audit
+Resume file: .planning/phases/07-complete-roll-over-release-0-3-0/07-UAT.md
 
 ## Operator Next Steps
 
-- [User scope correction — status-bar issue]: User explicitly said "I do not want to modify TaskNotes." Stop the upstream-fix path; do not install, publish or resume the experimental TaskNotes patch/build. The installed TaskNotes copies were never changed; the disposable dev-vault tests were fully restored. Keep the bug diagnosed, not resolved. Any future remedy must be in our plugin using supported public APIs. Earlier test-build/installation checkpoint instructions below are superseded. Scratch checkout and evidence are retained without deletion.
-
-- [2026-11-15 status-bar fix verified]: Prepared a minimal upstream TaskNotes source fix at local upstream commit 3802d151d40db28c18178872b9ad8a532fd5b4e9, based on 4.18.2. Strict build/typecheck, changed-service lint, 9 status-bar tests and original native reproductions pass; deliberate revert restores all four regression failures. Patch and unofficial local test ZIP are ready; see .planning/debug/status-bar-stale.md. All 9 dev-vault files restored; Personal Vault unchanged. Session awaits affected vault/running-version information and human workflow verification. Do not install a 4.18.2 build over the observed 4.13.0 disk copy without confirming the intended target. Earlier unimplemented-fix diagnosis below is historical.
-
-- [2026-11-15 status-bar diagnosis]: User's beta.2 report reproduced on TaskNotes 4.18.2: delayed appearance, stale post-stop membership, old elapsed start time and the native No active time tracking session found Notice. Direct public API writes reproduce without the pane controller. Root cause is TaskNotes' five-second retention of fulfilled status-bar query results plus a retained-snapshot ticker; no supported pane endpoint invalidates that cache. Source pattern also exists in Personal Vault's on-disk 4.13.0 bundle, but that bundle has no native stop button, so the screenshot's exact running install is unconfirmed. See .planning/debug/status-bar-stale.md and native JSON evidence. Product fix remains upstream/unimplemented; no private-API workaround added. Guarded UAT stopped, two new fixture notes archived, original six file hashes/settings restored, Personal Vault untouched.
-
-- [2026-11-15 beta.2 publication]: User authorized and published 0.3.0-beta.2 from milestone-v0.3 at 68add19e6b378baffc662e9a9e1b5df4fa1161f3, including the completed feedback revision. Local/GitHub build, lint and 636 tests passed; downloaded assets matched the tested bundle/tagged source. Release workflow 43741551679 succeeded. GitHub Latest remains 0.2.0. Physical mobile and actual BRAT update remain open. Prior statements below that no subsequent beta was authorized are historical; stable 0.3.0 remains unpublished and acceptance incomplete. See quick task 261115-hco for release URL and hashes.
-
-- [2026-11-15 beta feedback scope revision]: Done today, external history collection and configurable rollover are removed by explicit user direction. Staging and recurring requests now use local calendar dates; unfinished tasks persist and calendar age refreshes without task writes. Completion safety/replay records remain. See quick task 261115-gpo for UI fixes, tests and native evidence. This supersedes older instructions below to wait for overnight/custom-rollover acceptance. Physical mobile/touch, actual BRAT upgrade and stable publication remain open. No new beta publication was requested.
-
-- [2026-11-15 beta publication]: User explicitly authorized beta publication from milestone-v0.3 with physical acceptance still open. Published `0.3.0-beta.1` at `bdc5f0f53f060c10180dd2446bfb67556deb1ec1`; GitHub Release workflow 43735538641 passed full checks. Downloaded assets verified; GitHub Latest remains 0.2.0. See quick task 261115-fup for hashes and release URL. BRAT installation/update to this beta has not been exercised. This beta authorization does not close Phase 7 acceptance or authorize stable 0.3.0 publication. Older no-publication/candidate-version descriptions below are historical.
-
-- [2026-11-15 recovery disposition]: User authorized dev-vault completion-history reset. Verified backup is `07-completion-reset-before.json`; hash/runtime evidence is `07-completion-reset.json` in the Phase 7 directory. Reset changed only completion records/version. Native startup confirms completion available and zero prior attempts; refresh added 69 new fixture observations. UAT stopped. Recovery/reset gate is resolved; remaining native acceptance and publication gates stay open. Older quarantine descriptions below are historical.
-
-- Resume Plan 07-05 task 3 from `.planning/phases/07-complete-roll-over-release-0-3-0/.continue-here.md`. Recovery/reset, disabled-auto-stop and native upgrade gates are resolved; physical acceptance remains open.
-- Canonical verification for Phases 4–6 is stale; refresh with execute-phase before claiming milestone completion.
-- Current branch: gsd/phase-07-complete-roll-over-release-0-3-0. Local 0.3.0 candidate is prepared; 725 automated tests pass.
-- Two final native recurrence matrices ran 16 cases each with auto-stop on. The off-labelled repeat was corrected; earlier 13-case auto-stop-off evidence remains historical. The final-candidate off-setting matrix now passes all 16 cases; cold native upgrade passes 15 checks. Real overnight/sleep and physical mobile remain open; publication requires later explicit approval.
-- Dev-vault rehearsal incident: exact pre-rehearsal data bytes were lost during a failed cleanup. Recorded settings/orders and 15 completion attempts were recovered; completion history was quarantined, then explicitly reset with user approval and a verified backup. Personal Vault was not touched. See 07-NATIVE-EVIDENCE.md and 07-dev-data-recovery.json. UAT is stopped.
+- Run the remaining Phase 7 checks from [07-UAT.md](phases/07-complete-roll-over-release-0-3-0/07-UAT.md). Recheck the milestone audit when acceptance evidence changes.
+- Native follow-up verified the published beta's BRAT update, restored idle card/order, final keyboard selector in both tabs and field setup on TaskNotes 4.18.2. See [native follow-up](verification/2026-11-24-native-followup.md).
+- Local commit `5430b4c` uses TaskNotes title chips and task menus for card relationship rows. The build, lint, 692 feature tests and 13 vault-switch tests passed. Native checks also passed for chip rendering, both task menu targets and narrow layout. [Native follow-up](verification/2026-11-24-native-followup.md).
+- The diagnosed TaskNotes status-bar lag is tracked in [status-bar-stale.md](debug/status-bar-stale.md). The user directed that TaskNotes itself remain untouched. Any future plugin-side remedy must use a supported public interface.
+- The failed candidate rehearsal and the user-authorized completion-history reset are documented in [07-NATIVE-EVIDENCE.md](phases/07-complete-roll-over-release-0-3-0/07-NATIVE-EVIDENCE.md).

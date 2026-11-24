@@ -10,7 +10,7 @@ An Obsidian plugin that adds a dockable pane for monitoring and controlling Task
 
 ## Requirements
 
-- Obsidian 1.12.2 or later. The current pane layouts have been checked in a running Obsidian vault. The Configure staged field settings button and physical mobile behavior remain unverified.
+- Obsidian 1.12.2 or later. The pane layouts and Configure staged field settings button have been checked in a running desktop Obsidian vault. Physical mobile behavior remains unverified.
 - TaskNotes 4.10.0 or later, installed and enabled. The pane is a companion to TaskNotes. If TaskNotes is missing, disabled or too old, the pane explains the issue and connects when TaskNotes becomes ready.
 
 ## Installation
@@ -27,6 +27,8 @@ An Obsidian plugin that adds a dockable pane for monitoring and controlling Task
 6. Open **Settings → Community plugins** and enable **TaskNotes Task Control**.
 
 See the [BRAT guide](https://github.com/TfTHacker/obsidian42-brat/blob/main/BRAT-DEVELOPER-GUIDE.md) for details about latest and frozen versions. See the [0.4.0 release notes](docs/releases/0.4.0.md) for the release summary and verification limits.
+
+The [0.5.0-beta.1 preview](docs/releases/0.5.0-beta.1.md) adds parent links and expandable subtasks to cards. A real BRAT update from 0.4.0 to this beta preserved the saved idle card and its order in a disposable desktop vault. See the [native follow-up evidence](.planning/verification/2026-11-24-native-followup.md) for the tested versions and scope.
 
 ### Manual install
 
@@ -72,7 +74,7 @@ Version 0.3.0 added **Staged** beside **Timers**, with independent saved order, 
 
 Cards use fixed details: staged date, relative age, and context on one line, for example **Nov 18 · today · @home**. Multiple contexts appear as **@home, @work**; missing contexts add no separator. Timer cards without a staged date show just their contexts. Tags are not displayed.
 
-Cards in both tabs show clickable parent task names and a collapsed subtask summary, for example **Subtasks · 1 of 3 complete**. Expand the summary to see immediate subtasks, their completion status, and links to their notes. Status symbols are informational; the card's Complete action still applies to its main task. Empty or unavailable relationship sections are omitted. This requires TaskNotes' public relationship API; timers continue to work when those optional features are unavailable.
+Cards in both tabs show parent task links and a collapsed subtask summary, for example **Subtasks · 1 of 3 complete**. Expand the summary to see immediate subtasks. In the current development build, these links use the same TaskNotes rendering as card titles: when TaskNotes' link overlay is enabled, its chips provide status and interaction controls. Right-click a parent or subtask to open its TaskNotes menu. The card's Complete action still applies to its main task. Empty or unavailable relationship sections are omitted. This requires TaskNotes' public relationship API; timers continue to work when those optional features are unavailable. The published 0.5.0-beta.1 still uses plain relationship links with informational status symbols.
 
 In either task picker, **Enter** selects a result and **Shift+Enter** creates a new task from the current search query using TaskNotes' natural-language parser. Creation waits for pending parsing; queries containing only properties must be edited to include a task title. The saved task is staged or added as an idle timer card. Creation happens inline; it does not open TaskNotes' separate creation window.
 
@@ -90,7 +92,7 @@ At the top of **Settings → TaskNotes Task Control**, use **Configure staged fi
 
 Completion safety records remain stored to avoid replaying uncertain or completed recurring writes. Refreshing the list does not collect external completion history.
 
-Staging and recurring completion require TaskNotes **4.13.0+** and the relevant public API capabilities. Missing materialization capabilities disable the affected action with an explanation. Regular timers retain the **4.10.0+** floor. Native Phase 7 recurrence checks so far cover **4.18.2** only. Physical mobile-device and published BRAT-upgrade acceptance remain open. The current source removes the beta.1 Done today and custom rollover features; their former acceptance checks are superseded.
+Staging and recurring completion require TaskNotes **4.13.0+** and the relevant public API capabilities. Missing materialization capabilities disable the affected action with an explanation. Regular timers retain the **4.10.0+** floor. Native Phase 7 recurrence checks so far cover **4.18.2** only. Published BRAT upgrades from 0.2.0 to 0.3.0 and from 0.4.0 to 0.5.0-beta.1 have been checked in disposable desktop vaults; see the [native follow-up evidence](.planning/verification/2026-11-24-native-followup.md) for preservation checks and limits. Physical mobile-device acceptance remains open. The current source removes the beta.1 Done today and custom rollover features; their former acceptance checks are superseded.
 
 ### Timer controls
 
