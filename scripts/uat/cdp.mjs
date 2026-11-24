@@ -32,7 +32,7 @@ const PREPARE_EXPRESSION = `(async () => {
 	}
 	let obsidianVersion = null;
 	try { obsidianVersion = require("obsidian").apiVersion ?? null; } catch (e) { obsidianVersion = null; }
-	const paneLoaded = Boolean(app.plugins.getPlugin("tasknotes-timer-pane"));
+	const paneLoaded = Boolean(app.plugins.getPlugin("tasknotes-task-ctrl"));
 	if (!api) {
 		return { tasknotesVersion: null, apiVersion: null, timeWrite: false, paneLoaded, obsidianVersion };
 	}

@@ -3,7 +3,7 @@
 #   npm run uat:start [-- -Vault <path> -Port <n> -SkipBuild]
 #
 # Builds the checkout that contains this script (main checkout or a worktree) with npm run build,
-# installs its main.js, manifest.json and styles.css into <Vault>\.obsidian\plugins\tasknotes-timer-pane\
+# installs its main.js, manifest.json and styles.css into <Vault>\.obsidian\plugins\tasknotes-task-ctrl\
 # (never data.json), then launches. -SkipBuild launches whatever build is already installed.
 # Reload after a rebuild = run npm run uat:start again (it stops the previous instance first).
 #
@@ -125,7 +125,7 @@ if ($LASTEXITCODE -ne 0) { throw "Could not stop the previous UAT instance" }
 
 # Install the build: exactly main.js, manifest.json, styles.css; never data.json (T-iua-02).
 $pluginFiles = @("main.js", "manifest.json", "styles.css")
-$pluginDir = Join-Path $Vault ".obsidian\plugins\tasknotes-timer-pane"
+$pluginDir = Join-Path $Vault ".obsidian\plugins\tasknotes-task-ctrl"
 if (-not $SkipBuild) {
   foreach ($name in $pluginFiles) {
     if (-not (Test-Path -LiteralPath (Join-Path $checkoutRoot $name) -PathType Leaf)) {

@@ -6,9 +6,9 @@ import { execFile } from "node:child_process";
 import { promisify } from "node:util";
 
 const exec = promisify(execFile);
-export const PLUGIN_ID = "tasknotes-timer-pane";
+export const PLUGIN_ID = "tasknotes-task-ctrl";
 export const ASSETS = ["main.js", "manifest.json", "styles.css"];
-const REPOSITORY = "judealnas/obsidian-tasknotes-timer-pane";
+const REPOSITORY = "judealnas/obsidian-tasknotes-task-ctrl";
 const DEFAULT_ROOT = fileURLToPath(new URL("../", import.meta.url));
 const hash = bytes => createHash("sha256").update(bytes).digest("hex");
 const hashesOf = files => Object.fromEntries(ASSETS.map(name => [name, files[name] === null ? null : hash(files[name])]));
@@ -153,7 +153,7 @@ export function createSwitcher({ root = DEFAULT_ROOT, fetchImpl = globalThis.fet
     return Buffer.from(await response.arrayBuffer());
   }
   async function releaseFiles(tag) {
-    if (typeof tag !== "string" || !/^\d+\.\d+\.\d+(?:-[0-9A-Za-z.-]+)?(?:\+[0-9A-Za-z.-]+)?$/.test(tag)) throw new Error("Provide an exact release tag, for example: npm run vault:release -- 0.3.0-beta.3");
+    if (typeof tag !== "string" || !/^\d+\.\d+\.\d+(?:-[0-9A-Za-z.-]+)?(?:\+[0-9A-Za-z.-]+)?$/.test(tag)) throw new Error("Provide an exact release tag, for example: npm run vault:release -- 0.4.0");
     const url = `https://api.github.com/repos/${REPOSITORY}/releases/tags/${encodeURIComponent(tag)}`;
     const release = JSON.parse((await fetchBytes(url, "application/vnd.github+json")).toString("utf8"));
     if (release.draft || release.tag_name !== tag || !Array.isArray(release.assets)) throw new Error("The requested published release was not found.");

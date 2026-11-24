@@ -114,7 +114,7 @@ const expression = String.raw`(async () => {
  await step("ordinary-card-controller-callback", async () => {
   const t = await create("ordinary-callback", { recurrence: "" });
   await api.time.start(t.path, {}, ctx);
-  await app.commands.executeCommandById("tasknotes-timer-pane:open-timer-pane");
+  await app.commands.executeCommandById("tasknotes-task-ctrl:open-timer-pane");
   await wait(250);
   const view = app.workspace.getLeavesOfType("tasknotes-timer-pane")[0]?.view;
   if (!view?.services?.completion) throw new Error("The new completion build is not loaded");
@@ -132,7 +132,7 @@ const expression = String.raw`(async () => {
   const outcome = await view.services.controller.complete({ taskPath: t.path, title: t.title });
   const after = await snapshot(t.path);
   const second = await view.services.controller.complete({ taskPath: t.path, title: t.title });
-  const records = app.plugins.getPlugin("tasknotes-timer-pane").completions.records().filter(r => r.sourcePath === t.path);
+  const records = app.plugins.getPlugin("tasknotes-task-ctrl").completions.records().filter(r => r.sourcePath === t.path);
   const related = (await ownTasks()).filter(task => task.path === t.path || task.recurrence_parent === "[[" + t.path.replace(/\.md$/, "") + "]]");
   return { policy, before, outcome, after, second, afterRepeat: await snapshot(t.path), records, related: await Promise.all(related.map(t => snapshot(t.path))) };
  });
@@ -156,20 +156,20 @@ const expression = String.raw`(async () => {
   const first = result.cases.find(c => c.name === "coordinator-virtual-and-repeat");
   const path = first.records[0].sourcePath;
   const before = await snapshot(path);
-  const oldPlugin = app.plugins.getPlugin("tasknotes-timer-pane");
+  const oldPlugin = app.plugins.getPlugin("tasknotes-task-ctrl");
   result.currentStep = "restart:disable";
-  void app.plugins.disablePlugin("tasknotes-timer-pane");
-  for (let i = 0; i < 50 && app.plugins.getPlugin("tasknotes-timer-pane"); i++) await wait(100);
-  if (app.plugins.getPlugin("tasknotes-timer-pane")) throw new Error("Plugin did not unload");
+  void app.plugins.disablePlugin("tasknotes-task-ctrl");
+  for (let i = 0; i < 50 && app.plugins.getPlugin("tasknotes-task-ctrl"); i++) await wait(100);
+  if (app.plugins.getPlugin("tasknotes-task-ctrl")) throw new Error("Plugin did not unload");
   result.currentStep = "restart:enable";
-  void app.plugins.enablePlugin("tasknotes-timer-pane");
-  for (let i = 0; i < 50 && (!app.plugins.getPlugin("tasknotes-timer-pane") || app.plugins.getPlugin("tasknotes-timer-pane") === oldPlugin); i++) await wait(100);
-  if (!app.plugins.getPlugin("tasknotes-timer-pane") || app.plugins.getPlugin("tasknotes-timer-pane") === oldPlugin) throw new Error("Fresh plugin did not load");
+  void app.plugins.enablePlugin("tasknotes-task-ctrl");
+  for (let i = 0; i < 50 && (!app.plugins.getPlugin("tasknotes-task-ctrl") || app.plugins.getPlugin("tasknotes-task-ctrl") === oldPlugin); i++) await wait(100);
+  if (!app.plugins.getPlugin("tasknotes-task-ctrl") || app.plugins.getPlugin("tasknotes-task-ctrl") === oldPlugin) throw new Error("Fresh plugin did not load");
   result.currentStep = "restart:settings";
-  await app.plugins.getPlugin("tasknotes-timer-pane").settingsReady;
+  await app.plugins.getPlugin("tasknotes-task-ctrl").settingsReady;
   result.currentStep = "restart:view";
-  await app.commands.executeCommandById("tasknotes-timer-pane:open-timer-pane"); await wait(500);
-  const plugin = app.plugins.getPlugin("tasknotes-timer-pane");
+  await app.commands.executeCommandById("tasknotes-task-ctrl:open-timer-pane"); await wait(500);
+  const plugin = app.plugins.getPlugin("tasknotes-task-ctrl");
   const view = app.workspace.getLeavesOfType("tasknotes-timer-pane").map(l => l.view).find(v => v.services?.completion && v.services.gateway.completionAvailable());
   if (!view) throw new Error("A fresh connected pane did not restore after reload");
   view.services.gateway.probe(); await wait(500);

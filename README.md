@@ -20,18 +20,18 @@ An Obsidian plugin that adds a dockable pane for monitoring and controlling Task
 1. In Obsidian, open **Settings → Community plugins → Browse**, find **TaskNotes**, install it, and enable it.
 2. In the same Browse view, find **BRAT**, install it, and enable it.
 3. Open the command palette and run **BRAT: Add a beta plugin for testing**.
-4. Enter `judealnas/obsidian-tasknotes-timer-pane` and add the plugin.
+4. Enter `judealnas/obsidian-tasknotes-task-ctrl` and add the plugin.
 5. In **Settings → BRAT**, choose which release to track:
    - **Latest** follows the newest version and can include prereleases.
    - **Frozen version** stays on one release tag. Choose an available tag from the repository’s GitHub releases.
 6. Open **Settings → Community plugins** and enable **TaskNotes Task Control**.
 
-See the [BRAT guide](https://github.com/TfTHacker/obsidian42-brat/blob/main/BRAT-DEVELOPER-GUIDE.md) for details about latest and frozen versions. See the [0.3.0 release notes](docs/releases/0.3.0.md) for the release summary and verification limits.
+See the [BRAT guide](https://github.com/TfTHacker/obsidian42-brat/blob/main/BRAT-DEVELOPER-GUIDE.md) for details about latest and frozen versions. See the [0.4.0 release notes](docs/releases/0.4.0.md) for the release summary and verification limits.
 
 ### Manual install
 
-1. Download `main.js`, `manifest.json` and `styles.css` from the [release you want](https://github.com/judealnas/obsidian-tasknotes-timer-pane/releases).
-2. Put the files in `<vault>/.obsidian/plugins/tasknotes-timer-pane/`.
+1. Download `main.js`, `manifest.json` and `styles.css` from the [release you want](https://github.com/judealnas/obsidian-tasknotes-task-ctrl/releases).
+2. Put the files in `<vault>/.obsidian/plugins/tasknotes-task-ctrl/`.
 3. In **Settings → Community plugins**, enable **TaskNotes Task Control**.
 
 To build from source, run `npm install` and `npm run build`, then copy the same three files from the repository root.
@@ -50,7 +50,7 @@ Before switching, disable **TaskNotes Task Control** in Obsidian's Community plu
 
 ```powershell
 npm run vault:local                       # Build this checkout, including uncommitted changes
-npm run vault:release -- 0.3.0-beta.3       # Download this exact GitHub release
+npm run vault:release -- 0.4.0              # Download this exact GitHub release
 npm run vault:status                      # Identify the installed files
 npm run vault:undo                        # Restore files from the previous switch
 ```
@@ -68,7 +68,7 @@ Run `npm run test:vault-switch` to exercise switching and recovery against tempo
 
 ## Using the pane
 
-Version 0.3.0 adds **Staged** beside **Timers**, with independent saved order, task/running-timer counts, and a running cue on Timers. The display name changes; the plugin id, installed folder, saved data and view type remain `tasknotes-timer-pane`, and the command id remains `open-timer-pane`. Upgrade in place and keep `data.json`.
+Version 0.3.0 added **Staged** beside **Timers**, with independent saved order, task/running-timer counts, and a running cue on Timers. Version 0.4.0 uses plugin ID `tasknotes-task-ctrl` and installs in `.obsidian/plugins/tasknotes-task-ctrl/`; Obsidian command IDs use the `tasknotes-task-ctrl:` prefix. The saved pane view type remains `tasknotes-timer-pane` for layout compatibility. The repository is `judealnas/obsidian-tasknotes-task-ctrl`.
 
 Cards use fixed details: staged date, relative age, and context on one line, for example **Nov 18 · today · @home**. Multiple contexts appear as **@home, @work**; missing contexts add no separator. Timer cards without a staged date show just their contexts. Tags and subtasks are not displayed.
 
@@ -119,7 +119,7 @@ Differences from TaskNotes' own displays, all expected:
 
 ## Development
 
-Develop only in the repo's `dev-vault/` folder, never in your real vault. The build scripts only ever write into `dev-vault/.obsidian/plugins/tasknotes-timer-pane/` (and `main.js` at the repo root for `npm run build`). The vault-switch commands install into the vault you explicitly configure. Run development tests in the disposable dev vault.
+Develop only in the repo's `dev-vault/` folder, never in your real vault. The build scripts only ever write into `dev-vault/.obsidian/plugins/tasknotes-task-ctrl/` (and `main.js` at the repo root for `npm run build`). The vault-switch commands install into the vault you explicitly configure. Run development tests in the disposable dev vault.
 
 1. `npm install`
 2. `npm run seed` creates `dev-vault/` with four seed tasks in `TaskNotes/Tasks/`. Re-running it leaves existing notes alone. `npm run seed -- --reset` restores the seed notes to their tracked contents. Neither deletes anything or touches `dev-vault/.obsidian/`.
@@ -145,7 +145,7 @@ Before you start:
 
 Commands:
 
-- `npm run uat:start` runs `npm run build` in the checkout that contains the script (the main checkout or a worktree), copies `main.js`, `manifest.json` and `styles.css` into the main checkout's `dev-vault/.obsidian/plugins/tasknotes-timer-pane/`, and leaves `data.json` alone. Then it starts the instance, gets past the trust prompt and Restricted mode, and prints one `UAT Obsidian ready:` line with the TaskNotes version, API version, whether the pane loaded, `build=<checkout>@<commit>` (with `+dirty` when tracked files have uncommitted changes) and `mainjs=<hash>` of the installed `main.js`. If the build fails, nothing is installed or launched. Pass `-- -Vault <path> -Port <n>` to override the defaults.
+- `npm run uat:start` runs `npm run build` in the checkout that contains the script (the main checkout or a worktree), copies `main.js`, `manifest.json` and `styles.css` into the main checkout's `dev-vault/.obsidian/plugins/tasknotes-task-ctrl/`, and leaves `data.json` alone. Then it starts the instance, gets past the trust prompt and Restricted mode, and prints one `UAT Obsidian ready:` line with the TaskNotes version, API version, whether the pane loaded, `build=<checkout>@<commit>` (with `+dirty` when tracked files have uncommitted changes) and `mainjs=<hash>` of the installed `main.js`. If the build fails, nothing is installed or launched. Pass `-- -Vault <path> -Port <n>` to override the defaults.
 - `npm run uat:start -- -SkipBuild` launches whatever build is already installed, with no build and no copy.
 - `npm run uat:stop` stops only the UAT instance. Your own Obsidian is not touched.
 - `npm run uat:smoke` starts and stops the instance while sampling the foreground window, and fails if the UAT instance ever had focus, if your own Obsidian processes changed, or if the installed `main.js` doesn't match the checkout's build.
@@ -161,4 +161,4 @@ The instance listens for DevTools connections on port 9333. That port is localho
 1. `npm version patch` (or `minor` / `major`) bumps `package.json`, `package-lock.json`, `manifest.json` and `versions.json`, commits, and tags the version without a `v` prefix.
 2. `git push --follow-tags` pushes the commit and tag. The release workflow runs `npm run check`, confirms the tag matches `manifest.json`, and publishes a GitHub release with `main.js`, `manifest.json`, `styles.css` and `THIRD_PARTY_NOTICES.md`.
 
-For a beta, use the same prerelease version in `package.json`, `package-lock.json`, `manifest.json`, and the matching tag without a `v` prefix (for example, `0.3.0-beta.3`). Tags containing a hyphen are published as GitHub prereleases and do not replace GitHub's Latest release. Release notes come from `docs/releases/<tag>.md` when present. BRAT's latest tracking may still select prereleases. Beta publication does not close outstanding stable-release acceptance checks.
+For a beta, use the same prerelease version in `package.json`, `package-lock.json`, `manifest.json`, and the matching tag without a `v` prefix (for example, `0.4.0-beta.1`). Tags containing a hyphen are published as GitHub prereleases and do not replace GitHub's Latest release. Release notes come from `docs/releases/<tag>.md` when present. BRAT's latest tracking may still select prereleases. Beta publication does not close outstanding stable-release acceptance checks.

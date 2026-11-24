@@ -13,7 +13,7 @@ const deploy = mode === "deploy";
 
 // Hard-coded, repo-relative target (D-01). There is deliberately no environment
 // variable or CLI override: the build can never write into a real vault.
-const DEV_DIR = "dev-vault/.obsidian/plugins/tasknotes-timer-pane";
+const DEV_DIR = "dev-vault/.obsidian/plugins/tasknotes-task-ctrl";
 
 const devVaultAssets = {
 	name: "dev-vault-assets",

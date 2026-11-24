@@ -41,7 +41,7 @@ async function fixture(t, options = {}) {
     urls.push(url);
     if (url.includes("api.github.com")) return new Response(JSON.stringify({ tag_name: "0.3.0-beta.3", draft: false, assets: ASSETS.map(name => ({
       name, size: release[name].length, digest: `sha256:${digest(release[name])}`,
-      browser_download_url: `https://github.com/judealnas/obsidian-tasknotes-timer-pane/releases/download/0.3.0-beta.3/${name}`,
+      browser_download_url: `https://github.com/judealnas/obsidian-tasknotes-task-ctrl/releases/download/0.3.0-beta.3/${name}`,
     })) }));
     return new Response(release[new URL(url).pathname.split("/").pop()]);
   };
@@ -117,7 +117,7 @@ test("missing, corrupt and failed release downloads never modify the installed f
       if (!url.includes("api.github.com")) return mode === "http" ? new Response("failure", { status: 503 }) : new Response(bundle("9.9.9")[new URL(url).pathname.split("/").pop()]);
       return new Response(JSON.stringify({ tag_name: "0.3.0-beta.3", assets: (mode === "missing" ? ASSETS.slice(1) : ASSETS).map(name => ({
         name, size: bundle("9.9.9")[name].length, digest: mode === "digest" ? "sha256:bad" : undefined,
-        browser_download_url: `${mode === "url" ? "https://example.org" : "https://github.com"}/judealnas/obsidian-tasknotes-timer-pane/releases/download/0.3.0-beta.3/${name}`,
+        browser_download_url: `${mode === "url" ? "https://example.org" : "https://github.com"}/judealnas/obsidian-tasknotes-task-ctrl/releases/download/0.3.0-beta.3/${name}`,
       })) }));
     } });
     await assert.rejects(f.switcher.switch("release", "0.3.0-beta.3"));

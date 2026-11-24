@@ -25,7 +25,7 @@ const expectedVault = path.join(root, "dev-vault");
 const inspect = evaluate(`(async()=>{
  const vaultPath=app.vault.adapter.getBasePath();
  if(vaultPath.replaceAll('\\\\','/').toLowerCase()!==${JSON.stringify(expectedVault.replaceAll("\\", "/").toLowerCase())})throw new Error('Refusing non-dev-vault');
- const p=app.plugins.getPlugin('tasknotes-timer-pane'),tn=app.plugins.getPlugin('tasknotes'),api=tn?.api;
+ const p=app.plugins.getPlugin('tasknotes-task-ctrl'),tn=app.plugins.getPlugin('tasknotes'),api=tn?.api;
  const ready=api?.lifecycle.isReady()===true;
  const leaves=app.workspace.getLeavesOfType('tasknotes-timer-pane');
  const tasks=ready?await api.tasks.list():[];
@@ -37,7 +37,7 @@ const inspect = evaluate(`(async()=>{
   leaves:leaves.map(l=>({state:l.view.getState(),name:l.view.getDisplayText(),bridge:l.view.services?.gateway.getState(),text:l.view.contentEl.textContent})),files};
 })()`);
 inspect.files = inspect.files.map(({ path, raw }) => ({ path, sha256: hash(raw) }));
-const installedDir = path.join(expectedVault, ".obsidian/plugins/tasknotes-timer-pane");
+const installedDir = path.join(expectedVault, ".obsidian/plugins/tasknotes-task-ctrl");
 const data = readFileSync(path.join(installedDir, "data.json"));
 const backupPath = path.join(os.tmpdir(), `tasknotes-phase7-readonly-snapshot-${Date.now()}.json`);
 writeFileSync(backupPath, data, { flag: "wx" });

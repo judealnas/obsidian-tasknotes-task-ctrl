@@ -72,7 +72,7 @@ try {
   if ($launchExit -eq 0) {
     $readyLine = $launchOut | Where-Object { "$_" -like "UAT Obsidian ready:*" } | Select-Object -Last 1
     if ($readyLine -and ("$readyLine" -match 'vault=(.+?) port=')) {
-      $installedMain = Join-Path $Matches[1] ".obsidian\plugins\tasknotes-timer-pane\main.js"
+      $installedMain = Join-Path $Matches[1] ".obsidian\plugins\tasknotes-task-ctrl\main.js"
       if ((Test-Path -LiteralPath $installedMain -PathType Leaf) -and (Test-Path -LiteralPath $checkoutMain -PathType Leaf)) {
         $installedMatch = (Get-FileHash -LiteralPath $installedMain -Algorithm SHA256).Hash -eq
                           (Get-FileHash -LiteralPath $checkoutMain -Algorithm SHA256).Hash
