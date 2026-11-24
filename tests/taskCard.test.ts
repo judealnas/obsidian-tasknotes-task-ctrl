@@ -174,7 +174,7 @@ test.each([
  s.card.dispose();
 });
 
-test("relationship disclosure navigates safely, preserves expansion and releases subscriptions", () => {
+test("relationship disclosure keeps plain links, completion counts and expansion", async () => {
  const subscriptions: Array<{ path: string; show: (snapshot: CardRelationshipSnapshot | null) => void; off: ReturnType<typeof vi.fn> }> = [];
  const relationships: CardRelationshipSource = { subscribe(path, show) { const off = vi.fn(); subscriptions.push({ path, show, off }); return off; } };
  const s = setup(undefined, undefined, relationships);
@@ -186,16 +186,28 @@ test("relationship disclosure navigates safely, preserves expansion and releases
   ], completedStatuses: ["finished"],
  };
  subscriptions[0]!.show(snapshot);
- expect(s.el.querySelector(".tntp-relationships__parents")!.textContent).toBe("Parent: Research paper");
+ const parents = s.el.querySelector(".tntp-relationships__parents")!;
+ expect(parents.querySelector(".tntp-relationships__link")!.textContent).toBe("Research paper");
  const details = s.el.querySelector("details")!;
  expect(details.getAttribute("open")).toBeNull();
  expect(details.querySelector("summary")!.textContent).toBe("Subtasks · 1 of 2 complete");
+ const relatedRenders = viewHost.renders.slice(1);
+ expect(relatedRenders.map(render => render.markdown)).toEqual(["[[Paper]]", "[[Figure]]", "[[Text]]"]);
+ for (const render of relatedRenders) render.resolve();
+ await flush();
  expect(details.querySelector("img")).toBeNull();
- const parentLink = s.el.querySelector(".tntp-relationships__parents")!.querySelector("a")!;
+ expect(details.querySelector("a")!.textContent).toBe("<img src=x> figure");
+ expect(details.querySelector(".tntp-relationships__status")).toBeNull();
+ const parentLink = parents.querySelector("a.internal-link")!;
  event(parentLink, "click", { ctrlKey: true });
  expect(workspace.openLinkText).toHaveBeenLastCalledWith("Paper.md", model.taskPath, true);
- event(details.querySelector("a")!, "click");
+ const childLink = details.querySelector("a.internal-link")!;
+ event(childLink, "click");
  expect(workspace.openLinkText).toHaveBeenLastCalledWith("Figure.md", model.taskPath, false);
+ expect(event(childLink, "contextmenu").defaultPrevented).toBe(true);
+ expect(s.gateway.menuCalls.map(call => call.taskPath)).toEqual(["Figure.md"]);
+ s.gateway.setTaskMenuAvailable(false);
+ expect(event(parentLink, "contextmenu").defaultPrevented).toBe(false);
  expect(s.controller.complete).not.toHaveBeenCalled();
  details.setAttribute("open", "");
  s.card.update(model, true);
@@ -218,4 +230,57 @@ test("relationship disclosure navigates safely, preserves expansion and releases
  expect(subscriptions[1]!.off).toHaveBeenCalledTimes(1);
  subscriptions[1]!.show(snapshot);
  expect(s.root.children).toHaveLength(0);
+});
+
+test("related TaskNotes chips own mouse actions and keep the related task keyboard target", async () => {
+ const child = { path: "Folder/Child.md", title: "Child task", status: "open", archived: false };
+ const s = setup(undefined, undefined, {
+  subscribe(_path, show) { show({ parents: [], subtasks: [child], completedStatuses: ["done"] }); return () => {}; },
+ });
+ const render = viewHost.renders[1]!;
+ render.resolve();
+ await flush();
+ // TaskNotes can replace the Markdown anchor after Obsidian has rendered it.
+ render.wrapper.querySelector("a")!.detach();
+ const chip = render.wrapper.createSpan({ text: "Simulated chip" });
+ const nativeMenu = vi.fn((event: { preventDefault(): void }) => event.preventDefault());
+ chip.addEventListener("contextmenu", nativeMenu);
+ event(chip, "click");
+ event(chip, "auxclick", { button: 1 });
+ event(chip, "keydown", { key: "Enter" });
+ expect(workspace.openLinkText).not.toHaveBeenCalled();
+ event(chip, "contextmenu");
+ expect(nativeMenu).toHaveBeenCalledTimes(1);
+ expect(s.gateway.menuCalls).toHaveLength(0);
+ const link = s.el.querySelector(".tntp-relationships__link")!;
+ event(link, "keydown", { key: "Enter" });
+ expect(workspace.openLinkText).toHaveBeenCalledWith(child.path, model.taskPath, false);
+ s.card.dispose();
+});
+
+test("related link renders are discarded on status refresh and on card disposal", async () => {
+ let publish!: (snapshot: CardRelationshipSnapshot) => void;
+ const s = setup(undefined, undefined, { subscribe(_path, show) { publish = show; return () => {}; } });
+ const parent = { path: "Parent.md", title: "Parent task", status: "open", archived: false };
+ const snapshot: CardRelationshipSnapshot = { parents: [parent], subtasks: [], completedStatuses: ["done"] };
+ publish(snapshot);
+ const oldLink = s.el.querySelector(".tntp-relationships__link")!;
+ const oldRender = viewHost.renders[1]!;
+ publish(snapshot);
+ expect(viewHost.renders).toHaveLength(2);
+ publish({ ...snapshot, parents: [{ ...parent, status: "done" }] });
+ expect(oldRender.component.unloads).toBe(1);
+ oldRender.resolve("chip");
+ await flush();
+ expect(s.el.querySelector(".tntp-relationships__link")!.textContent).toBe("Parent task");
+ event(oldLink, "click");
+ event(oldLink, "contextmenu");
+ expect(workspace.openLinkText).not.toHaveBeenCalled();
+ expect(s.gateway.menuCalls).toHaveLength(0);
+ const pending = viewHost.renders[2]!;
+ s.card.dispose();
+ pending.resolve("chip");
+ await flush();
+ expect(s.root.children).toHaveLength(0);
+ expect(viewHost.renders.every(render => render.component.unloads === 1)).toBe(true);
 });

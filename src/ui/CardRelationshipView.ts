@@ -1,21 +1,31 @@
-import { Keymap, type App } from "obsidian";
+import type { App } from "obsidian";
+import { taskDisplayKey } from "../model/timeMath";
+import type { TaskNotesGateway } from "../tasknotes/TaskNotesBridge";
 import type { TaskInfo } from "../tasknotes/runtime-api.types";
 import type { CardRelationshipSnapshot, CardRelationshipSource } from "../state/CardRelationships";
+import { TaskTitle } from "./TaskTitle";
 
-/** Read-only note navigation; native details retains keyboard and expansion behavior. */
+interface CardRelationshipOptions {
+ app: App;
+ gateway: Pick<TaskNotesGateway, "showTaskMenu">;
+ source?: CardRelationshipSource;
+}
+
+/** Task links and their render owners within the card's native disclosure. */
 export class CardRelationshipView {
  private readonly root: HTMLElement;
  private readonly parents: HTMLElement;
  private readonly details: HTMLDetailsElement;
  private readonly summary: HTMLElement;
  private readonly list: HTMLElement;
+ private readonly links: TaskTitle[] = [];
  private path: string | null = null;
  private unsubscribe?: () => void;
  private generation = 0;
  private signature = "";
  private disposed = false;
 
- constructor(parent: HTMLElement, private readonly app: App, private readonly source?: CardRelationshipSource) {
+ constructor(parent: HTMLElement, private readonly options: CardRelationshipOptions) {
   this.root = parent.createDiv({ cls: "tntp-relationships tntp-relationships--empty" });
   this.parents = this.root.createDiv({ cls: "tntp-relationships__parents" });
   this.details = this.root.createEl("details", { cls: "tntp-relationships__subtasks" });
@@ -31,26 +41,29 @@ export class CardRelationshipView {
   this.details.removeAttribute("open");
   this.signature = "";
   this.render(null);
-  this.unsubscribe = this.source?.subscribe(path, snapshot => {
+  this.unsubscribe = this.options.source?.subscribe(path, snapshot => {
    if (!this.disposed && generation === this.generation) this.render(snapshot);
   });
  }
 
  dispose(): void {
+  if (this.disposed) return;
   this.disposed = true;
   this.generation++;
   this.unsubscribe?.();
+  this.clearLinks();
   this.root.detach();
  }
 
  private render(snapshot: CardRelationshipSnapshot | null): void {
   const signature = JSON.stringify(snapshot && {
-   parents: snapshot.parents.map(task => [task.path, task.title]),
-   subtasks: snapshot.subtasks.map(task => [task.path, task.title, task.status]),
+   parents: snapshot.parents.map(taskDisplayKey),
+   subtasks: snapshot.subtasks.map(taskDisplayKey),
    completedStatuses: snapshot.completedStatuses,
   });
   if (signature === this.signature) return;
   this.signature = signature;
+  this.clearLinks();
   const parents = snapshot?.parents ?? [];
   const subtasks = snapshot?.subtasks ?? [];
   this.root.toggleClass("tntp-relationships--empty", !parents.length && !subtasks.length);
@@ -69,19 +82,19 @@ export class CardRelationshipView {
   this.list.empty();
   for (const task of subtasks) {
    const row = this.list.createEl("li");
-   row.createSpan({ cls: "tntp-relationships__status", text: statusesKnown ? completed.has(task.status) ? "✓" : "○" : "•", attr: { "aria-hidden": "true" } });
-   row.createSpan({ cls: "tntp-visually-hidden", text: `${statusesKnown ? completed.has(task.status) ? "Complete" : "Incomplete" : task.status}: ` });
    this.link(row, task);
   }
  }
 
  private link(parent: HTMLElement, task: TaskInfo): void {
-  const sourcePath = this.path ?? "";
-  const link = parent.createEl("a", { cls: "internal-link tntp-relationships__link", text: task.title || task.path, attr: { href: task.path, "data-href": task.path } });
-  link.addEventListener("click", event => {
-   event.preventDefault();
-   event.stopPropagation();
-   if (!this.disposed && this.path === sourcePath) void this.app.workspace.openLinkText(task.path, sourcePath, Keymap.isModEvent(event)).catch((error: unknown) => console.error("TaskNotes Task Control: could not open related task", error));
-  });
+  this.links.push(new TaskTitle(parent, { taskPath: task.path, title: task.title || task.path, displayKey: "" }, {
+   app: this.options.app,
+   gateway: this.options.gateway,
+   relationship: { sourcePath: this.path ?? "" },
+  }));
+ }
+
+ private clearLinks(): void {
+  for (const link of this.links.splice(0)) link.dispose();
  }
 }

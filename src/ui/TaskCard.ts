@@ -175,7 +175,7 @@ export class TaskCard extends Component {
 		const titleOwner = new TaskTitle(card, timer, { app: this.app, gateway: this.options.gateway });
 		const title = titleOwner.title; const titleLabel = titleOwner.titleLabel;
 		const metadata = card.createDiv({ cls: ["tntp-label", "tntp-staged-metadata"] });
-  const relationships = new CardRelationshipView(card, this.app, this.options.relationships);
+  const relationships = new CardRelationshipView(card, { app: this.app, gateway: this.options.gateway, source: this.options.relationships });
   relationships.update(timer.taskPath);
 
 		const session = card.createDiv({ cls: ["tntp-stat", "tntp-stat--session"] });
