@@ -28,7 +28,7 @@ An Obsidian plugin that adds a dockable pane for monitoring and controlling Task
 
 See the [BRAT guide](https://github.com/TfTHacker/obsidian42-brat/blob/main/BRAT-DEVELOPER-GUIDE.md) for details about latest and frozen versions. See the [0.4.0 release notes](docs/releases/0.4.0.md) for the release summary and verification limits.
 
-The [0.5.0-beta.1 preview](docs/releases/0.5.0-beta.1.md) adds parent links and expandable subtasks to cards. A real BRAT update from 0.4.0 to this beta preserved the saved idle card and its order in a disposable desktop vault. See the [native follow-up evidence](.planning/verification/2026-11-24-native-followup.md) for the tested versions and scope.
+The [0.5.0-beta.2 preview](docs/releases/0.5.0-beta.2.md) adds TaskNotes-rendered relationship chips and compact card styling. The beta.1 feature set and desktop BRAT update evidence remain described in the [native follow-up record](.planning/verification/2026-11-24-native-followup.md); beta.2 itself has not been installed through BRAT. Physical mobile behavior remains unverified.
 
 ### Manual install
 
@@ -74,7 +74,7 @@ Version 0.3.0 added **Staged** beside **Timers**, with independent saved order, 
 
 Cards use fixed details: staged date, relative age, and context on one line, for example **Nov 18 · today · @home**. Multiple contexts appear as **@home, @work**; missing contexts add no separator. Timer cards without a staged date show just their contexts. Tags are not displayed.
 
-Cards in both tabs show parent task links and a collapsed subtask summary, for example **Subtasks · 1 of 3 complete**. Expand the summary to see immediate subtasks. In the current development build, these links use the same TaskNotes rendering as card titles: when TaskNotes' link overlay is enabled, its chips provide status and interaction controls. Right-click a parent or subtask to open its TaskNotes menu. The card's Complete action still applies to its main task. Empty or unavailable relationship sections are omitted. This requires TaskNotes' public relationship API; timers continue to work when those optional features are unavailable. The published 0.5.0-beta.1 still uses plain relationship links with informational status symbols.
+Cards in both tabs show parent task chips and a collapsed subtask summary, for example **Subtasks · 1 of 3 complete**. Expand the summary to see immediate subtask chips. Relationship chips use TaskNotes' title renderer, including its native status and interaction controls when the TaskNotes link overlay is enabled. Right-click a parent or subtask to open its TaskNotes menu. Scheduled dates are hidden in the pane's title chips. The card's Complete action still applies to its main task. Empty or unavailable relationship sections are omitted. This requires TaskNotes' public relationship API; timers continue to work when those optional features are unavailable. The published beta.1 uses plain relationship links with informational status symbols; beta.2 includes the chip renderer.
 
 In either task picker, **Enter** selects a result and **Shift+Enter** creates a new task from the current search query using TaskNotes' natural-language parser. Creation waits for pending parsing; queries containing only properties must be edited to include a task title. The saved task is staged or added as an idle timer card. Creation happens inline; it does not open TaskNotes' separate creation window.
 
