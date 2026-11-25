@@ -9,6 +9,7 @@ interface CardRelationshipOptions {
  app: App;
  gateway: Pick<TaskNotesGateway, "showTaskMenu">;
  source?: CardRelationshipSource;
+ onSnapshot?: (snapshot: CardRelationshipSnapshot) => void;
 }
 
 /** Task links and their render owners within the card's native disclosure. */
@@ -42,7 +43,9 @@ export class CardRelationshipView {
   this.signature = "";
   this.render(null);
   this.unsubscribe = this.options.source?.subscribe(path, snapshot => {
-   if (!this.disposed && generation === this.generation) this.render(snapshot);
+   if (this.disposed || generation !== this.generation) return;
+   this.render(snapshot);
+   if (snapshot) this.options.onSnapshot?.(snapshot);
   });
  }
 

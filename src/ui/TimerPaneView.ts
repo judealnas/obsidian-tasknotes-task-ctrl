@@ -16,9 +16,10 @@ import type { StagingController } from "../state/StagingController";
 import { displayTitle, taskDisplayKey } from "../model/timeMath";
 import { normalizeTimerPath } from "../model/pomodoroOwnership";
 import { orderStaged } from "../model/staging";
+import { stagedHierarchy } from "../model/stagedHierarchy";
 import type { StagedOrderStore } from "../state/StagedOrderStore";
 import { CardList } from "./CardList";
-import { CardRelationships } from "../state/CardRelationships";
+import { CardRelationships, type CardRelationshipSnapshot } from "../state/CardRelationships";
 import {
 	derivePaneState,
 	detectWakeGap,
@@ -93,6 +94,7 @@ export class TimerPaneView extends ItemView {
 	/** Cards by timer key, in display order. */
 	private cards: CardList<TaskCardModel, TaskCard> | null = null;
 	private stagedCards: CardList<TaskCardModel, TaskCard> | null = null;
+	private stagedRelationships = new Map<string, CardRelationshipSnapshot>();
 	private relationships: CardRelationships | null = null;
 	private tab: PaneTab = "timers";
 	private readonly paneId = `tntp-pane-${++nextPaneId}`;
@@ -143,6 +145,7 @@ export class TimerPaneView extends ItemView {
 		this.stagedCards?.dispose();
 		this.cards = null;
 		this.relationships?.dispose();
+		this.stagedRelationships.clear();
 		const relationships = new CardRelationships(gateway);
 		this.relationships = relationships;
 		this.register(() => relationships.dispose());
@@ -158,9 +161,23 @@ export class TimerPaneView extends ItemView {
 		const stagedPanel = root.createDiv({ cls: ["tntp-panel", "tntp-panel--staged"] });
 		const timersPanel = root.createDiv({ cls: ["tntp-panel", "tntp-panel--timers"] });
 		const stagedList = stagedPanel.createDiv({ cls: "tntp-cards" });
+		let stagedRenderScheduled = false;
 		this.stagedCards = new CardList(stagedList, {
 			key: timer => timer.taskPath,
-			create: (parent, timer) => new TaskCard(parent, timer, { app: this.app, gateway, relationships, controller: this.services.controller, completion: this.services.completion, isBusy: () => this.isBusy(), unstage: this.services.stagingController ? target => this.services.stagingController!.unstage(target) : undefined }),
+			create: (parent, timer) => new TaskCard(parent, timer, {
+				app: this.app, gateway, relationships,
+				controller: this.services.controller, completion: this.services.completion, isBusy: () => this.isBusy(),
+				unstage: this.services.stagingController ? target => this.services.stagingController!.unstage(target) : undefined,
+				onRelationships: snapshot => {
+					this.stagedRelationships.set(timer.taskPath, snapshot);
+					if (stagedRenderScheduled) return;
+					stagedRenderScheduled = true;
+					queueMicrotask(() => {
+						stagedRenderScheduled = false;
+						if (this.relationships === relationships) this.render();
+					});
+				},
+			}),
 			update: (card, timer) => card.update(timer, false),
 			dispose: card => card.dispose(),
 			commitOrder: order => this.services.stagedOrder?.reorder(order),
@@ -272,6 +289,7 @@ export class TimerPaneView extends ItemView {
 		this.cards?.dispose();
 		this.stagedCards?.dispose();
 		this.stagedCards = null;
+		this.stagedRelationships.clear();
 		this.relationships?.dispose();
 		this.relationships = null;
 		this.els = null;
@@ -424,7 +442,8 @@ export class TimerPaneView extends ItemView {
 			const timed = matches.find(timer => timer.state === "running") ?? matches[0];
 			return { ...(timed ?? { state: "idle" as const, taskPath: item.taskPath, title: displayTitle(item.task.title, item.taskPath), displayKey: taskDisplayKey(item.task) }), task: item.task, stagedCard: true, stagedMetadata: item.metadata };
 		}) : [];
-		this.stagedCards?.reconcile(stagedModels);
+		for (const path of this.stagedRelationships.keys()) if (!stagedPaths.has(path)) this.stagedRelationships.delete(path);
+		this.stagedCards?.reconcile(stagedModels, stagedHierarchy(stagedModels.map(model => model.taskPath), this.stagedRelationships));
 		const staged = els.tabs.staged;
 		if (connected) {
 			setTextIfChanged(staged.heading, "");

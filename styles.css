@@ -129,6 +129,81 @@
 .tntp-card--staged.tntp-card--paused .tntp-stop { display: none; }
 .tntp-card--staged .tntp-handle, .tntp-card--pending .tntp-handle { inset-inline-end: calc(var(--size-4-6) + var(--size-4-3)); }
 .tntp-card--staged .tntp-title, .tntp-card--pending .tntp-title { padding-inline-end: calc(var(--size-4-6) * 2); }
+.tntp-card--staged[hidden],
+.tntp-card--idle .tntp-staged-stats,
+.tntp-group-toggle[hidden] { display: none; }
+.tntp-panel--staged {
+	--tntp-indent-step: 16px;
+}
+@container tntp-pane (max-width: 300px) {
+	.tntp-panel--staged { --tntp-indent-step: 10px; }
+}
+.tntp-card--staged {
+	margin-inline-start: calc(var(--tntp-staged-depth, 0) * var(--tntp-indent-step));
+}
+.tntp-tree-guide {
+	/* Each segment starts in the gap above its card so the branches stay connected. */
+	--tntp-guide-top: calc(-1 * (var(--size-4-3) + var(--border-width)));
+	--tntp-guide-elbow: calc(var(--size-4-4) + var(--size-4-3));
+	--tntp-guide-color: var(--nav-indentation-guide-color, var(--background-modifier-border-hover));
+	position: absolute;
+	pointer-events: none;
+	inset-block: var(--tntp-guide-top) calc(-1 * var(--border-width));
+	inset-inline-start: calc((var(--tntp-guide-column) - var(--tntp-staged-depth) - 0.5) * var(--tntp-indent-step) - var(--border-width));
+	inline-size: calc(var(--tntp-indent-step) / 2 + var(--border-width));
+	box-sizing: border-box;
+	border-inline-start: var(--border-width) solid var(--tntp-guide-color);
+}
+.tntp-tree-guide--end {
+	inset-block-end: auto;
+	block-size: calc(var(--tntp-guide-elbow) - var(--tntp-guide-top));
+	border-block-end: var(--border-width) solid var(--tntp-guide-color);
+}
+.tntp-tree-guide--branch::after {
+	content: "";
+	position: absolute;
+	inset-inline: 0;
+	inset-block-start: calc(var(--tntp-guide-elbow) - var(--tntp-guide-top) - var(--border-width));
+	border-block-start: var(--border-width) solid var(--tntp-guide-color);
+}
+.tntp-staged-title-row {
+	display: flex;
+	align-items: flex-start;
+	gap: var(--size-4-1);
+}
+.tntp-staged-title-row .tntp-title { flex: 1; min-width: 0; }
+.tntp-group-toggle {
+	flex: none;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	width: var(--size-4-6);
+	height: var(--size-4-6);
+	min-width: 0;
+	min-height: 0;
+	box-sizing: border-box;
+	padding: 0;
+	border: 0;
+	background: transparent;
+	box-shadow: none;
+	color: var(--text-muted);
+}
+.tntp-group-toggle:hover { color: var(--text-normal); }
+.tntp-staged-stats {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: baseline;
+	gap: var(--size-4-1) var(--size-4-3);
+	margin-block-start: var(--size-4-2);
+}
+.tntp-staged-stats .tntp-stat {
+	flex-direction: row;
+	align-items: baseline;
+	gap: var(--size-4-1);
+	margin: 0;
+}
+.tntp-staged-stats .tntp-clock { font-size: var(--font-ui-medium); letter-spacing: normal; }
+.tntp-staged-stats .tntp-total { color: var(--text-muted); }
 .tntp-unstage {
 	position: absolute;
 	inset-block-start: var(--size-4-2);
@@ -369,6 +444,7 @@
 		padding-inline-end: 0;
 		padding-block-start: var(--size-4-6);
 	}
+	.tntp-group-toggle { margin-block-start: var(--size-4-6); }
 }
 
 /* Paused cards keep their height; muted timer numbers indicate the state. */

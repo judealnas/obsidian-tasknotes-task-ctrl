@@ -117,6 +117,81 @@ test("both tabs share task relationship reads without polling on timer ticks", a
  expect(readSubtasks).toHaveBeenCalledTimes(1);
 });
 
+test("staged subtask cards nest separately from their native relationship links", async () => {
+ const task = (name: string, staged: boolean) => ({
+  path: `${name}.md`, title: name, status: "open", archived: false, staged: staged ? "2026-11-12" : null,
+ });
+ const parent = task("Workshop", true);
+ const child = task("Exercises", true);
+ const sibling = task("Handout", true);
+ const grandchild = task("Solution", true);
+ const unstaged = task("Practice", false);
+ const standalone = task("Report", true);
+ const otherChild = task("Outline", true);
+ const s = setup([], undefined, true);
+ s.stagedOrder.set([parent.path, grandchild.path, standalone.path, child.path, sibling.path, otherChild.path]);
+ s.gateway.setUserFields([{ id: "s", key: "staged", displayName: "Staged", type: "date" }]);
+ s.gateway.listTasks = () => Promise.resolve([parent, grandchild, standalone, child, sibling, otherChild, unstaged]);
+ const subtasks = new Map([[parent.path, [child, sibling]], [child.path, [grandchild, unstaged]], [standalone.path, [otherChild]]]);
+ s.gateway.subtasks = path => Promise.resolve(subtasks.get(path) ?? []);
+ s.gateway.parents = path => Promise.resolve(path === grandchild.path ? [child] : []);
+ await s.view.onOpen(); await s.staging.refreshNow(); await flush(); await flush();
+ const panel = s.root.querySelector(".tntp-panel--staged")!;
+ const cards = () => panel.querySelectorAll(".tntp-card");
+ const titleOrder = () => panel.querySelectorAll(".tntp-title").map(el => el.textContent);
+ expect(titleOrder()).toEqual(["Workshop", "Exercises", "Solution", "Handout", "Report", "Outline"]);
+ const [parentCard, childCard, grandchildCard, siblingCard, , otherChildCard] = cards();
+ expect(cards().map(card => card.style.getPropertyValue("--tntp-staged-depth"))).toEqual(["0", "1", "2", "1", "0", "1"]);
+ expect(childCard!.querySelector(".tntp-tree-guide--branch")).toBeTruthy();
+ expect(grandchildCard!.querySelector(".tntp-tree-guide--line")).toBeTruthy();
+ expect(siblingCard!.querySelector(".tntp-tree-guide--end")).toBeTruthy();
+ const practiceRender = viewHost.renders.find(entry => entry.markdown === "[[Practice]]")!;
+ practiceRender.resolve("chip"); await flush();
+ expect(childCard!.querySelector(".tntp-relationships__list")!.querySelectorAll("li")).toHaveLength(2);
+ expect(childCard!.querySelector(".tntp-relationships__list")!.textContent).toContain("Simulated chip");
+
+ const parentToggle = parentCard!.querySelector(".tntp-group-toggle")!;
+ const childToggle = childCard!.querySelector(".tntp-group-toggle")!;
+ event(childToggle, "click");
+ expect(grandchildCard!.hidden).toBe(true);
+ event(parentToggle, "click");
+ expect(childCard!.hidden).toBe(true);
+ expect(parentCard!.querySelector(".tntp-relationships__list")!.textContent).toContain("Exercises");
+ event(parentToggle, "click");
+ expect(childCard!.hidden).toBe(false);
+ expect(grandchildCard!.hidden).toBe(true);
+ event(childToggle, "click");
+ expect(grandchildCard!.hidden).toBe(false);
+
+ const childHandle = childCard!.querySelector(".tntp-handle")!;
+ event(childHandle, "keydown", { key: "ArrowDown" });
+ expect(titleOrder()).toEqual(["Workshop", "Handout", "Exercises", "Solution", "Report", "Outline"]);
+ expect(grandchildCard!.querySelector(".tntp-tree-guide--line")).toBeNull();
+ const order = s.stagedOrder.get();
+ const dataTransfer = transfer();
+ event(childHandle, "dragstart", { dataTransfer });
+ event(otherChildCard!, "dragover", { dataTransfer, clientY: 10 });
+ expect(otherChildCard!.classes.has("tntp-card--drop-before")).toBe(false);
+ event(otherChildCard!, "drop", { dataTransfer, clientY: 10 });
+ expect(s.stagedOrder.get()).toEqual(order);
+ event(childHandle, "dragend");
+ event(childHandle, "dragstart", { dataTransfer });
+ event(siblingCard!, "dragover", { dataTransfer, clientY: 10 });
+ expect(siblingCard!.classes.has("tntp-card--drop-before")).toBe(true);
+ event(siblingCard!, "drop", { dataTransfer, clientY: 10 });
+ expect(titleOrder()).toEqual(["Workshop", "Exercises", "Solution", "Handout", "Report", "Outline"]);
+ expect(grandchildCard!.querySelector(".tntp-tree-guide--line")).toBeTruthy();
+
+ event(parentCard!.querySelector(".tntp-handle")!, "keydown", { key: "ArrowDown" });
+ expect(titleOrder()).toEqual(["Report", "Outline", "Workshop", "Exercises", "Solution", "Handout"]);
+ expect(cards()[2]).toBe(parentCard);
+ child.staged = null; await s.staging.refreshNow(); await flush();
+ expect(titleOrder()).toEqual(["Report", "Outline", "Workshop", "Solution", "Handout"]);
+ expect(cards()[3]).toBe(grandchildCard);
+ expect(grandchildCard!.style.getPropertyValue("--tntp-staged-depth")).toBe("1");
+ await s.view.onClose(); s.view.unload();
+});
+
 test("mobile arrows reorder both owning lists, announce once and retain boundary focus", async () => {
  Platform.isMobile = true;
  const s = setup([timer(), timer({ taskPath: "B.md", sessionKey: "b", state: "paused", title: "Task B", segmentStartMs: null })], undefined, true);
