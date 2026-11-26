@@ -67,6 +67,22 @@ test("product display name changes while saved pane identity stays unchanged", (
  expect(s.view.getViewType()).toBe("tasknotes-timer-pane"); s.view.unload();
 });
 
+test("uses the compact chip styles only when connected to TaskNotes 5", async () => {
+ const s = setup();
+ let major = 4;
+ s.gateway.getTaskNotesMajorVersion = () => major;
+ await s.view.onOpen();
+ const pane = s.root.querySelector(".tntp-pane")!;
+ expect(pane.classList.contains("tntp-pane--tasknotes-v5")).toBe(false);
+ s.gateway.setState({ kind: "missing" });
+ major = 5;
+ s.gateway.setState({ kind: "ready" });
+ expect(pane.classList.contains("tntp-pane--tasknotes-v5")).toBe(true);
+ s.gateway.setState({ kind: "missing" });
+ expect(pane.classList.contains("tntp-pane--tasknotes-v5")).toBe(false);
+ await s.view.onClose(); s.view.unload();
+});
+
 test("fixed context metadata appears in both tabs without display controls", async () => {
  const task: TaskInfo = { path: "A.md", title: "Task A", status: "open", archived: false, contexts: ["work"], tags: ["urgent"] };
  const s = setup([timer({ task })], undefined, true);
@@ -438,6 +454,12 @@ test("a real staged card joins running and paused timer sessions without replaci
 	event(card.querySelector(".tntp-complete")!, "click");
 	event(action, "click"); for (let i = 0; i < 8; i++) await flush();
 	expect(card.querySelector(".tntp-pause-resume__label")!.textContent).toBe("Pause");
+	const timerCard = (view.contentEl as unknown as Element).querySelector(".tntp-panel--timers")!.querySelector(".tntp-card")!;
+	for (const activeCard of [card, timerCard]) {
+		const stats = activeCard.querySelector(".tntp-timer-stats")!;
+		expect(stats.querySelector(".tntp-clock")).toBeTruthy();
+		expect(stats.querySelector(".tntp-total")).toBeTruthy();
+	}
 	event(card.querySelector(".tntp-complete")!, "click");
 	await vi.advanceTimersByTimeAsync(2000); expect(card.querySelector(".tntp-clock")!.textContent).toBe("0:00:02");
 	event(action, "click"); for (let i = 0; i < 8; i++) await flush();

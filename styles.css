@@ -121,7 +121,7 @@
 
 .tntp-panel--has-staged .tntp-cards { display: flex; }
 .tntp-panel--staging-retry .tntp-message__retry { display: inline-block; }
-.tntp-card--idle .tntp-stat,
+.tntp-card--idle .tntp-timer-stats,
 .tntp-card--idle .tntp-stop,
 .tntp-staged-metadata:empty { display: none; }
 .tntp-staged-metadata { margin-block: var(--size-4-1); overflow-wrap: anywhere; }
@@ -130,7 +130,6 @@
 .tntp-card--staged .tntp-handle, .tntp-card--pending .tntp-handle { inset-inline-end: calc(var(--size-4-6) + var(--size-4-3)); }
 .tntp-card--staged .tntp-title, .tntp-card--pending .tntp-title { padding-inline-end: calc(var(--size-4-6) * 2); }
 .tntp-card--staged[hidden],
-.tntp-card--idle .tntp-staged-stats,
 .tntp-group-toggle[hidden] { display: none; }
 .tntp-panel--staged {
 	--tntp-indent-step: 16px;
@@ -189,21 +188,6 @@
 	color: var(--text-muted);
 }
 .tntp-group-toggle:hover { color: var(--text-normal); }
-.tntp-staged-stats {
-	display: flex;
-	flex-wrap: wrap;
-	align-items: baseline;
-	gap: var(--size-4-1) var(--size-4-3);
-	margin-block-start: var(--size-4-2);
-}
-.tntp-staged-stats .tntp-stat {
-	flex-direction: row;
-	align-items: baseline;
-	gap: var(--size-4-1);
-	margin: 0;
-}
-.tntp-staged-stats .tntp-clock { font-size: var(--font-ui-medium); letter-spacing: normal; }
-.tntp-staged-stats .tntp-total { color: var(--text-muted); }
 .tntp-unstage {
 	position: absolute;
 	inset-block-start: var(--size-4-2);
@@ -371,46 +355,91 @@
 	display: none;
 }
 
+/* A relationship link sizes to its contents. TaskNotes 5's note wrapper must let it. */
+.tntp-pane--tasknotes-v5 .tntp-title__md .tasknotes-plugin.tasknotes-inline-widget {
+	display: inline;
+	container-type: normal;
+}
+
+/* Keep TaskNotes 5's native chip controls in source order instead of using its narrow note grid. */
+.tntp-pane--tasknotes-v5 .tntp-title__md .tasknotes-plugin.tasknotes-inline-widget .task-card--layout-inline {
+	&,
+	& :is(.task-card__main-row, .task-card__content, .task-card__title, .task-card__title-text) {
+		display: inline;
+		width: auto;
+		white-space: normal;
+		overflow: visible;
+		overflow-wrap: anywhere;
+		vertical-align: baseline;
+	}
+
+	& .task-card__content { pointer-events: auto; }
+
+	& .task-card__metadata {
+		width: auto;
+		max-width: 55%;
+	}
+
+	& :is(.task-card__status-dot, .task-card__priority-dot, .task-card__context-menu) {
+		margin-inline-end: 0.25em;
+		vertical-align: middle;
+	}
+
+	& .task-card__date-slot--scheduled,
+	& .task-card__metadata:has(.task-card__date-slot--scheduled):not(:has(
+		.task-card__metadata-property:not(.task-card__metadata-date--scheduled, [hidden]),
+		.task-card__metadata-overflow:not([hidden])
+	)) {
+		display: none;
+	}
+
+	body:not(.is-mobile) & :is(.task-card__status-dot, .task-card__priority-dot, .task-card__context-menu) {
+		min-width: 0;
+		min-height: 0;
+	}
+
+	body:not(.is-mobile) &:not(:hover, :focus-within) .task-card__context-menu {
+		opacity: 0;
+	}
+}
+
 /* Every chip in the pane is being tracked, so TaskNotes' tracking outline adds nothing here. */
 .tntp-pane .tntp-title .task-card--actively-tracked::before {
 	display: none;
 }
 
-.tntp-stat--session {
-	display: flex;
-	flex-direction: column;
-	gap: var(--size-4-1);
-	margin-top: var(--size-4-4);
-}
-
-/*
- * Numbers match TaskNotes' Pomodoro timer: it asks for an undefined --tn-font-mono, so it
- * renders in the interface font, bold, spaced 0.05em. Tabular digits stop the clock jittering.
- */
-.tntp-clock {
-	font-family: var(--font-interface);
-	font-variant-numeric: tabular-nums;
-	font-size: min(calc(var(--font-ui-large) * 1.6), 17cqi);
-	font-weight: var(--font-bold);
-	line-height: 1.1;
-	white-space: nowrap;
-	letter-spacing: 0.05em;
-	color: var(--text-normal);
-}
-
-.tntp-stat--total {
+.tntp-timer-stats {
 	display: flex;
 	flex-wrap: wrap;
 	align-items: baseline;
-	gap: var(--size-4-2);
-	margin-top: var(--size-4-4);
+	gap: var(--size-4-1) var(--size-4-3);
+	margin-block-start: var(--size-4-2);
+}
+
+.tntp-stat {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: baseline;
+	gap: var(--size-4-1);
+}
+
+/* Tabular digits keep both readouts steady as the timer runs. */
+.tntp-clock {
+	font-family: var(--font-interface);
+	font-variant-numeric: tabular-nums;
+	font-size: var(--font-ui-medium);
+	font-weight: var(--font-bold);
+	line-height: 1.1;
+	white-space: nowrap;
+	letter-spacing: normal;
+	color: var(--text-normal);
 }
 
 .tntp-total {
 	font-family: var(--font-interface);
 	font-variant-numeric: tabular-nums;
 	font-size: var(--font-ui-small);
-	color: var(--text-normal);
+	color: var(--text-muted);
 }
 
 /* Stop timer: mod-cta keeps Obsidian's own colors, padding, height and focus ring. */
@@ -447,9 +476,8 @@
 	.tntp-group-toggle { margin-block-start: var(--size-4-6); }
 }
 
-/* Paused cards keep their height; muted timer numbers indicate the state. */
-.tntp-card--paused .tntp-clock,
-.tntp-card--paused .tntp-total {
+/* Muting the session clock keeps the layout steady when paused. */
+.tntp-card--paused .tntp-clock {
 	color: var(--text-muted);
 }
 
