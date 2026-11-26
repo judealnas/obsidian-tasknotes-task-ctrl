@@ -220,7 +220,7 @@ export class TaskCard extends Component {
   });
   relationships.update(timer.taskPath);
 
-		const stats = timer.stagedCard ? card.createDiv({ cls: "tntp-staged-stats" }) : card;
+		const stats = card.createDiv({ cls: "tntp-timer-stats" });
 		const session = stats.createDiv({ cls: ["tntp-stat", "tntp-stat--session"] });
 		session.createSpan({ cls: "tntp-label", text: "Session" });
 		const clock = session.createSpan({ cls: "tntp-clock", attr: { role: "timer", "aria-live": "off" } });
@@ -251,7 +251,9 @@ export class TaskCard extends Component {
 		setIcon(stop.createSpan({ cls: "tntp-stop__icon" }), "square");
 		const stopLabel = stop.createSpan({ cls: "tntp-stop__label", text: STOP_LABEL });
 		stop.addEventListener("click", () => void this.stopTask(key));
-		const complete = actions.createEl("button", { cls: "tntp-complete", text: "Complete" });
+		const complete = actions.createEl("button", { cls: "tntp-complete" });
+		setIcon(complete.createSpan({ cls: "tntp-complete__icon", attr: { "aria-hidden": "true" } }), "check");
+		complete.createSpan({ cls: "tntp-complete__label", text: "Complete" });
 		complete.addEventListener("click", () => {
 			const current = (this.disposed ? undefined : this.elements);
 			if (!current || complete.disabled || this.isBusy()) return;

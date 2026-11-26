@@ -60,6 +60,7 @@ export interface TaskNotesGateway {
 	priorities?(): Promise<TaskPriority[]>;
 	subtasks?(path: string): Promise<TaskInfo[]>;
 	parents?(path: string): Promise<TaskInfo[]>;
+	getTaskNotesMajorVersion?(): number | null;
 	getState(): BridgeState;
 	onState(listener: (state: BridgeState) => void): () => void;
 	onData(listener: () => void): () => void;
@@ -194,6 +195,12 @@ export class TaskNotesBridge implements TaskNotesGateway {
 
 	getState(): BridgeState {
 		return this.state;
+	}
+
+	getTaskNotesMajorVersion(): number | null {
+		const plugin = this.lookupPlugin();
+		const version = plugin && readVersion(plugin);
+		return version ? parseVersion(version)?.[0] ?? null : null;
 	}
 
 	onState(listener: (state: BridgeState) => void): () => void {

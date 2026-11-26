@@ -412,6 +412,7 @@ export class TimerPaneView extends ItemView {
 		if (!els) return;
 		const { state, timers } = this.currentTimers();
 		const connected = state === "running" || state === "idle";
+		els.root.toggleClass("tntp-pane--tasknotes-v5", connected && this.services.gateway.getTaskNotesMajorVersion?.() === 5);
 		els.start.setAttribute("aria-label", this.tab === "staged" ? "Stage tasks" : "Add task");
 		const gate = this.tab === "staged" ? { available: !!this.services.staging?.getSnapshot().canStage, reason: "Stage tasks" } : this.services.idleCards?.availability() ?? { available: false, reason: "Loading saved tasks" };
 		els.start.disabled = !connected || !gate.available || this.isBusy();
