@@ -423,6 +423,41 @@
 	gap: var(--size-4-1);
 }
 
+.tntp-card--idle.tntp-card--timer-mode .tntp-timer-stats { display: flex; }
+.tntp-card--idle.tntp-card--timer-mode:not(.tntp-card--countdown) .tntp-stat,
+.tntp-countdown-input[hidden] { display: none; }
+.tntp-card--staged.tntp-card--paused.tntp-card--countdown .tntp-stop { display: inline-flex; }
+
+.tntp-timer-mode {
+	display: inline-flex;
+	gap: 1px;
+	margin-inline-start: auto;
+	padding: 2px;
+	border: var(--border-width) solid var(--background-modifier-border);
+	border-radius: var(--radius-s);
+}
+.tntp-timer-mode button {
+	display: grid;
+	place-items: center;
+	width: var(--size-4-6);
+	height: var(--size-4-6);
+	padding: 0;
+	box-shadow: none;
+	background: transparent;
+	color: var(--text-muted);
+}
+.tntp-timer-mode button[aria-pressed="true"] {
+	background: var(--background-modifier-hover);
+	color: var(--text-accent);
+}
+.tntp-timer-mode button .svg-icon { width: var(--icon-s); height: var(--icon-s); }
+.tntp-countdown-input {
+	width: 10ch;
+	font-variant-numeric: tabular-nums;
+}
+.tntp-countdown-input[aria-invalid="true"] { border-color: var(--text-error); }
+.tntp-countdown-feedback { margin-block-start: var(--size-4-1); color: var(--text-accent); }
+
 /* Tabular digits keep both readouts steady as the timer runs. */
 .tntp-clock {
 	font-family: var(--font-interface);

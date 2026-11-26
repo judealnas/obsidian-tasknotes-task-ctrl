@@ -20,7 +20,7 @@ import { IdleCardStore } from "./state/IdleCardStore";
 import { PickerCreationController } from "./state/PickerCreationController";
 
 /** The data.json keys this plugin owns; everything else is kept as found. */
-const OWNED_KEYS = new Set(["completionStatus", "rolloverHour", "pauseRecordsVersion", "pauseRecords", "cardOrder", "stagedOrder", "completionRecordsVersion", "completionRecords", "idleTaskPathsVersion", "idleTaskPaths"]);
+const OWNED_KEYS = new Set(["completionStatus", "defaultCountdownMs", "rolloverHour", "pauseRecordsVersion", "pauseRecords", "cardOrder", "stagedOrder", "completionRecordsVersion", "completionRecords", "idleTaskPathsVersion", "idleTaskPaths"]);
 
 function extrasOf(data: unknown): Record<string, unknown> {
 	if (typeof data !== "object" || data === null || Array.isArray(data)) return {};
@@ -70,6 +70,7 @@ export default class TaskNotesTimerPanePlugin extends Plugin {
 				...this.idleCards?.serialize(),
     ...this.completions?.serialize(),
 				completionStatus: written.completionStatus,
+				...(written.defaultCountdownMs === undefined ? {} : { defaultCountdownMs: written.defaultCountdownMs }),
 				pauseRecordsVersion: PAUSE_RECORDS_VERSION,
 				pauseRecords: this.pauses?.serialize() ?? [],
 				// Omitted when empty, so a user who never reorders keeps an unchanged data.json.
@@ -170,7 +171,7 @@ export default class TaskNotesTimerPanePlugin extends Plugin {
 		});
 
 		// Registered synchronously so Obsidian can restore a saved pane leaf (PANE-03).
-		this.registerView(VIEW_TYPE_TIMER_PANE, (leaf) => new TimerPaneView(leaf, { gateway: bridge, store, controller, completion, completions, cardOrder, stagedOrder, staging, stagingController, idleCards, taskCreation }));
+		this.registerView(VIEW_TYPE_TIMER_PANE, (leaf) => new TimerPaneView(leaf, { gateway: bridge, store, controller, countdown: controller, completion, completions, cardOrder, stagedOrder, staging, stagingController, idleCards, taskCreation }));
 		this.settingsReady = this.loadData().then((data: unknown) => {
 			this.dataReadable = true;
 			this.paneSettings = loadSettings(data);
@@ -218,18 +219,23 @@ export default class TaskNotesTimerPanePlugin extends Plugin {
 		// Backstop for anything no event reports; a no-op unless TaskNotes is ready.
 		this.registerInterval(window.setInterval(() => store.resync(), SAFETY_RESYNC_MS));
 		this.registerInterval(window.setInterval(() => staging.resync(), SAFETY_RESYNC_MS));
+		this.registerInterval(window.setInterval(() => {
+			if (bridge.getState().kind === "ready") void controller.expireCountdowns(Date.now()).catch(() => log("Checking expired countdowns failed."));
+		}, 1000));
 		// Deleting or renaming a note in Obsidian emits no TaskNotes runtime event (Pitfall 4).
 		// These are Obsidian-owned events, so Obsidian's registry releases them on unload.
 		// The pause changes synchronously, before TaskNotes re-indexes the note under its new
 		// path and before the next refresh reads it (D-12). Also works for folders.
 		this.registerEvent(this.app.vault.on("delete", file => {
 			idleCards.removePath(file.path);
+			controller.moveCountdownDrafts(file.path);
 			pauses.removePath(file.path);
 			store.requestRefresh();
 			staging.invalidate(); staging.requestRefresh();
 		}));
 		this.registerEvent(this.app.vault.on("rename", (file, oldPath) => {
 			idleCards.renamePath(oldPath, file.path);
+			controller.moveCountdownDrafts(oldPath, file.path);
 			pauses.renamePath(oldPath, file.path);
 			staging.renamePath(oldPath, file.path);
 			stagedOrder.renamePath(oldPath, file.path);

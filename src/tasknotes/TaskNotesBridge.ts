@@ -101,7 +101,7 @@ export interface TaskNotesGateway {
 	toggleCompleteInstance(path: string, date: string, context: TaskNotesMutationContext): Promise<TaskInfo>;
  materializeOccurrence?(path: string, date: string, context: TaskNotesMutationContext): Promise<TaskInfo>;
  materializationAvailability?(): { available: boolean; reason: string };
-	start(path: string, options: Record<string, never>, context: TaskNotesMutationContext): Promise<void>;
+	start(path: string, options: Record<string, never>, context: TaskNotesMutationContext): Promise<TaskInfo | void>;
 	/** Stops the task's open entry through TaskNotes' own api.time.stop; resolves the task as TaskNotes saved it. */
 	stop(taskPath: string, context: TaskNotesMutationContext): Promise<TaskInfo>;
 	/** A TaskNotes error as `{ code, message }`; code is null when TaskNotes cannot classify it. */
@@ -408,9 +408,9 @@ export class TaskNotesBridge implements TaskNotesGateway {
   return fields;
  }
 
- async start(path: string, options: Record<string, never>, context: TaskNotesMutationContext): Promise<void> {
+ async start(path: string, options: Record<string, never>, context: TaskNotesMutationContext): Promise<TaskInfo | void> {
   const api = this.featureApi("time.write", "time.start", api => typeof api.time.start === "function");
-  await api.time.start!(path, options, context);
+  return await api.time.start!(path, options, context);
  }
 
 	completionAvailable(): boolean {

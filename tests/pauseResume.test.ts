@@ -70,6 +70,35 @@ afterEach(() => {
 	vi.useRealTimers();
 });
 
+test("a countdown resumes with its remaining time and expires without stopping another timer", async () => {
+	const ctx = await setup([email()]);
+	const target = { taskPath: REPORT_PATH, title: "Write quarterly report", countdownMs: 2 * MINUTE };
+	expect(await ctx.controller.start(target)).toBe("started");
+	const began = Date.now();
+	vi.setSystemTime(began + MINUTE);
+	expect(await ctx.pauseCard(REPORT_PATH)).toBe("paused");
+	expect(ctx.card(REPORT_PATH)).toMatchObject({ countdownMs: 2 * MINUTE, accumulatedMs: MINUTE });
+	vi.setSystemTime(began + 5 * MINUTE);
+	await ctx.controller.expireCountdowns(Date.now());
+	expect(ctx.tn.stopCalls).toHaveLength(1);
+	expect(await ctx.resumeCard(REPORT_PATH)).toBe("resumed");
+	vi.setSystemTime(began + 6 * MINUTE);
+	await ctx.controller.expireCountdowns(Date.now());
+	expect(ctx.tn.stopCalls.map(call => call.path)).toEqual([REPORT_PATH, REPORT_PATH]);
+	expect(ctx.timers().map(timer => timer.taskPath)).toEqual([EMAIL_PATH]);
+	expect(ctx.controller.countdownDraft(REPORT_PATH)).toMatchObject({ enabled: true, expired: true });
+});
+
+test("stopping a paused countdown prepares its remaining duration for a new start", async () => {
+	const ctx = await setup([]);
+	const target = { taskPath: REPORT_PATH, title: "Write quarterly report", countdownMs: 45 * MINUTE };
+	expect(await ctx.controller.start(target)).toBe("started");
+	vi.setSystemTime(Date.now() + 408_000);
+	expect(await ctx.pauseCard(REPORT_PATH)).toBe("paused");
+	expect(await ctx.controller.stopPaused(target)).toBe("cleared");
+	expect(ctx.controller.countdownDraft(REPORT_PATH)).toMatchObject({ enabled: true, text: "38:12" });
+});
+
 describe("Pause (CTRL-02)", () => {
 	test("pausing the only running card closes its entry once and keeps the card, frozen and paused", async () => {
 		const ctx = await setup([report()]);

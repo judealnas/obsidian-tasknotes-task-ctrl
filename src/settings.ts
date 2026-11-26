@@ -1,7 +1,8 @@
 import type { TaskStatus } from "./tasknotes/runtime-api.types";
+import { validCountdownMs } from "./model/countdown";
 
 /** Null is separate from every possible TaskNotes status string. */
-export interface TimerPaneSettings { completionStatus: string | null; }
+export interface TimerPaneSettings { completionStatus: string | null; defaultCountdownMs?: number; }
 export const DEFAULT_SETTINGS: TimerPaneSettings = { completionStatus: null };
 
 export function loadSettings(data: unknown): TimerPaneSettings {
@@ -10,6 +11,7 @@ export function loadSettings(data: unknown): TimerPaneSettings {
 	const value = record.completionStatus;
 	return {
 		completionStatus: typeof value === "string" ? value : null,
+		...(validCountdownMs(record.defaultCountdownMs) ? { defaultCountdownMs: record.defaultCountdownMs } : {}),
 	};
 }
 

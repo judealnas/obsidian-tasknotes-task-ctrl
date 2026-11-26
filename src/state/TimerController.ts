@@ -6,17 +6,20 @@
  */
 import { isNoActiveSessionError, stopFailedNotice } from "../model/errors";
 import { normalizeTimerPath, sameEntry, selectRegularStopTargets, type Ownership } from "../model/pomodoroOwnership";
-import { pausedFromStop, type PausedRecord } from "../model/pauseLedger";
+import { pausedFromStop, sessionValueMs, type PausedRecord, type PauseRecord } from "../model/pauseLedger";
+import { DEFAULT_COUNTDOWN_MS, formatCountdown, validCountdownMs } from "../model/countdown";
 import { displayTitle, parseMs } from "../model/timeMath";
 import { MUTATION_SOURCE, type TaskNotesGateway } from "../tasknotes/TaskNotesBridge";
 import { PauseStore } from "./PauseStore";
 import type { TimerStore } from "./TimerStore";
 import type { WriteQueue } from "./WriteQueue";
 import { resolveCompletionStatus, type TimerPaneSettings } from "../settings";
+import type { TaskInfo } from "../tasknotes/runtime-api.types";
 
 /** The displayed timer, captured by the view at click time. */
 export type StopTarget = { taskPath: string; startTime: string; title: string };
-export type StartTarget = { taskPath: string; title: string };
+export type StartTarget = { taskPath: string; title: string; countdownMs?: number };
+type CountdownDraft = { enabled: boolean; text: string; expired?: boolean };
 export type StartOutcome = "started" | "already-running" | "pomodoro" | "failed" | "busy";
 export type CompleteOutcome = "completed" | "partial" | "unavailable" | "failed" | "busy";
 /** A paused card, captured by the view at click time. */
@@ -100,7 +103,9 @@ export class TimerController {
 					try {
 						// Public stop is path-only. External replacement after this final read
 						// can still race this write; the pane queue cannot make it atomic.
-						await gateway.stop(target.taskPath, { source: MUTATION_SOURCE, reason: "user stop all", correlationId: newCorrelationId() });
+						const record = this.runningCountdown(target);
+						const task = await gateway.stop(target.taskPath, { source: MUTATION_SOURCE, reason: "user stop all", correlationId: newCorrelationId() });
+						if (record) this.rememberStop(record, this.closedAt(task, target.startTime));
 						outcome.stopped++;
 					} catch (error) {
 						if (isNoActiveSessionError(gateway.normalizeError(error).message)) outcome.skipped++;
@@ -110,6 +115,7 @@ export class TimerController {
 				if (outcome.ownershipUnreadable) return;
 				const records = pauses.records();
 				const kept = records.filter(record => record.state !== "paused");
+				for (const record of records) if (record.state === "paused") this.rememberStop(record, Date.now());
 				outcome.cleared = records.length - kept.length;
 				if (outcome.cleared > 0) pauses.applyReconcile(kept);
 			});
@@ -128,6 +134,53 @@ export class TimerController {
 	private pending = 0;
 	private completing = false;
 	private readonly busyListeners = new Set<() => void>();
+	private readonly drafts = new Map<string, CountdownDraft>();
+
+	countdownDraft(path: string): CountdownDraft {
+		return this.drafts.get(normalizeTimerPath(path)) ?? {
+			enabled: false, text: formatCountdown(this.deps.getSettings?.().defaultCountdownMs ?? DEFAULT_COUNTDOWN_MS),
+		};
+	}
+
+	setCountdownDraft(path: string, draft: CountdownDraft): void {
+		this.drafts.set(normalizeTimerPath(path), draft);
+	}
+
+	moveCountdownDrafts(path: string, to?: string): void {
+		const from = normalizeTimerPath(path);
+		for (const [key, draft] of [...this.drafts]) {
+			if (key !== from && !key.startsWith(from + "/")) continue;
+			this.drafts.delete(key);
+			if (to) this.drafts.set(normalizeTimerPath(to) + key.slice(from.length), draft);
+		}
+	}
+
+	private runningCountdown(target: Pick<StopTarget, "taskPath" | "startTime">): PauseRecord | undefined {
+		const record = this.pauses.get(target.taskPath);
+		return record?.state === "running" && record.entryStart === target.startTime && record.countdownMs !== undefined ? record : undefined;
+	}
+
+	private closedAt(task: TaskInfo, startTime: string): number {
+		const closed = Array.isArray(task?.timeEntries) ? task.timeEntries.find(entry => entry?.startTime === startTime && entry.endTime) : undefined;
+		return parseMs(closed?.endTime) ?? Date.now();
+	}
+
+	private rememberStop(record: PauseRecord, now: number, expired = false): void {
+		if (record.countdownMs === undefined) return;
+		const ms = expired ? record.countdownMs : record.countdownMs - sessionValueMs(record, now);
+		this.setCountdownDraft(record.taskPath, { enabled: true, text: formatCountdown(ms), expired });
+	}
+
+	/** Called independently of the view. Only an exact, still-open, non-Pomodoro entry may expire. */
+	async expireCountdowns(now: number): Promise<void> {
+		if (this.isBusy()) return;
+		const due = this.pauses.records().filter(record => record.state === "running" &&
+			record.countdownMs !== undefined && sessionValueMs(record, now) >= record.countdownMs);
+		for (const record of due) {
+			if (record.state !== "running" || this.isBusy()) break;
+			await this.stop({ taskPath: record.taskPath, title: record.title, startTime: record.entryStart }, true);
+		}
+	}
 
 	isBusy(): boolean { return this.pending > 0; }
 	subscribeBusy(listener: () => void): () => void {
@@ -144,7 +197,8 @@ export class TimerController {
 
 	async start(target: StartTarget): Promise<StartOutcome> {
 		if (this.completing) return "busy";
-		const { gateway, queue, store, newCorrelationId, log } = this.deps;
+		if (target.countdownMs !== undefined && !validCountdownMs(target.countdownMs)) return "failed";
+		const { gateway, queue, store, log } = this.deps;
 		this.busy(1);
 		let outcome: StartOutcome = "failed";
 		try {
@@ -155,7 +209,8 @@ export class TimerController {
 				catch { ownership = { readable: false }; }
 				if (ownership.readable && ownership.owner && normalizeTimerPath(ownership.owner.taskPath) === normalizeTimerPath(target.taskPath)) return "pomodoro";
 				if ((await gateway.active()).some(item => item.taskPath === target.taskPath && !item.entry.endTime)) return "already-running";
-				await gateway.start(target.taskPath, {}, { source: MUTATION_SOURCE, reason: "user start", correlationId: newCorrelationId() });
+				if (target.countdownMs !== undefined && this.pauses.get(target.taskPath)?.state === "paused") return "already-running";
+				await this.startInQueue(target, "user start", target.countdownMs);
 				return "started";
 			});
 		} catch (error) {
@@ -171,6 +226,28 @@ export class TimerController {
 		if (outcome === "already-running") this.notice(target.title + " is already being timed.");
 		if (outcome === "pomodoro") this.notice(target.title + " is being timed by Pomodoro.");
 		return outcome;
+	}
+
+	private async startInQueue(target: StartTarget, reason: string, duration?: number, prior?: PausedRecord): Promise<void> {
+		const { gateway, newCorrelationId } = this.deps;
+		if (duration === undefined) {
+			await gateway.start(target.taskPath, {}, { source: MUTATION_SOURCE, reason, correlationId: newCorrelationId() });
+			return;
+		}
+		this.pauses.beginPending(target.taskPath);
+		try {
+			const task = await gateway.start(target.taskPath, {}, { source: MUTATION_SOURCE, reason, correlationId: newCorrelationId() });
+			const entries = Array.isArray(task?.timeEntries) ? task.timeEntries.filter(entry => entry && !entry.endTime && parseMs(entry.startTime) !== null) : [];
+			const start = entries.length === 1 ? entries[0]?.startTime : undefined;
+			if (!start) {
+				this.notice("TaskNotes started tracking, but did not identify the countdown entry. Tracking will continue as a stopwatch.");
+				return;
+			}
+			this.pauses.set({ state: "running", taskPath: target.taskPath, title: target.title, entryStart: start,
+				sessionStartedAt: prior?.sessionStartedAt ?? start, accumulatedMs: prior?.accumulatedMs ?? 0, countdownMs: duration });
+		} finally {
+			this.pauses.endPending(target.taskPath);
+		}
 	}
 
 	constructor(deps: TimerControllerDeps) {
@@ -278,7 +355,7 @@ export class TimerController {
 	 * TaskNotes' error.
 	 */
 	private async resumeInQueue(target: ResumeTarget, reason: string): Promise<"resumed" | "already-running" | "pomodoro"> {
-		const { gateway, newCorrelationId } = this.deps;
+		const { gateway } = this.deps;
 		const path = normalizeTimerPath(target.taskPath);
 		let ownership: Ownership;
 		try { ownership = await gateway.pomodoroOwnership(); }
@@ -286,7 +363,8 @@ export class TimerController {
 		// D-17 race: the Pomodoro is timing this task.
 		if (ownership.readable && ownership.owner && normalizeTimerPath(ownership.owner.taskPath) === path) return "pomodoro";
 		if ((await gateway.active()).some(item => !item.entry.endTime && normalizeTimerPath(item.taskPath) === path)) return "already-running";
-		await gateway.start(target.taskPath, {}, { source: MUTATION_SOURCE, reason, correlationId: newCorrelationId() });
+		const prior = this.pauses.get(path);
+		await this.startInQueue(target, reason, prior?.state === "paused" ? prior.countdownMs : undefined, prior?.state === "paused" ? prior : undefined);
 		return "resumed";
 	}
 
@@ -380,20 +458,29 @@ export class TimerController {
 	 * Stops exactly the target task, through the shared write queue, then re-derives
 	 * the pane from TaskNotes. Never touches any other running timer. Never rejects.
 	 */
-	async stop(target: StopTarget): Promise<StopOutcome> {
+	async stop(target: StopTarget, expired = false): Promise<StopOutcome> {
 		if (this.completing) return "busy";
 		const { gateway, store, queue, notify, newCorrelationId, log } = this.deps;
 		this.busy(1);
 		let outcome: StopOutcome;
 		try {
-			await queue.run(() =>
-				gateway.stop(target.taskPath, {
+			outcome = await queue.run(async (): Promise<StopOutcome> => {
+				const record = this.runningCountdown(target);
+				if (expired && !record) return "already-stopped";
+				if (record) {
+					const active = await gateway.active();
+					const ownership = await gateway.pomodoroOwnership();
+					if (!ownership.readable || !selectRegularStopTargets(active, ownership).some(item => sameEntry(item, target))) return "already-stopped";
+				}
+				const task = await gateway.stop(target.taskPath, {
 					source: MUTATION_SOURCE,
-					reason: "user stop",
+					reason: expired ? "countdown elapsed" : "user stop",
 					correlationId: newCorrelationId(),
-				}),
-			);
-			outcome = "stopped";
+				});
+				if (record) this.rememberStop(record, this.closedAt(task, target.startTime), expired);
+				return "stopped";
+			});
+			if (expired && outcome === "stopped") this.notice(`Time’s up for "${target.title}".`);
 		} catch (error) {
 			const { message } = gateway.normalizeError(error);
 			if (isNoActiveSessionError(message)) {
@@ -426,7 +513,9 @@ export class TimerController {
 		let outcome: "cleared" | "not-paused" = "not-paused";
 		try {
 			outcome = await queue.run((): Promise<"cleared" | "not-paused"> => {
-				if (pauses.get(target.taskPath)?.state !== "paused") return Promise.resolve("not-paused");
+				const record = pauses.get(target.taskPath);
+				if (record?.state !== "paused") return Promise.resolve("not-paused");
+				this.rememberStop(record, Date.now());
 				pauses.remove(target.taskPath);
 				return Promise.resolve("cleared");
 			});

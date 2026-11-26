@@ -1,8 +1,9 @@
 import { fieldStatus } from "../model/stagedField";
-import { Notice, PluginSettingTab, Setting, type App, type Plugin, type DropdownComponent } from "obsidian";
+import { Notice, PluginSettingTab, Setting, type App, type Plugin } from "obsidian";
 import { resolveCompletionStatus, type TimerPaneSettings } from "../settings";
 import type { TaskNotesGateway } from "../tasknotes/TaskNotesBridge";
 import type { TaskStatus } from "../tasknotes/runtime-api.types";
+import { DEFAULT_COUNTDOWN_MS, formatCountdown, parseCountdown } from "../model/countdown";
 
 export interface TimerPaneSettingDeps {
 	gateway: Pick<TaskNotesGateway, "statuses" | "userFields">;
@@ -15,6 +16,7 @@ export interface TimerPaneSettingDeps {
 export class TimerPaneSettingTab extends PluginSettingTab {
 	private generation = 0;
 	private configuring = false;
+	private saving = false;
 	constructor(app: App, plugin: Plugin, private readonly deps: TimerPaneSettingDeps) { super(app, plugin); }
 
 	display(): void { void this.render(++this.generation); }
@@ -71,16 +73,32 @@ export class TimerPaneSettingTab extends PluginSettingTab {
 					}
 				});
 			});
+		let duration = formatCountdown(this.deps.getSettings().defaultCountdownMs ?? DEFAULT_COUNTDOWN_MS);
+		new Setting(this.containerEl)
+			.setName("Default countdown duration")
+			.setDesc("Initial value when you select countdown on a task card. Enter mm:ss or hh:mm:ss.")
+			.addText(input => input.setValue(duration).onChange(value => { duration = value; }))
+			.addButton(button => button.setButtonText("Save duration").onClick(() => {
+				if (generation !== this.generation) return;
+				const ms = parseCountdown(duration);
+				if (ms === null) {
+					new Notice("Enter a positive countdown duration in mm:ss or hh:mm:ss.");
+					return;
+				}
+				return this.savePatch(button, generation, { defaultCountdownMs: ms }, "Couldn't save the default countdown duration. Try again.");
+			}));
 	}
 
 	/** Saves one changed setting over the current ones, so no other setting is lost (D-07). */
-	private async savePatch(dropdown: DropdownComponent, generation: number, patch: Partial<TimerPaneSettings>, failureMessage: string): Promise<void> {
-		dropdown.setDisabled(true);
+	private async savePatch(control: { setDisabled(disabled: boolean): unknown }, generation: number, patch: Partial<TimerPaneSettings>, failureMessage: string): Promise<void> {
+		if (this.saving) return;
+		this.saving = true;
+		control.setDisabled(true);
 		try { await this.deps.saveSettings({ ...this.deps.getSettings(), ...patch }); }
 		catch {
 			try { new Notice(failureMessage); }
 			catch { console.error("[tasknotes-timer-pane] Showing the settings Notice failed."); }
 		}
-		finally { if (generation === this.generation) this.display(); }
+		finally { this.saving = false; if (generation === this.generation) this.display(); }
 	}
 }

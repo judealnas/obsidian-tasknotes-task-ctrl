@@ -119,19 +119,19 @@ export class IdleCardStore {
 			this.forget(path); await this.save();
 		});
 	}
-	async start(path: string, title: string): Promise<void> {
+	async start(path: string, title: string, countdownMs?: number): Promise<void> {
 		await this.action(async () => {
 			path = normalizeTimerPath(path); const revision = this.revision;
 			if (!this.paths.includes(path)) return;
 			const represented = await this.represented(path);
 			if (!this.availability().available || revision !== this.revision) return;
 			if (represented) { await this.reconcile(); return; }
-			const outcome = await this.deps.controller.start({ taskPath: path, title });
+			const outcome = await this.deps.controller.start({ taskPath: path, title, ...(countdownMs === undefined ? {} : { countdownMs }) });
 			if (this.disposed || revision !== this.revision) return;
 			if (outcome === "started" || outcome === "already-running") {
 				await this.reconcile();
 				// The controller confirmed a write. Never resurrect this pending card after Stop.
-				if (outcome === "started" && !this.disposed && revision === this.revision && this.paths.includes(path)) { this.forget(path); await this.save(); }
+				if (outcome === "started" && countdownMs === undefined && !this.disposed && revision === this.revision && this.paths.includes(path)) { this.forget(path); await this.save(); }
 			}
 		});
 	}
@@ -149,8 +149,12 @@ export class IdleCardStore {
 		const regular = selectRegularStopTargets(active, ownership);
 		const snapshot = deriveSnapshot(active, { records: this.deps.pauses.records(), tasks: new Map() });
 		const timers = snapshot.primary ? [snapshot.primary, ...snapshot.others] : [];
+		const pendingPaths = this.deps.pauses.pendingPaths();
 		let changed = false;
 		for (const path of [...this.paths]) {
+			// Keep countdown cards available for editing after they stop. The view
+			// filters this idle membership out while the timer is represented.
+			if (this.deps.pauses.get(path)?.countdownMs !== undefined || pendingPaths.has(path)) continue;
 			if (!regular.some(item => normalizeTimerPath(item.taskPath) === path)) continue;
 			const timer = timers.find(item => normalizeTimerPath(item.taskPath) === path);
 			if (timer) { this.forget(path, timer.sessionKey); changed = true; }

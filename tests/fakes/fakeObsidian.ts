@@ -39,14 +39,18 @@ export class Dropdown {
 	onChange(callback: (value: string) => void): this { this.change = callback; return this; }
 }
 class SettingsButton {
+	click: () => void | Promise<void> = () => undefined;
 	setCta(): this { return this; }
 	setButtonText(_text: string): this { return this; }
 	setDisabled(_disabled: boolean): this { return this; }
-	onClick(_callback: () => Promise<void>): this { return this; }
+	onClick(callback: () => void | Promise<void>): this { this.click = callback; return this; }
 }
 export class Setting {
 	descEl = { createDiv: (_options: unknown) => undefined };
-	addButton(callback: (button: SettingsButton) => void): this { callback(new SettingsButton()); return this; }
+	button = new SettingsButton();
+	text = new Dropdown();
+	addButton(callback: (button: SettingsButton) => void): this { callback(this.button); return this; }
+	addText(callback: (text: Dropdown) => void): this { callback(this.text); return this; }
 	name = "";
 	description = "";
 	dropdown = new Dropdown();

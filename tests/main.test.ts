@@ -167,7 +167,7 @@ test("loading failures keep the plugin usable and log a safe explanation", async
 	vi.spyOn(plugin, "loadData").mockRejectedValue(new Error("private/path"));
 	const log = vi.spyOn(console, "error").mockImplementation(() => undefined);
 	plugin.onload(); (host.tabs[0] as TimerPaneSettingTab).display(); await flush();
-	expect(host.settings).toHaveLength(2);
+ expect(host.settings).toHaveLength(3);
 	expect(log).toHaveBeenCalledWith("[tasknotes-timer-pane] Loading timer pane settings failed; using defaults.");
 	await expect(saveSettingsOf(host.tabs[0])({ completionStatus: "done" })).rejects.toThrow("Saved plugin data is unreadable");
  expect(host.saved).toEqual([]);
@@ -387,5 +387,5 @@ test("legacy rollover setting is retired on the next save without changing pause
  await saveSettingsOf(host.tabs[0])({ completionStatus: null });
  expect(host.saved[host.saved.length - 1]).toEqual({ completionStatus: null, pauseRecordsVersion: 1, pauseRecords: [PAUSED], cardOrder: ["a", "b"], extraKey: 1 });
  (host.tabs[0] as TimerPaneSettingTab).display(); await flush();
- expect(host.settings.map(s => s.name)).toEqual(["Staged field in TaskNotes", "Completion status"]);
+ expect(host.settings.map(s => s.name)).toEqual(["Staged field in TaskNotes", "Completion status", "Default countdown duration"]);
 });

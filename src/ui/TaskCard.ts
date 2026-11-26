@@ -1,10 +1,11 @@
-import { Component, Platform, setIcon, setTooltip, type App } from "obsidian";
+import { Component, Notice, Platform, setIcon, setTooltip, type App } from "obsidian";
 import { TaskTitle } from "./TaskTitle";
 import { CardRelationshipView } from "./CardRelationshipView";
 import type { CardRelationshipSnapshot, CardRelationshipSource } from "../state/CardRelationships";
-import { formatHms, timerSessionMs, totalMs, type OpenTimer } from "../model/timeMath";
+import { formatHms, parseEntries, timerSessionMs, totalMs, type OpenTimer } from "../model/timeMath";
 import type { TimerPaneServices } from "./TimerPaneView";
 import type { TaskInfo } from "../tasknotes/runtime-api.types";
+import { formatCountdown, parseCountdown } from "../model/countdown";
 
 export interface IdleTaskCard {
 	state: "idle";
@@ -26,7 +27,9 @@ export interface TaskCardOptions {
  isBusy?: () => boolean;
  unstage?: (target: { taskPath: string; title: string }) => Promise<unknown>;
  removeIdle?: (path: string) => Promise<void>;
- startIdle?: (path: string, title: string) => Promise<void>;
+ startIdle?: (path: string, title: string, countdownMs?: number) => Promise<void>;
+ countdown?: TimerPaneServices["countdown"];
+ onCountdownChange?: () => void;
 }
 const STOP_LABEL = "Stop timer";
 const STOPPING_LABEL = "Stopping…";
@@ -41,6 +44,13 @@ interface CardElements {
 	titleLabel: HTMLElement;
 	titleOwner: TaskTitle;
 	clock: HTMLElement;
+	countdown?: {
+		label: HTMLElement;
+		input: HTMLInputElement;
+		stopwatch: HTMLButtonElement;
+		alarm: HTMLButtonElement;
+		feedback: HTMLElement;
+	};
 	total: HTMLElement;
 	/** Pause on a running card, Resume on a paused one (D-01, D-09). */
 	pauseResume: HTMLButtonElement;
@@ -140,6 +150,7 @@ export class TaskCard extends Component {
   card.card.toggleClass("tntp-card--idle", timer.state === "idle");
   card.card.toggleClass("tntp-card--staged", !!timer.stagedCard);
   card.card.toggleClass("tntp-card--pending", !!timer.pendingCard);
+  this.updateCountdown(card);
   this.updatePauseResume(card);
   const busy = this.isBusy();
   card.unstage.disabled = busy || (timer.pendingCard ? !this.options.removeIdle : !this.options.unstage);
@@ -170,7 +181,8 @@ export class TaskCard extends Component {
   if (this.disposed) return;
   const { timer, clock, total } = this.elements;
   if (timer.state === "idle") return;
-  setTextIfChanged(clock, formatHms(timerSessionMs(timer, nowMs)));
+  const elapsed = timerSessionMs(timer, nowMs);
+  setTextIfChanged(clock, timer.countdownMs === undefined ? formatHms(elapsed) : formatCountdown(timer.countdownMs - elapsed));
   setTextIfChanged(total, timer.totalKnown ? formatHms(totalMs(timer.entries, nowMs)) : UNKNOWN_TOTAL);
  }
  dispose(): void {
@@ -222,11 +234,46 @@ export class TaskCard extends Component {
 
 		const stats = card.createDiv({ cls: "tntp-timer-stats" });
 		const session = stats.createDiv({ cls: ["tntp-stat", "tntp-stat--session"] });
-		session.createSpan({ cls: "tntp-label", text: "Session" });
+		const clockLabel = session.createSpan({ cls: "tntp-label", text: "Session" });
 		const clock = session.createSpan({ cls: "tntp-clock", attr: { role: "timer", "aria-live": "off" } });
 		const totalRow = stats.createDiv({ cls: ["tntp-stat", "tntp-stat--total"] });
 		totalRow.createSpan({ cls: "tntp-label", text: "Total" });
 		const total = totalRow.createSpan({ cls: "tntp-total" });
+		const countdownService = this.options.countdown;
+		let countdown: CardElements["countdown"];
+		if (countdownService) {
+			const input = session.createEl("input", {
+				cls: "tntp-countdown-input",
+				attr: { type: "text", "aria-label": "Countdown duration (mm:ss or hh:mm:ss)", maxlength: "9", spellcheck: "false" },
+			});
+			const mode = stats.createDiv({ cls: "tntp-timer-mode", attr: { role: "group", "aria-label": "Timer mode" } });
+			const stopwatch = mode.createEl("button", { attr: { type: "button" } });
+			const alarm = mode.createEl("button", { attr: { type: "button" } });
+			setIcon(stopwatch, "timer");
+			setIcon(alarm, "alarm-clock");
+			setTooltip(stopwatch, "Stopwatch");
+			setTooltip(alarm, "Countdown");
+			const feedback = card.createDiv({ cls: "tntp-countdown-feedback", attr: { role: "status" } });
+			countdown = { label: clockLabel, input, stopwatch, alarm, feedback };
+			const choose = (enabled: boolean) => {
+				const current = this.elements;
+				if (this.disposed || this.isBusy() || current.timer.state !== "idle") return;
+				const path = current.timer.taskPath;
+				countdownService.setCountdownDraft(path, { ...countdownService.countdownDraft(path), enabled, expired: false });
+				input.removeAttribute("aria-invalid");
+				this.options.onCountdownChange?.();
+				this.updateCountdown(current);
+				if (enabled) input.focus();
+			};
+			stopwatch.addEventListener("click", () => choose(false));
+			alarm.addEventListener("click", () => choose(true));
+			input.addEventListener("input", () => {
+				const path = this.elements.timer.taskPath;
+				countdownService.setCountdownDraft(path, { enabled: true, text: input.value });
+				input.removeAttribute("aria-invalid");
+				this.options.onCountdownChange?.();
+			});
+		}
 
 		// One click, no confirmation: stopping closes the entry and keeps it (CTRL-01).
 		// Card listeners live on the card itself and go away with it when it is detached.
@@ -241,11 +288,22 @@ export class TaskCard extends Component {
 			const model = current.timer;
 			const { taskPath, title } = model;
 			if (model.state === "idle") {
-				if (model.pendingCard) void this.options.startIdle?.(taskPath, title);
-				else void this.options.controller.start({ taskPath, title });
+				const draft = countdownService?.countdownDraft(taskPath);
+				const duration = draft?.enabled ? parseCountdown(draft.text) : undefined;
+				if (duration === null) {
+					countdown?.input.setAttribute("aria-invalid", "true");
+					countdown?.input.focus();
+					new Notice("Enter a positive countdown duration in mm:ss or hh:mm:ss.");
+					return;
+				}
+				if (model.pendingCard) void this.options.startIdle?.(taskPath, title, duration);
+				else void this.options.controller.start({ taskPath, title, ...(duration === undefined ? {} : { countdownMs: duration }) });
 			}
 			else if (model.state === "paused") void this.options.controller.resume({ taskPath, title });
 			else void this.options.controller.pause({ taskPath, startTime: model.startTime, title });
+		});
+		countdown?.input.addEventListener("keydown", event => {
+			if (event.key === "Enter") { event.preventDefault(); pauseResume.click(); }
 		});
 		const stop = actions.createEl("button", { cls: ["mod-cta", "tntp-stop"] });
 		setIcon(stop.createSpan({ cls: "tntp-stop__icon" }), "square");
@@ -280,6 +338,7 @@ export class TaskCard extends Component {
 			titleLabel,
 			titleOwner,
 			clock,
+			countdown,
 			total,
 			pauseResume,
 			pauseResumeIcon,
@@ -293,6 +352,28 @@ export class TaskCard extends Component {
 			disclosure,
 			treeGuides,
 		};
+	}
+
+	private updateCountdown(card: CardElements): void {
+		const { countdown, timer } = card;
+		if (!countdown || !this.options.countdown) return;
+		const draft = this.options.countdown.countdownDraft(timer.taskPath);
+		const idle = timer.state === "idle";
+		const enabled = idle ? draft.enabled : timer.countdownMs !== undefined;
+		const locked = !idle || this.isBusy();
+		card.card.toggleClass("tntp-card--timer-mode", true);
+		card.card.toggleClass("tntp-card--countdown", enabled);
+		setTextIfChanged(countdown.label, enabled ? (idle ? "Duration" : "Remaining") : "Session");
+		countdown.input.hidden = !(idle && enabled);
+		countdown.input.disabled = locked;
+		card.clock.hidden = idle;
+		if (idle && countdown.input.value !== draft.text) countdown.input.value = draft.text;
+		if (idle && enabled) setTextIfChanged(card.total, timer.task ? formatHms(totalMs(parseEntries(timer.task.timeEntries), Date.now())) : UNKNOWN_TOTAL);
+		countdown.stopwatch.disabled = countdown.alarm.disabled = locked;
+		countdown.stopwatch.setAttribute("aria-pressed", String(!enabled));
+		countdown.alarm.setAttribute("aria-pressed", String(enabled));
+		countdown.feedback.hidden = !(idle && enabled && draft.expired);
+		setTextIfChanged(countdown.feedback, countdown.feedback.hidden ? "" : "Time’s up");
 	}
 
 	/**

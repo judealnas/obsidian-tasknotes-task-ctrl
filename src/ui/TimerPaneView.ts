@@ -49,6 +49,7 @@ export interface TimerPaneServices {
 	store: TimerStore;
 	cardOrder: CardOrderStore;
 	controller: Pick<TimerController, "stop" | "start" | "stopAll" | "complete" | "pause" | "resume" | "stopPaused" | "pauseAll" | "resumeAll" | "completionAvailable" | "isBusy" | "subscribeBusy">;
+	countdown?: Pick<TimerController, "countdownDraft" | "setCountdownDraft">;
 	staging?: StagingStore;
 	stagingController?: StagingController;
 	stagedOrder?: StagedOrderStore;
@@ -167,6 +168,7 @@ export class TimerPaneView extends ItemView {
 			create: (parent, timer) => new TaskCard(parent, timer, {
 				app: this.app, gateway, relationships,
 				controller: this.services.controller, completion: this.services.completion, isBusy: () => this.isBusy(),
+				countdown: this.services.countdown, onCountdownChange: () => this.render(),
 				unstage: this.services.stagingController ? target => this.services.stagingController!.unstage(target) : undefined,
 				onRelationships: snapshot => {
 					this.stagedRelationships.set(timer.taskPath, snapshot);
@@ -212,7 +214,7 @@ export class TimerPaneView extends ItemView {
 		const cards = timersPanel.createDiv({ cls: "tntp-cards" });
 		this.cards = new CardList(cards, {
 			key: timerCardKey,
-			create: (parent, timer) => new TaskCard(parent, timer, { app: this.app, gateway, relationships, controller: this.services.controller, completion: this.services.completion, isBusy: () => this.isBusy(), removeIdle: path => this.services.idleCards!.remove(path), startIdle: (path, title) => this.services.idleCards!.start(path, title) }),
+			create: (parent, timer) => new TaskCard(parent, timer, { app: this.app, gateway, relationships, controller: this.services.controller, completion: this.services.completion, isBusy: () => this.isBusy(), countdown: this.services.countdown, onCountdownChange: () => this.render(), removeIdle: path => this.services.idleCards!.remove(path), startIdle: (path, title, countdownMs) => this.services.idleCards!.start(path, title, countdownMs) }),
 			update: (card, timer) => card.update(timer, this.completionReady),
 			dispose: card => card.dispose(),
 			commitOrder: order => this.services.cardOrder.reorder(order),

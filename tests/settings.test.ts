@@ -23,6 +23,15 @@ function setup(preference: string | null = null) {
 }
 
 describe("completion settings", () => {
+	test("saves and reloads a custom countdown duration alongside the completion choice", async () => {
+		const ctx = setup("done-a");
+		ctx.tab.display(); await flush();
+		const countdown = host.settings.find(setting => setting.name === "Default countdown duration")!;
+		expect(countdown.text.value).toBe("45:00");
+		countdown.text.change("1:20:00");
+		await countdown.button.click();
+		expect(settings.loadSettings(ctx.current())).toEqual({ completionStatus: "done-a", defaultCountdownMs: 4_800_000 });
+	});
 	test("saved data has a narrow validating loader", () => {
 		expect(settings).toHaveProperty("loadSettings", expect.any(Function));
 	});

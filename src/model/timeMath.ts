@@ -35,6 +35,7 @@ export interface OpenTimer {
 	sortMs: number;
 	/** Closed segments of this session, in ms. */
 	accumulatedMs: number;
+	countdownMs?: number;
 	/** Start of the running segment; null while paused. */
 	segmentStartMs: number | null;
 	/** False while TaskNotes cannot return a paused card's task: Total shows a dash. */
@@ -162,6 +163,7 @@ export function snapshotSignature(snapshot: TimerSnapshot): string {
 					timer.state,
 					timer.sessionStartedAt,
 					String(timer.accumulatedMs),
+					String(timer.countdownMs ?? ""),
 					String(timer.totalKnown),
 				].join(FIELD_SEPARATOR),
 			)
@@ -231,6 +233,7 @@ export function deriveSnapshot(active: readonly ActiveTimeEntry[], ledger?: Snap
 			sessionKey: sessionKeyOf(taskPath, sessionStartedAt),
 			sortMs: parseMs(sessionStartedAt) ?? startMs,
 			accumulatedMs: session?.accumulatedMs ?? 0,
+			countdownMs: session?.countdownMs,
 			segmentStartMs: startMs,
 			totalKnown: true,
 			entries: parseEntries(item?.task?.timeEntries),
@@ -252,6 +255,7 @@ export function deriveSnapshot(active: readonly ActiveTimeEntry[], ledger?: Snap
 			sessionKey: sessionKeyOf(record.taskPath, record.sessionStartedAt),
 			sortMs: parseMs(record.sessionStartedAt) ?? startMs,
 			accumulatedMs: record.accumulatedMs,
+			countdownMs: record.countdownMs,
 			segmentStartMs: null,
 			totalKnown: task !== null,
 			entries: parseEntries(task?.timeEntries),
@@ -268,7 +272,7 @@ export function deriveSnapshot(active: readonly ActiveTimeEntry[], ledger?: Snap
  * maps a missing endTime to an open entry, drops an unparseable endTime, and ignores
  * the legacy `duration` field.
  */
-function parseEntries(timeEntries: unknown): ParsedEntry[] {
+export function parseEntries(timeEntries: unknown): ParsedEntry[] {
 	if (!Array.isArray(timeEntries)) return [];
 	const parsed: ParsedEntry[] = [];
 	for (const raw of timeEntries as unknown[]) {

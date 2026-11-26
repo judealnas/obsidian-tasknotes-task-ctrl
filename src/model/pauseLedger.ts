@@ -22,6 +22,7 @@ interface PauseRecordBase {
 	sessionStartedAt: string;
 	/** Sum of this session's closed segments, in ms (finite, >= 0). */
 	accumulatedMs: number;
+	countdownMs?: number;
 }
 
 /** A paused session: its last entry is closed. */
@@ -78,6 +79,7 @@ export function pausedFromStop(input: PausedFromStopInput): PausedRecord {
 		title: input.title,
 		sessionStartedAt: continuing?.sessionStartedAt ?? entryStart,
 		accumulatedMs: (continuing?.accumulatedMs ?? 0) + Math.max(0, endMs - startMs),
+		...(continuing?.countdownMs === undefined ? {} : { countdownMs: continuing.countdownMs }),
 		pausedAt: new Date(endMs).toISOString(),
 		lastEntryStart: entryStart,
 	};
@@ -104,7 +106,9 @@ function parseStoredRecord(value: unknown): PauseRecord | null {
 	const accumulatedMs = Math.max(0, value.accumulatedMs);
 	const basename = taskPath.split("/").pop() ?? taskPath;
 	const title = typeof value.title === "string" ? value.title : basename.endsWith(".md") ? basename.slice(0, -".md".length) : basename;
-	const base = { taskPath, title, sessionStartedAt: value.sessionStartedAt, accumulatedMs };
+	const countdownMs = value.countdownMs;
+	const base = { taskPath, title, sessionStartedAt: value.sessionStartedAt, accumulatedMs,
+		...(typeof countdownMs === "number" && Number.isSafeInteger(countdownMs) && countdownMs >= 1000 ? { countdownMs } : {}) };
 	if (value.state === "paused") {
 		if (!timestamp(value.pausedAt) || !timestamp(value.lastEntryStart)) return null;
 		return { state: "paused", ...base, pausedAt: value.pausedAt, lastEntryStart: value.lastEntryStart };
@@ -200,6 +204,10 @@ export function reconcile(records: readonly PauseRecord[], obs: PauseObservation
 			changed = true;
 			continue;
 		}
+		if (obs.pending.has(record.taskPath) && record.countdownMs !== undefined) {
+			next.push(record);
+			continue;
+		}
 		let current: PauseRecord = record;
 		if (record.state === "paused") {
 			// Rule 2 (D-11).
@@ -210,6 +218,9 @@ export function reconcile(records: readonly PauseRecord[], obs: PauseObservation
 				if (latest === null || (parseMs(startTime) ?? 0) > (parseMs(latest) ?? 0)) latest = startTime;
 			}
 			if (latest !== null) {
+				// A countdown resumes only through our Resume command. An external
+				// regular timer must never inherit a deadline that could stop it.
+				if (record.countdownMs !== undefined) { changed = true; continue; }
 				current = {
 					state: "running",
 					taskPath: record.taskPath,
