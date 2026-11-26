@@ -69,4 +69,15 @@ No further native deployment was needed for this model/controller correction.
 
 ## Final selector behavior note (2026-11-19)
 
-The native observations and screenshots above are historical evidence from the earlier preview-and-button implementation. They do not verify the final selector interaction. The final source uses Enter to select an existing task and Shift+Enter to create directly from the current search query after pending parsing completes. There is no parsed preview, editable title field, or create button. Metadata-only queries that parse to `Untitled Task` are blocked with a request to add a task title. A failed destination write retains the known created task identity so retry does not create a duplicate. Uncertain creation failures can be retried from the current query; there is no inspection acknowledgement gate. The automated checks listed above predate later source changes; current automated results are recorded with the corresponding commit/turn report, and no new native UAT is claimed here.
+The earlier native observations and screenshots show the preview-and-button implementation. The final selector uses Enter to select an existing task and Shift+Enter to create directly from the current search query after pending parsing completes. Metadata-only queries that parse to `Untitled Task` are blocked with a request to add a task title. A failed destination write retains the known created task identity so retry can route that note. Uncertain creation failures can be retried from the current query. The automated checks above predate later source changes.
+
+## Native follow-up on 0.5.0-beta.1 (2026-11-24 UTC)
+
+Verified the published beta after an actual BRAT upgrade from `0.4.0` in a temporary hidden Obsidian 1.15.1 vault with TaskNotes 4.18.2.
+
+- On both tabs, Enter selected and routed an existing task without making a new note. Enter with no match left the selector open without writing a note.
+- Shift+Enter created and added an idle task on Timers. On Staged it created and staged one task with the parsed due date, kept the query and focus, and blocked a duplicate from the unchanged query. The selector prompted for a title on a metadata-only query. Escape closed it.
+- Neither creation started time tracking. Three idle cards rendered in saved order after a cold restart, with the Timers count at zero.
+- **Configure staged field** saved a Date field with no default. The existing custom field, task form layout and fixture note bytes were preserved.
+
+Physical mobile and touch input remain unverified. The full keyboard and input method matrix and native failure scenarios remain outside this run. [Native acceptance follow-up](../../.planning/verification/2026-11-24-native-followup.md)

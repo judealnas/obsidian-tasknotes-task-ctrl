@@ -1,14 +1,12 @@
 ---
 phase: 06-staged-tab-core
-verified: "2026-11-14"
+verified: "2026-11-24"
 status: passed
-score: "16/16 requirements supported; G-06-6 fixed and natively verified; corrected appearance review pending"
-covered_files: [".planning/phases/06-staged-tab-core/06-01-PLAN.md",".planning/phases/06-staged-tab-core/06-01-SUMMARY.md",".planning/phases/06-staged-tab-core/06-02-PLAN.md",".planning/phases/06-staged-tab-core/06-02-SUMMARY.md",".planning/phases/06-staged-tab-core/06-03-PLAN.md",".planning/phases/06-staged-tab-core/06-03-SUMMARY.md",".planning/phases/06-staged-tab-core/06-04-PLAN.md",".planning/phases/06-staged-tab-core/06-04-SUMMARY.md",".planning/phases/06-staged-tab-core/06-05-PLAN.md",".planning/phases/06-staged-tab-core/06-05-SUMMARY.md",".planning/phases/06-staged-tab-core/06-layout-check.txt","package-lock.json","package.json","src/main.ts","src/model/cardOrder.ts","src/model/errors.ts","src/model/pauseLedger.ts","src/model/pomodoroOwnership.ts","src/model/stagedField.ts","src/model/staging.ts","src/model/stagingDay.ts","src/model/taskLink.ts","src/model/taskPicker.ts","src/model/timeMath.ts","src/settings.ts","src/state/CardOrderStore.ts","src/state/PauseStore.ts","src/state/StagedOrderStore.ts","src/state/StagingController.ts","src/state/StagingStore.ts","src/state/TimerController.ts","src/state/TimerStore.ts","src/state/WriteQueue.ts","src/tasknotes/TaskNotesBridge.ts","src/tasknotes/runtime-api.types.ts","src/ui/CardList.ts","src/ui/TaskCard.ts","src/ui/TaskPickerModal.ts","src/ui/TimerPaneSettingTab.ts","src/ui/TimerPaneView.ts","styles.css","tests/bridge.test.ts","tests/cardList.test.ts","tests/cardOrder.test.ts","tests/cardOrderStore.test.ts","tests/contract.test.ts","tests/controller.test.ts","tests/fakes/fakeGateway.ts","tests/fakes/fakeObsidian.ts","tests/fakes/fakeTaskNotes.ts","tests/fakes/viewHost.ts","tests/main.test.ts","tests/pauseLedger.test.ts","tests/pauseResume.test.ts","tests/pauseStore.test.ts","tests/readPath.test.ts","tests/settings.test.ts","tests/stagedField.test.ts","tests/stagedOrderStore.test.ts","tests/staging.test.ts","tests/stagingController.test.ts","tests/stagingDay.test.ts","tests/stagingStore.test.ts","tests/store.test.ts","tests/taskCard.test.ts","tests/taskLink.test.ts","tests/taskPicker.test.ts","tests/taskPickerModal.test.ts","tests/timerPaneView.test.ts"]
-covered_digest: v3:sha256:17ae3de38c1b0081ea0265c64c9a7bac17f9939275ca4cb8ca30a450d9e738e9
+score: "16/16 requirements supported; G-06-6 fixed and accepted"
+covered_files: [".planning/phases/06-staged-tab-core/06-01-PLAN.md",".planning/phases/06-staged-tab-core/06-01-SUMMARY.md",".planning/phases/06-staged-tab-core/06-02-PLAN.md",".planning/phases/06-staged-tab-core/06-02-SUMMARY.md",".planning/phases/06-staged-tab-core/06-03-PLAN.md",".planning/phases/06-staged-tab-core/06-03-SUMMARY.md",".planning/phases/06-staged-tab-core/06-04-PLAN.md",".planning/phases/06-staged-tab-core/06-04-SUMMARY.md",".planning/phases/06-staged-tab-core/06-05-PLAN.md",".planning/phases/06-staged-tab-core/06-05-SUMMARY.md",".planning/phases/06-staged-tab-core/06-layout-check.txt","package-lock.json","package.json","src/main.ts","src/model/calendarDate.ts","src/model/cardOrder.ts","src/model/errors.ts","src/model/pauseLedger.ts","src/model/pomodoroOwnership.ts","src/model/stagedField.ts","src/model/staging.ts","src/model/taskLink.ts","src/model/taskPicker.ts","src/model/timeMath.ts","src/settings.ts","src/state/CardOrderStore.ts","src/state/PauseStore.ts","src/state/StagedOrderStore.ts","src/state/StagingController.ts","src/state/StagingStore.ts","src/state/TimerController.ts","src/state/TimerStore.ts","src/state/WriteQueue.ts","src/tasknotes/TaskNotesBridge.ts","src/tasknotes/runtime-api.types.ts","src/ui/CardList.ts","src/ui/CardRelationshipView.ts","src/ui/TaskCard.ts","src/ui/TaskPickerModal.ts","src/ui/TaskTitle.ts","src/ui/TimerPaneSettingTab.ts","src/ui/TimerPaneView.ts","styles.css","tests/bridge.test.ts","tests/calendarDate.test.ts","tests/cardList.test.ts","tests/cardOrder.test.ts","tests/cardOrderStore.test.ts","tests/cardRelationships.test.ts","tests/contract.test.ts","tests/controller.test.ts","tests/fakes/fakeGateway.ts","tests/fakes/fakeObsidian.ts","tests/fakes/fakeTaskNotes.ts","tests/fakes/viewHost.ts","tests/main.test.ts","tests/pauseLedger.test.ts","tests/pauseResume.test.ts","tests/pauseStore.test.ts","tests/readPath.test.ts","tests/settings.test.ts","tests/stagedField.test.ts","tests/stagedOrderStore.test.ts","tests/staging.test.ts","tests/stagingController.test.ts","tests/stagingStore.test.ts","tests/store.test.ts","tests/taskCard.test.ts","tests/taskLink.test.ts","tests/taskPicker.test.ts","tests/taskPickerModal.test.ts","tests/timerPaneView.test.ts"]
+covered_digest: "v3:sha256:2bb20a335f4d5a3956cb0010f7cf850774098739d08d0e37a1e46d08c928f6bb"
 behavior_unverified: 0
-human_verification:
-  - test: "Corrected Unstage and reorder controls"
-    expected: "Review 06-controls-review.png and confirm the corrected spacing is acceptable. Native geometry and hit testing pass."
+human_verification: []
 gaps: []
 decision_coverage:
   honored: 16
@@ -17,6 +15,14 @@ decision_coverage:
 ---
 
 # Phase 6 verification
+
+## Current-source re-verification — 2026-11-24
+
+The shared selector and TaskNotes Note actions route staging through `StagingController`. It rechecks eligibility inside the shared queue, writes the fixed date field, and shares the stage/unstage paths with the live store. The view still joins staged items to timer state and renders independent lists, counts and the Timers staged marker. `CardList` and the two order stores persist the respective orders through `persistAll`. Staging, order, picker and mounted-view tests cover these links. The local relationship rendering changes are within card content. The current build, lint, 692 feature tests and 13 vault-switch tests passed.
+
+Phase 7 enabled staged completion, and later releases replaced the Phase 6 Stage header with the shared `+` selector. The final note in [06-UAT.md](06-UAT.md) records the user's approval of the corrected Unstage/reorder screenshot. Native geometry passed 225 assertions with a 4 px gap. This carries forward the accepted Phase 6 result. The earlier TaskNotes 4.18.2 run also observed an Unstage leaving the active Pomodoro intact.
+
+## Original phase verification and gap fix — 2026-11-14
 
 Four plans and ten tasks are implemented and committed. The phase goal is supported by source, 650 passing tests, and a live TaskNotes 4.18.2 check. Phase acceptance remains pending the five explicit prohibition reviews below. The independent verifier and code-review capabilities were disabled in project configuration; this report records the parent agent's source/runtime verification, not an independent review.
 

@@ -1,7 +1,7 @@
 {
 	"id": "tasknotes-task-ctrl",
 	"name": "TaskNotes Task Control",
-	"version": "0.4.0",
+	"version": "0.5.0-beta.3",
 	"minAppVersion": "1.12.2",
 	"description": "Stage tasks and control regular task timers.",
 	"author": "Jude Alnas",

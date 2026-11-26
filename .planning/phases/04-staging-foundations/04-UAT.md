@@ -37,7 +37,7 @@ result: pass
 ### 6. Timers behave as before (regression)
 expected: In the pane, start a timer on a task, pause it, resume it, then stop it. Each action works in one click, the elapsed time ticks, and the TaskNotes status bar stays in sync — same as v0.2, no new errors or notices.
 result: pass
-note: "First run failed (pause removed the card) because the task was already status: done; root cause is pre-existing Phase 3 reconcile rule 4, not Phase 4 (see Deferred Follow-Ups, .planning/debug/pause-removes-card.md). Task reset to open; retest passed 2026-11-13."
+note: "First run used a completed task. Phase 3 pause reconciliation cleared that card. The open-task retest passed on 2026-11-13. The user confirmed on 2026-11-24 that completed task cards should be removed."
 
 ## Summary
 
@@ -50,10 +50,8 @@ blocked: 0
 
 ## Gaps
 
-[none — G-04-6 reclassified as pre-existing and deferred per user decision 2026-11-13]
+[none]
 
-## Deferred Follow-Ups
+## Disposition of former follow-up G-04-6
 
-- test: 6
-  idea: "Pausing a task that is already completed drops its card: pauseLedger reconcile rule 4 (Phase 3 D-12 'completed elsewhere') deletes paused records for any completed-type status, even if completed before the pause. Make rule 4 drop only records completed after pausedAt (or block pause / hide completed tasks in the picker), plus a regression test. Pre-existing since v0.2. Debug: .planning/debug/pause-removes-card.md"
-  deferred_at: 2026-11-13
+The completed-task pause card disappearance was deferred on 2026-11-13. The user confirmed on 2026-11-24 that completed tasks should be removed from the pane. The follow-up is closed as expected behavior. [Diagnosis](../../debug/pause-removes-card.md).

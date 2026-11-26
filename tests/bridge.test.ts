@@ -880,6 +880,26 @@ describe("Timers unaffected by staging (SC3)", () => {
 	});
 });
 
+test("parent relationships preserve the API receiver and reject results after disconnect", async () => {
+ const tn = createFakeTaskNotes({ capabilities: [...DEFAULT_CAPABILITIES, "relationships.read"] });
+ const parent = { path: "Parent.md", title: "Parent", status: "open", archived: false };
+ let finish!: (tasks: typeof parent[]) => void;
+ Object.assign(tn.api, { relationships: {
+  subtasks: () => Promise.resolve([]),
+  parents: function (path: string) {
+   expect(this).toBe(tn.api.relationships); expect(path).toBe("Child.md");
+   return new Promise<typeof parent[]>(resolve => { finish = resolve; });
+  },
+ } });
+ const ctx = setup(tn.plugin); ctx.bridge.probe();
+ const first = ctx.bridge.parents("Child.md"); finish([parent]);
+ expect(await first).toEqual([parent]);
+ const pending = ctx.bridge.parents("Child.md");
+ ctx.setPlugin(null); ctx.bridge.probe(); finish([parent]);
+ await expect(pending).rejects.toThrow(/TaskNotes (changed|is not connected)/);
+ ctx.bridge.dispose();
+});
+
 test("inline creation and optional metadata require capability plus function without blocking readiness", async () => {
  const tn = createFakeTaskNotes({ capabilities: [...DEFAULT_CAPABILITIES, "nlp.parse", "relationships.read"] });
  Object.assign(tn.api, { nlp: { parse: (text: string) => ({ title: text, status: "open", priority: "high" }) }, relationships: { subtasks: () => Promise.resolve([]) } });
@@ -895,5 +915,7 @@ test("inline creation and optional metadata require capability plus function wit
  const old = setup(createFakeTaskNotes().plugin); old.bridge.probe();
  expect(old.bridge.inlineCreationAvailability().available).toBe(false); expect(old.bridge.getState().kind).toBe("ready");
  await expect(old.bridge.subtasks("A.md")).rejects.toThrow("relationships.read");
+ await expect(old.bridge.parents("A.md")).rejects.toThrow("relationships.read");
+ await expect(bridge.parents("A.md")).rejects.toThrow("relationships.parents");
  bridge.dispose(); old.bridge.dispose();
 });

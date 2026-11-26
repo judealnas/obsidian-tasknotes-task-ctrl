@@ -36,13 +36,13 @@
     {
       "number": "7",
       "name": "Complete, Roll Over & Release 0.3.0",
-      "status": "in_progress"
+      "status": "human_needed"
     }
   ],
   "next": {
-    "command": "$gsd-execute-phase 7",
-    "label": "Review dev-vault recovery, then finish native acceptance",
-    "reason": "Phase 7 has 4/6 complete plans; Plan 05 task 3 remains open; 89% of milestone plans complete"
+    "command": "$gsd-verify-work 7",
+    "label": "Finish remaining Phase 7 acceptance",
+    "reason": "0.3.0 is published and the legacy BRAT upgrade passed. Physical mobile reorder remains open."
   },
-  "updated_at": "2026-11-15T06:57:17.291877Z"
+  "updated_at": "2026-11-24T04:41:00Z"
 }

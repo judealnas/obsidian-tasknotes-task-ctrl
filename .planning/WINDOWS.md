@@ -1,10 +1,10 @@
 ---
 schema_version: 1
-open_count: 6
+open_count: 1
 waived_count: 7
-fixed_count: 4
+fixed_count: 9
 total_count: 17
-last_updated: 2026-11-13T20:08:58.152Z
+last_updated: 2026-11-24T04:35:36.151Z
 ---
 
 # Broken Windows Ledger
@@ -26,12 +26,12 @@ last_updated: 2026-11-13T20:08:58.152Z
 | 9 | 02 | unrun-verify | src/ui/TimerPaneView.ts |  | 02-03 live UAT pending: Complete beside Stop, native chip click/right-click and keyboard use, TaskNotes auto-stop on/off, live catalog refresh, preference reload and stale fallback. | waived | User explicitly requested skipping tests requiring human intervention. Native Phase 2 checks were not performed; retain skipped evidence in 02-UAT.md. | 2026-10-16T01:57:07.224Z | 2026-10-16T02:57:20.503Z |
 | 10 | 3 | stub | styles.css |  | Paused cards hide Stop and Complete until plan 03-03 wires stopPaused and complete-paused | fixed |  | 2026-10-16T07:13:19.538Z | 2026-10-16T07:38:04.616Z |
 | 11 | 3 | stub | src/state/TimerStore.ts |  | reconcile runs with completedStatuses and fileExists null; plan 03-02 adds the completed-elsewhere, deleted and Pomodoro takeover rules | fixed |  | 2026-10-16T07:13:20.287Z | 2026-10-16T07:25:50.098Z |
-| 12 | 3 | unrun-verify | src/main.ts |  | 03-02 human-checks deferred to end of phase: Pomodoro takeover, done-elsewhere and archive-only pauses; explorer rename/move/delete of a paused or resumed note; renamed pause survives restart | open |  | 2026-10-16T07:25:50.958Z |  |
-| 13 | 3 | unrun-verify | src/ui/TimerPaneView.ts |  | 03-03 human-checks deferred to end of phase: paused-card Stop and Complete leave no stray TaskNotes entry; Stop all empties the pane; Pause all and Resume all across three tasks; header disabled tooltips and four-button wrap in a narrow sidebar | open |  | 2026-10-16T07:38:05.409Z |  |
-| 14 | 3 | unrun-verify | src/state/TimerStore.ts |  | 03-04 human-checks deferred to end of phase: live Pomodoro session hides only its own entry, Pause all and Stop all leave it running, muted can't-check line with disabled Pause all/Stop all when ownership is unreadable | open |  | 2026-10-16T07:46:23.725Z |  |
-| 15 | 3 | unrun-verify | src/ui/TaskPickerModal.ts |  | 03-04 human-check deferred to end of phase: picker shows muted Pomodoro tag on the live Pomodoro's task, choosing it shows the Notice and writes nothing; tag gone after pausing the Pomodoro | open |  | 2026-10-16T07:46:24.414Z |  |
-| 16 | 05 | stub | src/ui/TimerPaneView.ts |  | Intentional Phase 05 static Staged list and disabled Stage action; Phase 06 wires staging behavior. | open |  | 2026-11-13T19:57:46.417Z |  |
-| 17 | 05 | unrun-verify | .planning/phases/05-two-tab-shell/05-03-SUMMARY.md |  | Physical OS drag, hover, narrow-pane visual judgment, sleep/wake, incompatible-version metadata and unreadable Pomodoro ownership were not observed natively; title mouse/chip menu ownership remains unverified. | open |  | 2026-11-13T20:08:58.152Z |  |
+| 12 | 3 | unrun-verify | src/main.ts |  | 03-02 human-checks deferred to end of phase: Pomodoro takeover, done-elsewhere and archive-only pauses; explorer rename/move/delete of a paused or resumed note; renamed pause survives restart | fixed | Phase 3 UAT tests 6–7 passed: Pomodoro takeover, completion/archive, rename/move/delete and restart. | 2026-10-16T07:25:50.958Z | 2026-11-24T04:35:36.150Z |
+| 13 | 3 | unrun-verify | src/ui/TimerPaneView.ts |  | 03-03 human-checks deferred to end of phase: paused-card Stop and Complete leave no stray TaskNotes entry; Stop all empties the pane; Pause all and Resume all across three tasks; header disabled tooltips and four-button wrap in a narrow sidebar | fixed | Phase 3 UAT tests 8–13 passed: card actions, bulk actions, tooltips and narrow layout. | 2026-10-16T07:38:05.409Z | 2026-11-24T04:35:36.151Z |
+| 14 | 3 | unrun-verify | src/state/TimerStore.ts |  | 03-04 human-checks deferred to end of phase: live Pomodoro session hides only its own entry, Pause all and Stop all leave it running, muted can't-check line with disabled Pause all/Stop all when ownership is unreadable | open | Phase 3 UAT test 14 passed the live ownership checks. Test 15 remains deferred: a natural unreadable-ownership state was not reproduced on that desktop configuration. | 2026-10-16T07:46:23.725Z |  |
+| 15 | 3 | unrun-verify | src/ui/TaskPickerModal.ts |  | 03-04 human-check deferred to end of phase: picker shows muted Pomodoro tag on the live Pomodoro's task, choosing it shows the Notice and writes nothing; tag gone after pausing the Pomodoro | fixed | Phase 3 UAT test 16 passed: Pomodoro picker tag and start guard. | 2026-10-16T07:46:24.414Z | 2026-11-24T04:35:36.151Z |
+| 16 | 05 | stub | src/ui/TimerPaneView.ts |  | Intentional Phase 05 static Staged list and disabled Stage action; Phase 06 wires staging behavior. | fixed | Phase 6 implemented and verified the live Staged list. The shared selector supplies the current staging entry point. | 2026-11-13T19:57:46.417Z | 2026-11-24T04:35:36.151Z |
+| 17 | 05 | unrun-verify | .planning/phases/05-two-tab-shell/05-03-SUMMARY.md |  | Physical OS drag, hover, narrow-pane visual judgment, sleep/wake, incompatible-version metadata and unreadable Pomodoro ownership were not observed natively; title mouse/chip menu ownership remains unverified. | fixed | Phase 5 UAT and verification closed the checks using native renderer input and source evidence. The user accepted physical Windows sleep as an observation limit and actual OS sleep was not exercised. | 2026-11-13T20:08:58.152Z | 2026-11-24T04:35:36.151Z |
 
 ````json
 [
@@ -185,10 +185,10 @@ last_updated: 2026-11-13T20:08:58.152Z
     "file": "src/main.ts",
     "line": null,
     "description": "03-02 human-checks deferred to end of phase: Pomodoro takeover, done-elsewhere and archive-only pauses; explorer rename/move/delete of a paused or resumed note; renamed pause survives restart",
-    "status": "open",
-    "reason": "",
+    "status": "fixed",
+    "reason": "Phase 3 UAT tests 6–7 passed: Pomodoro takeover, completion/archive, rename/move/delete and restart.",
     "recorded_at": "2026-10-16T07:25:50.958Z",
-    "resolved_at": null,
+    "resolved_at": "2026-11-24T04:35:36.150Z",
     "milestone": null
   },
   {
@@ -198,10 +198,10 @@ last_updated: 2026-11-13T20:08:58.152Z
     "file": "src/ui/TimerPaneView.ts",
     "line": null,
     "description": "03-03 human-checks deferred to end of phase: paused-card Stop and Complete leave no stray TaskNotes entry; Stop all empties the pane; Pause all and Resume all across three tasks; header disabled tooltips and four-button wrap in a narrow sidebar",
-    "status": "open",
-    "reason": "",
+    "status": "fixed",
+    "reason": "Phase 3 UAT tests 8–13 passed: card actions, bulk actions, tooltips and narrow layout.",
     "recorded_at": "2026-10-16T07:38:05.409Z",
-    "resolved_at": null,
+    "resolved_at": "2026-11-24T04:35:36.151Z",
     "milestone": null
   },
   {
@@ -212,7 +212,7 @@ last_updated: 2026-11-13T20:08:58.152Z
     "line": null,
     "description": "03-04 human-checks deferred to end of phase: live Pomodoro session hides only its own entry, Pause all and Stop all leave it running, muted can't-check line with disabled Pause all/Stop all when ownership is unreadable",
     "status": "open",
-    "reason": "",
+    "reason": "Phase 3 UAT test 14 passed the live ownership checks. Test 15 remains deferred: a natural unreadable-ownership state was not reproduced on that desktop configuration.",
     "recorded_at": "2026-10-16T07:46:23.725Z",
     "resolved_at": null,
     "milestone": null
@@ -224,10 +224,10 @@ last_updated: 2026-11-13T20:08:58.152Z
     "file": "src/ui/TaskPickerModal.ts",
     "line": null,
     "description": "03-04 human-check deferred to end of phase: picker shows muted Pomodoro tag on the live Pomodoro's task, choosing it shows the Notice and writes nothing; tag gone after pausing the Pomodoro",
-    "status": "open",
-    "reason": "",
+    "status": "fixed",
+    "reason": "Phase 3 UAT test 16 passed: Pomodoro picker tag and start guard.",
     "recorded_at": "2026-10-16T07:46:24.414Z",
-    "resolved_at": null,
+    "resolved_at": "2026-11-24T04:35:36.151Z",
     "milestone": null
   },
   {
@@ -237,10 +237,10 @@ last_updated: 2026-11-13T20:08:58.152Z
     "file": "src/ui/TimerPaneView.ts",
     "line": null,
     "description": "Intentional Phase 05 static Staged list and disabled Stage action; Phase 06 wires staging behavior.",
-    "status": "open",
-    "reason": "",
+    "status": "fixed",
+    "reason": "Phase 6 implemented and verified the live Staged list. The shared selector supplies the current staging entry point.",
     "recorded_at": "2026-11-13T19:57:46.417Z",
-    "resolved_at": null,
+    "resolved_at": "2026-11-24T04:35:36.151Z",
     "milestone": "v0.3"
   },
   {
@@ -250,10 +250,10 @@ last_updated: 2026-11-13T20:08:58.152Z
     "file": ".planning/phases/05-two-tab-shell/05-03-SUMMARY.md",
     "line": null,
     "description": "Physical OS drag, hover, narrow-pane visual judgment, sleep/wake, incompatible-version metadata and unreadable Pomodoro ownership were not observed natively; title mouse/chip menu ownership remains unverified.",
-    "status": "open",
-    "reason": "",
+    "status": "fixed",
+    "reason": "Phase 5 UAT and verification closed the checks using native renderer input and source evidence. The user accepted physical Windows sleep as an observation limit and actual OS sleep was not exercised.",
     "recorded_at": "2026-11-13T20:08:58.152Z",
-    "resolved_at": null,
+    "resolved_at": "2026-11-24T04:35:36.151Z",
     "milestone": "v0.3"
   }
 ]

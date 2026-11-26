@@ -47,8 +47,14 @@ export class Element extends EventTarget {
 	parentElement: Element | null = null;
 	attrs = new Map<string, string>();
 	classes = new Set<string>();
+	private styleProperties = new Map<string, string>();
+	style = {
+		setProperty: (key: string, value: string) => { this.styleProperties.set(key, value); },
+		getPropertyValue: (key: string) => this.styleProperties.get(key) ?? "",
+	};
 	private text = "";
 	disabled = false;
+	hidden = false;
 	scrollTop = 0;
 	shown = true;
 	movements = 0;
