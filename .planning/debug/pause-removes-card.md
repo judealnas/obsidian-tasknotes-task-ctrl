@@ -1,12 +1,16 @@
 ---
-status: diagnosed
+status: resolved
 trigger: "Phase 4 UAT test 6: Pausing a timer removes the card, making resuming impossible. It seems to have the same behavior as clicking stop or complete."
 created: 2026-11-13
-updated: 2026-11-13
+updated: 2026-11-24
 goal: find_root_cause_only
 ---
 
-## Current Focus
+## Disposition — 2026-11-24
+
+The user confirmed that completed tasks should be removed from the pane. Clearing this paused card is expected behavior. The 2026-11-13 open-task retest passed, and the follow-up is closed. The original diagnosis below records how the completed-status reconciliation produced the observation.
+
+## Original Diagnosis
 
 bug_class: Bohrbug (deterministic, data-triggered)
 hypothesis: CONFIRMED. The paused task ("Write quarterly report") already had status "done" (a completed-type status, completedDate 2026-10-16). Reconcile rule 4 (D-12 "completed elsewhere") deletes any paused record whose task has a completed-type status, so the record is dropped on the refresh right after the pause and the card disappears. The rule cannot tell "completed while paused" from "was already completed when paused". This behavior is from v0.2 (Phase 3), not a Phase 4 regression.

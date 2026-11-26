@@ -9,7 +9,7 @@ Design sources: `.planning/research/STAGING-DECISIONS.md` (settled decisions; v0
 
 ### Tabs
 
-- [x] **TABS-01**: Pane has two tabs: **Staged** and **Timers**; Timers shows every regular timed task exactly as in v0.2 (cards, Start, Pause all, Resume all, Stop all)
+- [x] **TABS-01**: Pane has two tabs, **Staged** and **Timers**. Timers retains the v0.2 regular timer cards and controls alongside later idle cards and the shared selector.
 - [x] **TABS-02**: Pane remembers the last-active tab across restarts
 - [x] **TABS-03**: Tab labels show counts (e.g. "Staged 4 · Timers 1"), and the Timers tab is visibly highlighted while any regular timer runs
 - [x] **TABS-04**: Timers-tab cards for staged tasks show a small staged marker
@@ -17,12 +17,12 @@ Design sources: `.planning/research/STAGING-DECISIONS.md` (settled decisions; v0
 ### Setup
 
 - [x] **SETUP-01** (revised 2026-11-15): The staged field key remains fixed as `staged`. Completion settings save safely. The rollover-hour setting is removed and legacy values are retired on the next normal save.
-- [x] **SETUP-02**: If the `staged` key isn't registered as a TaskNotes **date** user field (checked via `catalog.userFields()`), the Staged tab shows a setup notice explaining how to register it (type date, no default value) and Stage is disabled; no write is attempted
+- [x] **SETUP-02**: If the `staged` key isn't registered as a TaskNotes **date** user field with no default (checked via `catalog.userFields()`), the Staged tab shows a setup notice and blocks staging writes. A separate user-invoked settings action can register the field.
 - [x] **SETUP-03**: If TaskNotes lacks the staging APIs (older than 4.13.0 or missing capability), the Staged tab explains why and the Timers tab keeps working as before
 
 ### Staging
 
-- [x] **STAGE-01**: User can stage a task from a picker listing tasks that are not done, not archived, and not already staged; staging writes `staged: <staging day>` via `api.tasks.update`
+- [x] **STAGE-01**: The Staged selector lists open, unarchived tasks that have not already been staged. Staging writes the local calendar date to `staged` via `api.tasks.update`.
 - [x] **STAGE-02**: Tasks staged outside the pane (hand edit, other device) appear on the Staged tab, appended at the bottom of the order
 - [x] **STAGE-03**: ✕ unstages a task by writing an empty (`null`) `staged` value; if the task's regular timer is running it is stopped, and if paused its pause is cleared; a Pomodoro-owned timer is left untouched
 - [x] **STAGE-04**: Missing, empty/null, or invalid `staged` values count as not staged; a future date stays hidden until that day
@@ -44,8 +44,8 @@ Design sources: `.planning/research/STAGING-DECISIONS.md` (settled decisions; v0
 
 ### Completion
 
-- [ ] **DONE-01**: ✓ on a non-recurring staged task completes it (configured completed status), stops its timer, and clears `staged`
-- [ ] **CTRL-13**: On either tab, ✓ on a recurring task completes only today's instance (local calendar date passed explicitly), never closes the series, and a repeated ✓ never un-completes it
+- [x] **DONE-01**: ✓ on a non-recurring staged task completes it (configured completed status), stops its regular timer, and clears `staged`
+- [x] **CTRL-13**: On either tab, ✓ on a recurring task passes the local calendar date and completes only the occurrence TaskNotes resolves. The series stays open and a repeat does not un-complete the occurrence.
 - **DONE-02 — Removed by user, 2026-11-15:** No Done today section or external completion-history collection. Completion safety records remain.
 
 ### Persistent staging and calendar age
@@ -56,7 +56,12 @@ Design sources: `.planning/research/STAGING-DECISIONS.md` (settled decisions; v0
 
 ### Release
 
-- [ ] **PANE-04**: Display name becomes "TaskNotes Task Control"; plugin id (`tasknotes-timer-pane`), view type, command ids and saved data are unchanged; released as 0.3.0 through BRAT
+- [x] **PANE-04**: Published 0.3.0 changes the display name to TaskNotes Task Control and keeps plugin ID `tasknotes-timer-pane`, view type and command IDs. An actual BRAT upgrade from 0.2.0 preserved populated pauses, Timers order, plugin data and the saved pane. [Acceptance evidence](phases/07-complete-roll-over-release-0-3-0/07-UAT.md).
+
+### Later releases
+
+- **0.4.0** changed the repository to `judealnas/obsidian-tasknotes-task-ctrl` and the installed plugin ID, folder and command prefix to `tasknotes-task-ctrl`. The saved view type remains `tasknotes-timer-pane`. No automatic data transfer across IDs has been established.
+- **0.5.0-beta.1** adds parent links and expandable immediate subtasks to cards in both tabs. See [current release evidence](PROJECT.md#current-state).
 
 ## Future Requirements
 
@@ -75,12 +80,12 @@ Deferred; tracked but not in this roadmap.
 |---------|--------|
 | Pomodoro display or 🍅 start on staged cards | User chose to keep v0.2 behavior: Pomodoro-owned entries hidden in both tabs |
 | Using TaskNotes' `scheduled` field for staging | Kept free for its intended purpose (Q2) |
-| Auto-registering the `staged` user field | No official API; would require TaskNotes internals (Q15) |
+| Registering `staged` automatically in the background | The separate Configure staged field action runs on explicit user input and has an isolated TaskNotes settings dependency |
 | Deleting the key via undocumented `customFrontmatter` | User chose documented-only `null` write; empty `staged:` is harmless |
 | Already-staged tasks in the Stage picker / re-staging to reset days | User chose to hide them; unstage + re-stage resets instead |
 | Configurable staged field key | Hard-coded as `staged` for simplicity (Phase 4 discussion) |
 | Cross-device data.json merge (former SYNC-05) | Multi-device operation is out of scope (Phase 4 discussion); single-device saves still never reset other keys |
-| Bulk timer actions on the Staged tab header | Staged header has Stage only; bulk actions stay on Timers |
+| Bulk timer actions on the Staged tab header | Bulk timer actions stay on Timers |
 | Auto-archive / "overdue" styling for long-staged tasks | Anti-feature per research; quiet carry-over with days count instead |
 
 ## Traceability
@@ -108,14 +113,14 @@ Which phases cover which requirements. Updated during roadmap creation.
 | ORDER-01 | Phase 6 | Complete |
 | ORDER-02 | Phase 6 | Complete |
 | ORDER-03 | Phase 6 | Complete |
-| ORDER-04 | Phase 7 | Pending |
-| DONE-01 | Phase 7 | Pending |
-| CTRL-13 | Phase 7 | Pending |
+| ORDER-04 | Phase 7 | Partial: implementation and host tests pass, physical touch open |
+| DONE-01 | Phase 7 | Complete |
+| CTRL-13 | Phase 7 | Complete |
 | DONE-02 | Phase 7 | Removed by user 2026-11-15 |
 | ROLL-01 | Phase 4 | Superseded: calendar dates |
 | ROLL-02 | Phase 7 | Revised: persistent staging / calendar age |
 | ROLL-03 | Phase 7 | Removed by user 2026-11-15 |
-| PANE-04 | Phase 7 | Pending |
+| PANE-04 | Phase 7 | Complete |
 
 **Coverage:**
 - v0.3 requirements: 27 total
@@ -124,4 +129,4 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 ---
 *Requirements defined: 2026-11-12*
-*Last updated: 2026-11-12 after Phase 4 discussion (SYNC-05 dropped; staged key fixed)*
+*Last updated: 2026-11-24 UTC after release and verification reconciliation*

@@ -1,10 +1,10 @@
 ---
 phase: 05-two-tab-shell
-verified: 2026-11-14T04:06:31.633Z
+verified: 2026-11-24
 status: passed
 score: 18/18 must-haves satisfied (17 verified, 1 includes accepted physical-observation limit)
-covered_files: [".planning/phases/05-two-tab-shell/05-01-PLAN.md",".planning/phases/05-two-tab-shell/05-01-SUMMARY.md",".planning/phases/05-two-tab-shell/05-02-PLAN.md",".planning/phases/05-two-tab-shell/05-02-SUMMARY.md",".planning/phases/05-two-tab-shell/05-03-PLAN.md",".planning/phases/05-two-tab-shell/05-03-SUMMARY.md",".planning/phases/05-two-tab-shell/05-03-native-evidence.jsonl",".planning/phases/05-two-tab-shell/05-CDP-UAT-evidence.jsonl",".planning/phases/05-two-tab-shell/05-CONTEXT.md",".planning/phases/05-two-tab-shell/05-DOM-VERIFY.md",".planning/phases/05-two-tab-shell/05-SECURITY.md",".planning/phases/05-two-tab-shell/05-UAT.md",".planning/phases/05-two-tab-shell/05-cdp-client.mjs.txt",".planning/phases/05-two-tab-shell/05-narrow-640.png",".planning/phases/05-two-tab-shell/05-narrow-768.png",".planning/phases/05-two-tab-shell/05-narrow-staged.png",".planning/phases/05-two-tab-shell/COVERAGE.md","package-lock.json","package.json","src/main.ts","src/model/cardOrder.ts","src/model/taskLink.ts","src/model/timeMath.ts","src/state/CardOrderStore.ts","src/state/TimerController.ts","src/state/TimerStore.ts","src/tasknotes/TaskNotesBridge.ts","src/ui/CardList.ts","src/ui/TaskCard.ts","src/ui/TaskPickerModal.ts","src/ui/TimerPaneView.ts","styles.css","tests/cardList.test.ts","tests/fakes/viewHost.ts","tests/main.test.ts","tests/store.test.ts","tests/taskCard.test.ts","tests/taskPickerModal.test.ts","tests/timerPaneView.test.ts"]
-covered_digest: "v3:sha256:805eac118318b8192991423be8f86aae8d3c63e224aa59661f28729aef4daf90"
+covered_files: [".planning/phases/05-two-tab-shell/05-01-PLAN.md",".planning/phases/05-two-tab-shell/05-01-SUMMARY.md",".planning/phases/05-two-tab-shell/05-02-PLAN.md",".planning/phases/05-two-tab-shell/05-02-SUMMARY.md",".planning/phases/05-two-tab-shell/05-03-PLAN.md",".planning/phases/05-two-tab-shell/05-03-SUMMARY.md",".planning/phases/05-two-tab-shell/05-03-native-evidence.jsonl",".planning/phases/05-two-tab-shell/05-CDP-UAT-evidence.jsonl",".planning/phases/05-two-tab-shell/05-CONTEXT.md",".planning/phases/05-two-tab-shell/05-DOM-VERIFY.md",".planning/phases/05-two-tab-shell/05-SECURITY.md",".planning/phases/05-two-tab-shell/05-UAT.md",".planning/phases/05-two-tab-shell/05-cdp-client.mjs.txt",".planning/phases/05-two-tab-shell/05-narrow-640.png",".planning/phases/05-two-tab-shell/05-narrow-768.png",".planning/phases/05-two-tab-shell/05-narrow-staged.png",".planning/phases/05-two-tab-shell/COVERAGE.md","package-lock.json","package.json","src/main.ts","src/model/cardOrder.ts","src/model/taskLink.ts","src/model/timeMath.ts","src/state/CardOrderStore.ts","src/state/TimerController.ts","src/state/TimerStore.ts","src/tasknotes/TaskNotesBridge.ts","src/ui/CardList.ts","src/ui/CardRelationshipView.ts","src/ui/TaskCard.ts","src/ui/TaskPickerModal.ts","src/ui/TaskTitle.ts","src/ui/TimerPaneView.ts","styles.css","tests/cardList.test.ts","tests/cardRelationships.test.ts","tests/fakes/viewHost.ts","tests/main.test.ts","tests/store.test.ts","tests/taskCard.test.ts","tests/taskPickerModal.test.ts","tests/timerPaneView.test.ts"]
+covered_digest: "v3:sha256:228784c0a33dea847330805b86263b8a1ec78add58091aef8212300181611e57"
 behavior_unverified: 0
 overrides_applied: 1
 overrides:
@@ -21,6 +21,14 @@ decision_coverage:
 ---
 
 # Phase 5: Two-Tab Shell Verification Report
+
+## Current-source re-verification — 2026-11-24
+
+`TimerPaneView` restores tab state per leaf through `getState` and `setState`, with Timers as the fallback. Shared refreshes reconcile separate lists and leave selection intact. Timers keeps the regular timer controls and keyboard/drag ordering. The shared `+` selector, persistent idle cards and live Staged list are later features. The local relationship chip changes affect card-title rendering and event ownership. The current view/card/store/main tests passed alongside the build, lint, 692 feature tests and 13 vault-switch tests.
+
+The accepted Phase 5 native results below apply to the shell tested on 2026-11-14. The user accepted native renderer suspension and reconnect as the available evidence. Actual Windows sleep remains unobserved.
+
+## Original phase verification — 2026-11-14
 
 The phase is verified and accepted. All three plans are executed, all 13 UAT checks pass, and the current regression run passes 568 tests across 20 files. The TABS-02 review classification was explicitly accepted by the user. Physical Windows sleep was accepted as an observation limit, not claimed as exercised.
 

@@ -228,7 +228,7 @@ export interface TaskNotesRuntimeApiV1 {
 
 	readonly pomodoro?: { status(): Promise<PomodoroState>; };
 	readonly nlp?: { parse(text: string): ParsedTaskData };
-	readonly relationships?: { subtasks(path: string): Promise<TaskInfo[]> };
+	readonly relationships?: { subtasks(path: string): Promise<TaskInfo[]>; parents?(path: string): Promise<TaskInfo[]> };
 
 	readonly events: {
 		/** The payload is left as unknown: the pane only re-derives from `time.active()`. */

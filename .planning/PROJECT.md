@@ -1,29 +1,22 @@
-# TaskNotes Timer Pane
+# TaskNotes Task Control
 
 ## What This Is
 
 An Obsidian plugin that adds a dockable pane for monitoring and controlling TaskNotes' regular (non-Pomodoro) task time tracking. TaskNotes already has a Pomodoro pane, but for normal task timing the only indication that a task is being timed is a small status-bar indicator in the bottom right of the window. This pane fills that gap: keep it open beside your notes to see how long you've spent on the current task, and stop, pause, or switch tasks in one or two clicks.
 
-From v0.3 the plugin is renamed **TaskNotes Task Control** (id unchanged: `tasknotes-timer-pane`) and adds daily task staging: pick the tasks you'll tackle today, put them in order, and start or stop timing each from that list. The pane has two tabs, Staged and Timers.
+The pane has two tabs, Staged and Timers. 0.3.0 changed the display name to TaskNotes Task Control and added persistent task staging. Since 0.4.0, the plugin ID, folder and command prefix use `tasknotes-task-ctrl`. Obsidian layouts still use the saved view type `tasknotes-timer-pane`.
 
 ## Core Value
 
 With the pane open, I can always see what task is being timed and how long I've spent on it, and stop, pause, or switch tasks in one to two clicks, without leaving the pane.
 
-## Current Milestone: v0.3 Staging Tasks
+## v0.3 Staging Tasks
 
 **Goal:** Let me pick the tasks I'll tackle today, put them in order, and start, stop, pause, or complete each from that list, with the all-timers view one tab away.
 
-**Target features:**
-- Two-tab pane: **Staged** (today's chosen tasks) and **Timers** (all regular timed tasks, as in v0.2), both using the existing card style
-- Stage tasks from the ranked picker; unstage with ✕; staged state is a `staged: YYYY-MM-DD` TaskNotes user field (configurable key) written via `api.tasks.update`, with a setup notice if the field isn't registered
-- Staged cards: idle shows start / ✓ complete / ✕ unstage; running also shows elapsed, pause, stop; title opens the note, right-click opens TaskNotes' task menu
-- Independent, persisted manual order per tab (drag + ArrowUp/Down; up/down buttons on mobile); tasks staged elsewhere join at the bottom
-- Persistent staging until completion or Unstage, with days-staged measured by local calendar dates; no configurable rollover hour
-- Completing clears `staged`; recurring tasks safely complete the resolved occurrence for the requested calendar date. No Done today history UI.
-- Rename display name to "TaskNotes Task Control"; release 0.3.0
+Stable 0.3.0 ships the shared task selector, persistent idle timer cards, the Staged tab, independent per-tab order and recurring-safe completion. The staging key is fixed at `staged` and ordinary staging writes go through `api.tasks.update`.
 
-Beta feedback on 2026-11-15 supersedes earlier Done today/custom rollover decisions; see quick task 261115-gpo. Positional + insertion, drag scrolling and narrow-pane fixes are also in scope.
+On 2026-11-15, the user removed Done today and configurable rollover. Unfinished tasks stay staged until completion or Unstage, and days-staged is calculated from local calendar dates. See [the beta feedback summary](quick/261115-gpo-apply-beta-feedback-remove-done-today-an/SUMMARY.md).
 
 Design source: `.planning/research/STAGING-DECISIONS.md` (grilling log; Q7/Q23/Q25 superseded by this milestone's choices).
 
@@ -39,13 +32,14 @@ Design source: `.planning/research/STAGING-DECISIONS.md` (grilling log; Q7/Q23/Q
 - ✓ Stop all regular timers while protecting the exact active Pomodoro-owned entry — v0.2 (Phase 2); user confirmed the mixed regular/Pomodoro case
 - ✓ Complete timed tasks using a live, persisted completed-status preference — v0.2 (Phase 2); automated checks and user desktop acceptance
 - ✓ Pause and resume per card and from the header, persisted across restarts, with Pomodoro-owned timers hidden from the pane — v0.2 (Phase 3); 361 automated tests and user desktop acceptance (the unreadable-ownership note is a deferred follow-up)
-- ✓ Rollover hour setting (default 4 AM, 24 fixed 12-hour labels) that persists, and saving one setting never drops another (SETUP-01) — v0.3 (Phase 4); 539 automated tests and user desktop UAT 6/6
-- ✓ DST-safe staging day: before the rollover hour it is still the previous day (ROLL-01) — v0.3 (Phase 4); five-timezone test matrix
-- ✓ Bridge can tell whether TaskNotes supports staging and recurring completion (4.13.0 floor) without affecting Timers on 4.10–4.12 — v0.3 (Phase 4); no Staged UI yet
+- ✓ Settings saves preserve other plugin data and retire the legacy rollover field on normal save. Staging age and completion use local calendar dates.
+- ✓ The bridge detects support for staging and recurring completion (4.13.0 floor), while regular timers retain the 4.10.0 floor.
+- ✓ Phases 5 and 6 verified the two-tab shell, independent restored selection and order, staging controls, counts and staged markers.
+- ✓ Phase 7 verified ordinary and recurring completion in candidate native matrices with TaskNotes auto-stop enabled and disabled.
 
 ### Active
 
-See `.planning/REQUIREMENTS.md` for v0.3 Staging Tasks requirements.
+See [REQUIREMENTS.md](REQUIREMENTS.md) and the [v0.3 audit](v0.3-MILESTONE-AUDIT.md) for Phase 7 acceptance. Current-release follow-up tracks the flows below.
 
 Still deferred from v0.2 (not in v0.3 scope):
 - Finish the skipped Phase 1 native desktop checks (already-stopped race, stop failure and recovery, archived timers, completion auto-stop)
@@ -64,7 +58,7 @@ Still deferred from v0.2 (not in v0.3 scope):
 - Recent tasks, today's log, estimate progress, hotkeys — deferred to v2 during scoping (next-milestone candidates)
 - Pomodoro display or 🍅 start on staged cards — v0.3 keeps v0.2 behavior: Pomodoro-owned entries are hidden in both tabs and start is refused with a notice
 - Using TaskNotes' `scheduled` field for staging — kept free for its intended purpose; staging uses its own `staged` field
-- Auto-registering the `staged` user field — no official API; would require TaskNotes internals
+- Background registration of the `staged` field. Setup is an explicit settings action with a manual alternative.
 
 ## Context
 
@@ -72,19 +66,25 @@ Still deferred from v0.2 (not in v0.3 scope):
 - **Inspiration:** https://github.com/jane-t/TaskNotesTimer — Tauri desktop overlay that polls TaskNotes' HTTP API (active-timer endpoint), offers a task dropdown of open/in-progress tasks, START/STOP buttons, large live count-up clock. Good reference for feature set and UX; architecture differs (external app vs. in-Obsidian view).
 - **Possible reference (low trust):** https://github.com/zczs520/tasknotes/releases/tag/5.2.3 — a fork that claims to implement this feature; user knows little about it and prefers not to use it.
 - **UI precedent:** TaskNotes' own Pomodoro timer pane — the target look/feel for a persistent sidebar pane.
-- **Integration approach:** in-process via TaskNotes' documented JavaScript Runtime API v1 (`app.plugins.getPlugin("tasknotes").api`, added in 4.10.0). Writes only through `api.time.start`/`stop` so data stays in TaskNotes' format and its status bar stays consistent. See `.planning/research/SUMMARY.md`.
+- **Integration approach:** in-process via TaskNotes Runtime API v1. Timer and task operations use public API methods. The separate Configure staged field action uses TaskNotes settings internals because there is no public field-registration method. Its manual alternative is TaskNotes Custom User Fields.
 
 ## Current State
 
-Shipped **v0.2 MVP** on 2026-11-12 (plugin version 0.2.0, distributed through BRAT): about 3,600 lines of TypeScript in `src/` with a Vitest suite, on Obsidian 1.14.4 typings, TS 6, esbuild 0.28 and ESLint 9 with obsidianmd rules. After the phases, quick tasks added wikilink title chips with TaskNotes' task menu, drag-and-drop/keyboard card reordering, and BRAT release plumbing.
+- **0.3.0** published stable and retained the original installed identity. The Phase 7 [release record](phases/07-complete-roll-over-release-0-3-0/07-RELEASE.md) records all three releases and workflows. The v0.3 milestone remains open for the checks in [07-UAT.md](phases/07-complete-roll-over-release-0-3-0/07-UAT.md).
+- **0.4.0** is GitHub's Latest stable release. It uses the new repository and installed identity. The saved view type is unchanged. [Release notes](../docs/releases/0.4.0.md).
+- **0.5.0-beta.1** is published as a prerelease. Parent links and expandable immediate subtasks appear in both tabs. The release build, lint, 690 feature tests and 13 vault-switch tests passed. Native TaskNotes 4.18.2 checks covered parent navigation, subtask counts and expansion through refresh, and cards at 448 and 280 px. [Release notes](../docs/releases/0.5.0-beta.1.md).
 
-Known debt at close: Phase 1 verification is human_needed with skipped native checks; all phase verification reports were stale (the verifier is disabled in config); a dev-only `npm audit` moment advisory via `eslint-plugin-obsidianmd`. See `.planning/MILESTONES.md`.
+Native desktop follow-up verified the published 0.4.0 → 0.5.0-beta.1 BRAT update, restored idle card/order, Enter and Shift+Enter in both tabs, and the Configure staged field action on TaskNotes 4.18.2. The earlier selector report preserves prototype observations. [Current native evidence](verification/2026-11-24-native-followup.md).
+
+Unpublished commit `5430b4c` uses TaskNotes title chips and task menus for parent and subtask links, replacing the custom status glyphs. The build, lint, 692 feature tests and 13 vault-switch tests passed. Native desktop checks confirmed chip rendering, both task menu targets, no horizontal overflow at 256 px and the plain-link fallback with the TaskNotes overlay disabled. [Native evidence](verification/2026-11-24-native-followup.md).
+
+Phase 1's deferred desktop checks and the Phase 3 unreadable-Pomodoro observation remain tracked.
 
 ## Constraints
 
 - **Dependency**: Requires TaskNotes plugin installed and enabled — the pane is a companion, not a replacement
 - **Data format**: Must write time entries exactly as TaskNotes does (ideally by calling TaskNotes' own APIs) — avoids corrupting tracked time or desyncing TaskNotes' UI
-- **Compatibility**: Relies on TaskNotes Runtime API v1 (TaskNotes >= 4.10.0); never TaskNotes internals — must degrade gracefully if TaskNotes is missing, disabled, too old, or reloaded
+- **Compatibility**: Regular timers require TaskNotes Runtime API v1 (TaskNotes 4.10.0+). Staging and recurring completion need TaskNotes 4.13.0+ and relevant capabilities. Field registration has a separate compatibility check and manual fallback.
 - **Platform**: `isDesktopOnly: false`, but verified on desktop only
 - **Tech stack**: Obsidian plugin (TypeScript, Obsidian API, esbuild per sample-plugin conventions)
 - **Distribution**: Personal use — manual install or BRAT
@@ -104,12 +104,12 @@ Known debt at close: Phase 1 verification is human_needed with skipped native ch
 | Pause implemented as stop + new entry on resume | TaskNotes time tracking has no native pause; time entries are start/end pairs | Phase 3 accepted |
 | Pause records live in the plugin's data.json, keyed by session and reconciled against TaskNotes on every refresh | Survives restarts; renames follow vault events; clears only on clear signals (resume, stop, complete, delete, Pomodoro takeover), never by age or a null read | Phase 3 accepted |
 | Sidebar view + ribbon icon + command | Matches Pomodoro pane placement; easy to open | ✓ Good (v0.2) |
-| Merge task staging (taskctrl idea) into this plugin as v0.3, renamed "TaskNotes Task Control", id unchanged | Keeps install, saved data, release history and planning | — Pending |
-| Two tabs (Staged, Timers) with independent per-tab order | User wants the all-timers view kept intact; ordering is momentary and per-view | — Pending |
-| Staging stored as a `staged: YYYY-MM-DD` user field; order in plugin data | `tasks.update` only writes registered user fields; date enables roll-forward with no writes | Phase 4 spike confirmed on TaskNotes 4.13.8: a `null` unstage keeps `staged:` and reads as not staged; a new user field is visible without reload. UI still pending (Phase 6) |
-| Staged key hard-coded `staged`; rollover hour is a dropdown saved only when not the default | Fewer settings to misconfigure; users who never change it keep a byte-identical data.json | Phase 4 accepted |
+| Task staging and display rename in 0.3.0, installed identity change in 0.4.0 | Keep the saved Obsidian view type across releases | Both published. The original-ID 0.2.0 → 0.3.0 BRAT update passed. |
+| Two tabs (Staged, Timers) with independent per-tab order | Keep regular timers and staging accessible in one pane | Phase 5 and 6 accepted |
+| Staging stored as a `staged: YYYY-MM-DD` user field; order stored in plugin data | `tasks.update` writes the registered field. Its date allows age to update without task writes. | Phase 4 spike confirmed null unstage. Phase 6 verified UI wiring. |
+| Fixed `staged` key and local calendar dates | The user removed the custom rollover setting on 2026-11-15 | Reflected in current source and requirements |
 | Staging and recurring completion share one TaskNotes 4.13.0 floor, feature-gated outside `REQUIRED_CAPABILITIES` | Timers must keep working on TaskNotes 4.10–4.12 | Phase 4 accepted (4.12.3 regression tested) |
-| Pomodoro stays hidden in v0.3 (no 🍅 display or start) | Simplest; preserves the v0.2 orphan-entry protection | — Pending |
+| Pomodoro-owned entries stay hidden from Timers and appear idle when staged | Preserve the v0.2 ownership protection | Accepted; native unreadable-ownership message observation remains deferred |
 | Don't base on zczs520 fork | Unknown provenance | ✓ Good (v0.2): not needed |
 
 ## Evolution
@@ -130,4 +130,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-11-13 after Phase 5*
+*Last updated: 2026-11-24 UTC after release and acceptance reconciliation*

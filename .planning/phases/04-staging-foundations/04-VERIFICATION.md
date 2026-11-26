@@ -1,8 +1,8 @@
 ---
 phase: 04-staging-foundations
-verified: 2026-11-13T17:45:00Z
+verified: 2026-11-24
 status: passed
-score: 3/3 roadmap success criteria verified (43/43 plan truths verified)
+score: "Current staging contract and settings verified; custom rollover superseded"
 covered_files:
   - .planning/phases/04-staging-foundations/04-01-PLAN.md
   - .planning/phases/04-staging-foundations/04-01-SUMMARY.md
@@ -19,13 +19,16 @@ covered_files:
   - .planning/phases/04-staging-foundations/04-UAT.md
   - scripts/staging-spike.mjs
   - src/main.ts
+  - src/model/calendarDate.ts
   - src/model/stagedField.ts
-  - src/model/stagingDay.ts
   - src/settings.ts
   - src/tasknotes/TaskNotesBridge.ts
+  - src/tasknotes/configureStagedField.ts
   - src/tasknotes/runtime-api.types.ts
   - src/ui/TimerPaneSettingTab.ts
   - tests/bridge.test.ts
+  - tests/calendarDate.test.ts
+  - tests/configureStagedField.test.ts
   - tests/contract.test.ts
   - tests/controller.test.ts
   - tests/fakes/fakeGateway.ts
@@ -33,13 +36,20 @@ covered_files:
   - tests/main.test.ts
   - tests/settings.test.ts
   - tests/stagedField.test.ts
-  - tests/stagingDay.test.ts
-covered_digest: "v3:sha256:428335480d00eb6ca388b4b549ee941b6b15927888edc5805add9f9ae168cb84"
+covered_digest: "v3:sha256:c66a13f719094b7d0a8bac96dfc44f765086733fc8dc8921e9816dc6eb3e5b6e"
 behavior_unverified: 0
 overrides_applied: 0
 ---
 
 # Phase 4: Staging Foundations Verification Report
+
+## Current-source re-verification — 2026-11-24
+
+Reviewed current source against the revised scope. The user removed the custom rollover setting on 2026-11-15. `calendarDate.ts` supplies the local calendar date, and `persistAll` retires the legacy `rolloverHour` on normal save while preserving unrelated data. Date, settings and startup tests cover those behaviors. `TaskNotesBridge` gates staging/recurrence on TaskNotes 4.13.0 and the relevant methods, independently of the regular timer contract. `fieldStatus` still checks the type and default for the fixed `staged` key. Bridge and contract tests cover the older-host fallback and field states.
+
+The later Configure staged field button is a separately invoked setup action with an isolated TaskNotes settings dependency. [Native follow-up](../../verification/2026-11-24-native-followup.md) observed successful registration on TaskNotes 4.18.2. Phase 4's contract read and normal timer/staging actions still use the public Runtime API. The current source passed the build, zero-warning lint, 692 feature tests and 13 vault-switch tests. The original 4.13.8 spike and Phase 4 desktop results below remain historical observations.
+
+## Original phase verification — 2026-11-13
 
 **Phase Goal:** The plugin knows what "today" means for the fixed `staged` field, can tell whether TaskNotes supports staging, and saving one setting never loses another. This phase adds no Staged UI yet.
 **Verified:** 2026-11-13T17:45:00Z

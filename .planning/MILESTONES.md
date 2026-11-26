@@ -1,5 +1,14 @@
 # Milestones
 
+## v0.3 Staging Tasks — published, acceptance open
+
+Stable 0.3.0 was published on 2026-11-24 UTC. It added persistent staging, independent tab ordering, persistent idle timer cards and recurring-safe task completion under the new display name. GitHub release workflow and asset evidence are in [07-RELEASE.md](phases/07-complete-roll-over-release-0-3-0/07-RELEASE.md). The milestone closeout remains open under the [v0.3 audit](v0.3-MILESTONE-AUDIT.md).
+
+## Later published releases
+
+- **0.4.0**, stable and GitHub Latest. Changed the repository and installed ID to `tasknotes-task-ctrl` while retaining the saved view type. [Release notes](../docs/releases/0.4.0.md).
+- **0.5.0-beta.1**, prerelease. Added parent task links and expandable subtask rows to cards in both tabs. [Release notes](../docs/releases/0.5.0-beta.1.md).
+
 ## v0.2 MVP (Shipped: 2026-11-12)
 
 **Delivered:** A dockable Obsidian pane that shows every regular TaskNotes timer with a live session clock and total, and lets the user start, stop, complete, pause and resume them (singly or all at once) without leaving the pane. Released to BRAT as plugin version 0.2.0.

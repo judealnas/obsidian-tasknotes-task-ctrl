@@ -1,5 +1,7 @@
 import { Component, Platform, setIcon, setTooltip, type App } from "obsidian";
 import { TaskTitle } from "./TaskTitle";
+import { CardRelationshipView } from "./CardRelationshipView";
+import type { CardRelationshipSnapshot, CardRelationshipSource } from "../state/CardRelationships";
 import { formatHms, timerSessionMs, totalMs, type OpenTimer } from "../model/timeMath";
 import type { TimerPaneServices } from "./TimerPaneView";
 import type { TaskInfo } from "../tasknotes/runtime-api.types";
@@ -15,6 +17,8 @@ export type TaskCardModel = (OpenTimer | IdleTaskCard) & { stagedMetadata?: stri
 function cardKey(model: TaskCardModel): string { return model.state === "idle" ? model.taskPath : model.sessionKey; }
 
 export interface TaskCardOptions {
+ relationships?: CardRelationshipSource;
+ onRelationships?: (snapshot: CardRelationshipSnapshot) => void;
  app: App;
  gateway: TimerPaneServices["gateway"];
  controller: TimerPaneServices["controller"];
@@ -28,6 +32,7 @@ const STOP_LABEL = "Stop timer";
 const STOPPING_LABEL = "Stopping…";
 const UNKNOWN_TOTAL = "—";
 interface CardElements {
+ relationships: CardRelationshipView;
 	timer: TaskCardModel;
 	card: HTMLElement;
 	/** Drag handle; the only draggable element of the card. */
@@ -48,6 +53,8 @@ interface CardElements {
 	stopLabel: HTMLElement;
 	complete: HTMLButtonElement;
 	unstage: HTMLButtonElement;
+	disclosure?: HTMLButtonElement;
+	treeGuides?: HTMLElement;
 }
 
 
@@ -78,6 +85,8 @@ export class TaskCard extends Component {
  private reorder: ((delta: -1 | 1) => void) | null = null;
  private moveUp: HTMLButtonElement | null = null;
  private moveDown: HTMLButtonElement | null = null;
+ private toggleGroup?: () => void;
+ private guideKey: string | null = null;
  private get app(): App { return this.options.app; }
  private isBusy(): boolean { return this.options.isBusy?.() ?? this.options.controller.isBusy(); }
  constructor(parent: HTMLElement, timer: TaskCardModel, private readonly options: TaskCardOptions) {
@@ -88,6 +97,30 @@ export class TaskCard extends Component {
  get card(): HTMLElement { return this.elements.card; }
  get handle(): HTMLButtonElement { return this.elements.handle; }
  get currentModel(): TaskCardModel { return this.elements.timer; }
+ setGroup(followingSiblings: readonly boolean[], expanded: boolean | null, toggle: () => void): void {
+  const { card, disclosure, treeGuides } = this.elements;
+  if (!disclosure || !treeGuides) return;
+  // Keep the elbow for this card when deep levels share the last indentation step.
+  const guides = followingSiblings.length <= 3 ? followingSiblings : [...followingSiblings.slice(0, 2), followingSiblings[followingSiblings.length - 1]];
+  const guideKey = guides.join(",");
+  if (this.guideKey !== guideKey) {
+   this.guideKey = guideKey;
+   card.style.setProperty("--tntp-staged-depth", String(guides.length));
+   treeGuides.empty();
+   for (const [index, continues] of guides.entries()) {
+    const last = index === guides.length - 1;
+    if (!last && !continues) continue;
+    const guide = treeGuides.createSpan({ cls: ["tntp-tree-guide", last ? (continues ? "tntp-tree-guide--branch" : "tntp-tree-guide--end") : "tntp-tree-guide--line"] });
+    guide.style.setProperty("--tntp-guide-column", String(index + 1));
+   }
+  }
+  disclosure.hidden = expanded === null;
+  this.toggleGroup = expanded === null ? undefined : toggle;
+  if (expanded !== null && disclosure.getAttribute("aria-expanded") !== String(expanded)) {
+   disclosure.setAttribute("aria-expanded", String(expanded));
+   setIcon(disclosure, expanded ? "chevron-down" : "chevron-right");
+  }
+ }
  setPosition(index: number, count: number, move: (delta: -1 | 1) => void): void {
   if (this.disposed) return;
   this.reorder = move;
@@ -98,9 +131,11 @@ export class TaskCard extends Component {
   if (this.disposed) return;
   const card = this.elements;
   card.timer = timer;
+  card.relationships.update(timer.taskPath);
   this.completionReady = completionReady;
   card.titleOwner.update(timer);
   setTextIfChanged(card.titleLabel, `Open ${timer.title}`);
+  card.disclosure?.setAttribute("aria-label", `Staged subtask cards for ${timer.title}`);
   setTextIfChanged(card.metadata, [timer.stagedMetadata, formatContexts(timer.task?.contexts)].filter(Boolean).join(" · "));
   card.card.toggleClass("tntp-card--idle", timer.state === "idle");
   card.card.toggleClass("tntp-card--staged", !!timer.stagedCard);
@@ -141,11 +176,13 @@ export class TaskCard extends Component {
  dispose(): void {
   if (this.disposed) return;
   this.disposed = true;
+  this.elements.relationships.dispose();
   this.elements.titleOwner.dispose(); this.elements.card.detach();
   this.unload();
  }
 	private buildCard(parent: HTMLElement, key: string, timer: TaskCardModel): CardElements {
 		const card = parent.createDiv({ cls: "tntp-card" });
+		const treeGuides = timer.stagedCard ? card.createDiv({ attr: { "aria-hidden": "true" } }) : undefined;
 		if (Platform.isMobile) {
 			card.addClass("tntp-card--mobile");
 			const column = card.createDiv({ cls: "tntp-reorder" });
@@ -166,14 +203,28 @@ export class TaskCard extends Component {
 		setTooltip(handle, "Drag to reorder, or use Up and Down arrow keys");
 		// The tooltip owns aria-label ("Open task note"); the accessible name
 		// "Open {title}" comes from a visually hidden label via aria-labelledby.
-		const titleOwner = new TaskTitle(card, timer, { app: this.app, gateway: this.options.gateway });
+		const titleRow = timer.stagedCard ? card.createDiv({ cls: "tntp-staged-title-row" }) : card;
+		const disclosure = timer.stagedCard ? titleRow.createEl("button", {
+			cls: "tntp-group-toggle", attr: { type: "button", "aria-label": "Staged subtask cards" },
+		}) : undefined;
+		if (disclosure) {
+			disclosure.hidden = true;
+			disclosure.addEventListener("click", () => { if (!this.disposed) this.toggleGroup?.(); });
+		}
+		const titleOwner = new TaskTitle(titleRow, timer, { app: this.app, gateway: this.options.gateway });
 		const title = titleOwner.title; const titleLabel = titleOwner.titleLabel;
 		const metadata = card.createDiv({ cls: ["tntp-label", "tntp-staged-metadata"] });
+  const relationships = new CardRelationshipView(card, {
+   app: this.app, gateway: this.options.gateway, source: this.options.relationships,
+   onSnapshot: this.options.onRelationships,
+  });
+  relationships.update(timer.taskPath);
 
-		const session = card.createDiv({ cls: ["tntp-stat", "tntp-stat--session"] });
+		const stats = card.createDiv({ cls: "tntp-timer-stats" });
+		const session = stats.createDiv({ cls: ["tntp-stat", "tntp-stat--session"] });
 		session.createSpan({ cls: "tntp-label", text: "Session" });
 		const clock = session.createSpan({ cls: "tntp-clock", attr: { role: "timer", "aria-live": "off" } });
-		const totalRow = card.createDiv({ cls: ["tntp-stat", "tntp-stat--total"] });
+		const totalRow = stats.createDiv({ cls: ["tntp-stat", "tntp-stat--total"] });
 		totalRow.createSpan({ cls: "tntp-label", text: "Total" });
 		const total = totalRow.createSpan({ cls: "tntp-total" });
 
@@ -200,7 +251,9 @@ export class TaskCard extends Component {
 		setIcon(stop.createSpan({ cls: "tntp-stop__icon" }), "square");
 		const stopLabel = stop.createSpan({ cls: "tntp-stop__label", text: STOP_LABEL });
 		stop.addEventListener("click", () => void this.stopTask(key));
-		const complete = actions.createEl("button", { cls: "tntp-complete", text: "Complete" });
+		const complete = actions.createEl("button", { cls: "tntp-complete" });
+		setIcon(complete.createSpan({ cls: "tntp-complete__icon", attr: { "aria-hidden": "true" } }), "check");
+		complete.createSpan({ cls: "tntp-complete__label", text: "Complete" });
 		complete.addEventListener("click", () => {
 			const current = (this.disposed ? undefined : this.elements);
 			if (!current || complete.disabled || this.isBusy()) return;
@@ -219,6 +272,7 @@ export class TaskCard extends Component {
 		});
 
 		return {
+   relationships,
 			timer,
 			card,
 			handle,
@@ -236,6 +290,8 @@ export class TaskCard extends Component {
 			complete,
 			metadata,
 			unstage,
+			disclosure,
+			treeGuides,
 		};
 	}
 

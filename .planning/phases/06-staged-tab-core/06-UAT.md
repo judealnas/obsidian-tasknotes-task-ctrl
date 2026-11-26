@@ -90,7 +90,7 @@ blocked: 0
 
 ## Gap fix execution — 2026-11-14
 
-06-05 implemented G-06-6. Native checks passed 225 assertions across 36 layouts with a 4px gap throughout; the existing 17 native checks also passed. Build/lint/650 tests passed. Corrected screenshot: 06-controls-review.png. Historical test 6 remains an issue record with verified plan/SUMMARY resolution; test 7 awaits user visual acceptance.
+06-05 implemented G-06-6. Native checks passed 225 assertions across 36 layouts with a 4px gap throughout; the existing 17 native checks also passed. Build, lint and 650 tests passed. The corrected screenshot is in 06-controls-review.png. Test 6 retains the reported issue, and test 7 records acceptance after the fix.
 
 - Test 7: User reviewed the corrected screenshot and said it looks good.
 

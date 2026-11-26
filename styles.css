@@ -121,7 +121,7 @@
 
 .tntp-panel--has-staged .tntp-cards { display: flex; }
 .tntp-panel--staging-retry .tntp-message__retry { display: inline-block; }
-.tntp-card--idle .tntp-stat,
+.tntp-card--idle .tntp-timer-stats,
 .tntp-card--idle .tntp-stop,
 .tntp-staged-metadata:empty { display: none; }
 .tntp-staged-metadata { margin-block: var(--size-4-1); overflow-wrap: anywhere; }
@@ -129,6 +129,65 @@
 .tntp-card--staged.tntp-card--paused .tntp-stop { display: none; }
 .tntp-card--staged .tntp-handle, .tntp-card--pending .tntp-handle { inset-inline-end: calc(var(--size-4-6) + var(--size-4-3)); }
 .tntp-card--staged .tntp-title, .tntp-card--pending .tntp-title { padding-inline-end: calc(var(--size-4-6) * 2); }
+.tntp-card--staged[hidden],
+.tntp-group-toggle[hidden] { display: none; }
+.tntp-panel--staged {
+	--tntp-indent-step: 16px;
+}
+@container tntp-pane (max-width: 300px) {
+	.tntp-panel--staged { --tntp-indent-step: 10px; }
+}
+.tntp-card--staged {
+	margin-inline-start: calc(var(--tntp-staged-depth, 0) * var(--tntp-indent-step));
+}
+.tntp-tree-guide {
+	/* Each segment starts in the gap above its card so the branches stay connected. */
+	--tntp-guide-top: calc(-1 * (var(--size-4-3) + var(--border-width)));
+	--tntp-guide-elbow: calc(var(--size-4-4) + var(--size-4-3));
+	--tntp-guide-color: var(--nav-indentation-guide-color, var(--background-modifier-border-hover));
+	position: absolute;
+	pointer-events: none;
+	inset-block: var(--tntp-guide-top) calc(-1 * var(--border-width));
+	inset-inline-start: calc((var(--tntp-guide-column) - var(--tntp-staged-depth) - 0.5) * var(--tntp-indent-step) - var(--border-width));
+	inline-size: calc(var(--tntp-indent-step) / 2 + var(--border-width));
+	box-sizing: border-box;
+	border-inline-start: var(--border-width) solid var(--tntp-guide-color);
+}
+.tntp-tree-guide--end {
+	inset-block-end: auto;
+	block-size: calc(var(--tntp-guide-elbow) - var(--tntp-guide-top));
+	border-block-end: var(--border-width) solid var(--tntp-guide-color);
+}
+.tntp-tree-guide--branch::after {
+	content: "";
+	position: absolute;
+	inset-inline: 0;
+	inset-block-start: calc(var(--tntp-guide-elbow) - var(--tntp-guide-top) - var(--border-width));
+	border-block-start: var(--border-width) solid var(--tntp-guide-color);
+}
+.tntp-staged-title-row {
+	display: flex;
+	align-items: flex-start;
+	gap: var(--size-4-1);
+}
+.tntp-staged-title-row .tntp-title { flex: 1; min-width: 0; }
+.tntp-group-toggle {
+	flex: none;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	width: var(--size-4-6);
+	height: var(--size-4-6);
+	min-width: 0;
+	min-height: 0;
+	box-sizing: border-box;
+	padding: 0;
+	border: 0;
+	background: transparent;
+	box-shadow: none;
+	color: var(--text-muted);
+}
+.tntp-group-toggle:hover { color: var(--text-normal); }
 .tntp-unstage {
 	position: absolute;
 	inset-block-start: var(--size-4-2);
@@ -260,8 +319,8 @@
 	margin: 0;
 }
 
-/* Keep a plain link visibly distinct from ordinary card-title text. */
-.tntp-title a.internal-link {
+/* Keep a plain link visibly distinct from surrounding card text. */
+:is(.tntp-title, .tntp-relationships__link) a.internal-link {
 	color: var(--link-color);
 	text-decoration: underline;
 }
@@ -277,7 +336,7 @@
 }
 
 /* TaskNotes keeps inline chips on one line; let a long title wrap inside the card instead. */
-.tntp-pane .tntp-title .task-card--layout-inline {
+.tntp-pane :is(.tntp-title, .tntp-relationships__link) .task-card--layout-inline {
 	white-space: normal;
 	min-width: 0;
 	max-width: 100%;
@@ -286,46 +345,101 @@
 .tntp-title__md,
 .tntp-title__md .task-card__title { min-width: 0; max-width: 100%; overflow-wrap: anywhere; }
 
+/* Scheduled dates add noise to main, parent and subtask title chips. */
+.tntp-pane :is(.tntp-title, .tntp-relationships__link) .task-card__metadata-date--scheduled {
+	display: none;
+}
+
+/* Do not leave an empty metadata line when scheduled is the chip's only field. */
+.tntp-pane :is(.tntp-title, .tntp-relationships__link) .task-card__metadata:has(> .task-card__metadata-date--scheduled):not(:has(> :not(.task-card__metadata-date--scheduled))) {
+	display: none;
+}
+
+/* A relationship link sizes to its contents. TaskNotes 5's note wrapper must let it. */
+.tntp-pane--tasknotes-v5 .tntp-title__md .tasknotes-plugin.tasknotes-inline-widget {
+	display: inline;
+	container-type: normal;
+}
+
+/* Keep TaskNotes 5's native chip controls in source order instead of using its narrow note grid. */
+.tntp-pane--tasknotes-v5 .tntp-title__md .tasknotes-plugin.tasknotes-inline-widget .task-card--layout-inline {
+	&,
+	& :is(.task-card__main-row, .task-card__content, .task-card__title, .task-card__title-text) {
+		display: inline;
+		width: auto;
+		white-space: normal;
+		overflow: visible;
+		overflow-wrap: anywhere;
+		vertical-align: baseline;
+	}
+
+	& .task-card__content { pointer-events: auto; }
+
+	& .task-card__metadata {
+		width: auto;
+		max-width: 55%;
+	}
+
+	& :is(.task-card__status-dot, .task-card__priority-dot, .task-card__context-menu) {
+		margin-inline-end: 0.25em;
+		vertical-align: middle;
+	}
+
+	& .task-card__date-slot--scheduled,
+	& .task-card__metadata:has(.task-card__date-slot--scheduled):not(:has(
+		.task-card__metadata-property:not(.task-card__metadata-date--scheduled, [hidden]),
+		.task-card__metadata-overflow:not([hidden])
+	)) {
+		display: none;
+	}
+
+	body:not(.is-mobile) & :is(.task-card__status-dot, .task-card__priority-dot, .task-card__context-menu) {
+		min-width: 0;
+		min-height: 0;
+	}
+
+	body:not(.is-mobile) &:not(:hover, :focus-within) .task-card__context-menu {
+		opacity: 0;
+	}
+}
+
 /* Every chip in the pane is being tracked, so TaskNotes' tracking outline adds nothing here. */
 .tntp-pane .tntp-title .task-card--actively-tracked::before {
 	display: none;
 }
 
-.tntp-stat--session {
-	display: flex;
-	flex-direction: column;
-	gap: var(--size-4-1);
-	margin-top: var(--size-4-4);
-}
-
-/*
- * Numbers match TaskNotes' Pomodoro timer: it asks for an undefined --tn-font-mono, so it
- * renders in the interface font, bold, spaced 0.05em. Tabular digits stop the clock jittering.
- */
-.tntp-clock {
-	font-family: var(--font-interface);
-	font-variant-numeric: tabular-nums;
-	font-size: min(calc(var(--font-ui-large) * 1.6), 17cqi);
-	font-weight: var(--font-bold);
-	line-height: 1.1;
-	white-space: nowrap;
-	letter-spacing: 0.05em;
-	color: var(--text-normal);
-}
-
-.tntp-stat--total {
+.tntp-timer-stats {
 	display: flex;
 	flex-wrap: wrap;
 	align-items: baseline;
-	gap: var(--size-4-2);
-	margin-top: var(--size-4-4);
+	gap: var(--size-4-1) var(--size-4-3);
+	margin-block-start: var(--size-4-2);
+}
+
+.tntp-stat {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: baseline;
+	gap: var(--size-4-1);
+}
+
+/* Tabular digits keep both readouts steady as the timer runs. */
+.tntp-clock {
+	font-family: var(--font-interface);
+	font-variant-numeric: tabular-nums;
+	font-size: var(--font-ui-medium);
+	font-weight: var(--font-bold);
+	line-height: 1.1;
+	white-space: nowrap;
+	letter-spacing: normal;
+	color: var(--text-normal);
 }
 
 .tntp-total {
 	font-family: var(--font-interface);
 	font-variant-numeric: tabular-nums;
 	font-size: var(--font-ui-small);
-	color: var(--text-normal);
+	color: var(--text-muted);
 }
 
 /* Stop timer: mod-cta keeps Obsidian's own colors, padding, height and focus ring. */
@@ -359,11 +473,11 @@
 		padding-inline-end: 0;
 		padding-block-start: var(--size-4-6);
 	}
+	.tntp-group-toggle { margin-block-start: var(--size-4-6); }
 }
 
-/* Paused cards keep their height; muted timer numbers indicate the state. */
-.tntp-card--paused .tntp-clock,
-.tntp-card--paused .tntp-total {
+/* Muting the session clock keeps the layout steady when paused. */
+.tntp-card--paused .tntp-clock {
 	color: var(--text-muted);
 }
 
@@ -417,3 +531,30 @@
 .tntp-picker-error { padding: 4px 12px; overflow-wrap: anywhere; }
 
 .tntp-settings-success { color: var(--color-green); margin-top: var(--size-4-1); }
+
+/* Relationship rows remain compact until the native disclosure is expanded. */
+.tntp-relationships {
+ margin-block: var(--size-4-2);
+ font-size: var(--font-ui-small);
+ color: var(--text-muted);
+ overflow-wrap: anywhere;
+ min-width: 0;
+}
+.tntp-relationships--empty,
+.tntp-relationships__parents:empty { display: none; }
+.tntp-relationships__subtasks { margin-block-start: var(--size-4-1); }
+.tntp-relationships__subtasks > summary { cursor: pointer; }
+.tntp-relationships__subtasks > summary:focus-visible,
+.tntp-relationships__link:focus-visible { outline: 2px solid var(--background-modifier-border-focus); outline-offset: 2px; }
+.tntp-relationships__list {
+ list-style: none;
+ padding-inline-start: var(--size-4-3);
+ margin-block: var(--size-4-1);
+}
+.tntp-relationships__list > li { margin-block: var(--size-4-1); }
+.tntp-relationships__link { display: inline-flex; vertical-align: baseline; max-width: 100%; }
+.tntp-relationships__link:not(.tntp-title--chip) {
+ color: var(--link-color);
+ cursor: var(--cursor-link);
+ text-decoration: underline;
+}

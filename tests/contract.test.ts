@@ -37,6 +37,7 @@ describe("TaskNotes Runtime API v1 contract", () => {
   expectTypeOf<NonNullable<NonNullable<Api["tasks"]>["create"]>>().parameters.toEqualTypeOf<[data: TaskCreationData, context?: TaskNotesMutationContext]>();
   expectTypeOf<NonNullable<NonNullable<Api["catalog"]>["priorities"]>>().returns.toEqualTypeOf<TaskPriority[]>();
   expectTypeOf<NonNullable<Api["relationships"]>["subtasks"]>().returns.toEqualTypeOf<Promise<TaskInfo[]>>();
+  expectTypeOf<NonNullable<NonNullable<Api["relationships"]>["parents"]>>().returns.toEqualTypeOf<Promise<TaskInfo[]>>();
  });
 	test("root: apiVersion is the literal 1, capabilities and hasCapability", () => {
 		expectTypeOf<Api["apiVersion"]>().toEqualTypeOf<1>();
